@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: mass-schedule-api
+    env: python
+    buildCommand: pip install -r requirements.txt && playwright install
+    startCommand: python main.py
+    plan: free
