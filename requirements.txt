@@ -2,3 +2,4 @@ flask
 nest_asyncio
 playwright
 beautifulsoup4
+flask-cors
