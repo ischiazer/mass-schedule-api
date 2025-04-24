@@ -4,17 +4,35 @@ import nest_asyncio
 import asyncio
 from playwright.async_api import async_playwright
 import json
+import os
 
 app = Flask(__name__)
 nest_asyncio.apply()
+
 
 @app.route('/')
 def home():
     return "Mass Schedule API is running!"
 
+
 @app.route('/schedule')
 def get_schedule():
     return asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
+
+
+@app.route('/refresh')
+def refresh_schedule():
+    data = asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
+
+    # Ensure static directory exists
+    os.makedirs("static", exist_ok=True)
+
+    # Save cleaned schedule to static file
+    with open("static/schedule.json", "w", encoding="utf-8") as f:
+        json.dump(data.get_json(), f, ensure_ascii=False, indent=2)
+
+    return "Schedule updated and saved to static/schedule.json"
+
 
 async def fetch_and_clean_schedule():
     url = "https://messes.info/horaires/paroisse%20notre%20dame%20du%20Bois%20Renou?display=TABLE"
@@ -44,7 +62,7 @@ async def fetch_and_clean_schedule():
                 "LITURGIE": cells[6].get_text(strip=True),
             })
 
-    # Apply cleaning
+    # Clean and format
     mapping_churches = {
         'Église Notre Dame de la Visitation': 'Hirel',
         "Église Notre-Dame de l'Assomption": 'La Gouesnière',
@@ -63,7 +81,7 @@ async def fetch_and_clean_schedule():
     for row in mass_schedule:
         try:
             clean_row = {
-                'Date': row['DATE'][5:],  # drop 'dim. '
+                'Date': row['DATE'][5:],  # Skip prefix like "dim. "
                 'Jour': mapping_days.get(row['DATE'][:3], row['DATE'][:3]),
                 'Heure': row['HEURE'],
                 'Où': mapping_churches.get(row['LIEU DE CULTE'], row['LIEU DE CULTE']),
@@ -74,6 +92,7 @@ async def fetch_and_clean_schedule():
             continue
 
     return jsonify(clean_schedule)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
