@@ -22,18 +22,21 @@ def get_schedule():
 def refresh_schedule():
     data = asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
 
-    # Ensure /static directory exists
     os.makedirs("static", exist_ok=True)
 
-    # Save JSON data
+    # Save cleaned JSON
     with open("static/schedule.json", "w", encoding="utf-8") as f:
         json.dump(data.get_json(), f, ensure_ascii=False, indent=2)
 
-    # Save last updated timestamp (in French-style format)
+    # Save last updated timestamp in French format
     now = datetime.now()
     formatted = now.strftime("%A %d %B %Y à %H:%M")
     with open("static/last_updated.txt", "w", encoding="utf-8") as f:
         f.write(formatted)
+
+    # Save heartbeat timestamp (ISO format)
+    with open("static/heartbeat.txt", "w") as hb:
+        hb.write(now.isoformat())
 
     return "Schedule updated and saved to static/schedule.json"
 
@@ -84,7 +87,7 @@ async def fetch_and_clean_schedule():
     for row in mass_schedule:
         try:
             clean_row = {
-                'Date': row['DATE'][5:],  # Remove "dim. ", etc.
+                'Date': row['DATE'][5:],  # Remove prefix (e.g. "dim. ")
                 'Jour': mapping_days.get(row['DATE'][:3], row['DATE'][:3]),
                 'Heure': row['HEURE'],
                 'Où': mapping_churches.get(row['LIEU DE CULTE'], row['LIEU DE CULTE']),
