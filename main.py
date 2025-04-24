@@ -75,3 +75,6 @@ async def fetch_and_clean_schedule():
             continue
 
     return jsonify(clean_schedule)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
