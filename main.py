@@ -5,36 +5,37 @@ import asyncio
 from playwright.async_api import async_playwright
 import json
 import os
-from flask_cors import CORS
+from datetime import datetime
 
 app = Flask(__name__)
-CORS(app)
 nest_asyncio.apply()
-
 
 @app.route('/')
 def home():
     return "Mass Schedule API is running!"
 
-
 @app.route('/schedule')
 def get_schedule():
     return asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
-
 
 @app.route('/refresh')
 def refresh_schedule():
     data = asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
 
-    # Ensure static directory exists
+    # Ensure /static directory exists
     os.makedirs("static", exist_ok=True)
 
-    # Save cleaned schedule to static file
+    # Save JSON data
     with open("static/schedule.json", "w", encoding="utf-8") as f:
         json.dump(data.get_json(), f, ensure_ascii=False, indent=2)
 
-    return "Schedule updated and saved to static/schedule.json"
+    # Save last updated timestamp (in French-style format)
+    now = datetime.now()
+    formatted = now.strftime("%A %d %B %Y à %H:%M")
+    with open("static/last_updated.txt", "w", encoding="utf-8") as f:
+        f.write(formatted)
 
+    return "Schedule updated and saved to static/schedule.json"
 
 async def fetch_and_clean_schedule():
     url = "https://messes.info/horaires/paroisse%20notre%20dame%20du%20Bois%20Renou?display=TABLE"
@@ -83,7 +84,7 @@ async def fetch_and_clean_schedule():
     for row in mass_schedule:
         try:
             clean_row = {
-                'Date': row['DATE'][5:],  # Skip prefix like "dim. "
+                'Date': row['DATE'][5:],  # Remove "dim. ", etc.
                 'Jour': mapping_days.get(row['DATE'][:3], row['DATE'][:3]),
                 'Heure': row['HEURE'],
                 'Où': mapping_churches.get(row['LIEU DE CULTE'], row['LIEU DE CULTE']),
@@ -94,7 +95,6 @@ async def fetch_and_clean_schedule():
             continue
 
     return jsonify(clean_schedule)
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
