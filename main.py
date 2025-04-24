@@ -5,8 +5,10 @@ import asyncio
 from playwright.async_api import async_playwright
 import json
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 nest_asyncio.apply()
 
 
