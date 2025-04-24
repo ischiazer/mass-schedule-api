@@ -2,6 +2,6 @@ services:
   - type: web
     name: mass-schedule-api
     env: python
-    buildCommand: pip install -r requirements.txt && playwright install
+    buildCommand: pip install -r requirements.txt && playwright install chromium
     startCommand: python main.py
     plan: free
