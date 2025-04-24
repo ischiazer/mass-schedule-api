@@ -1,20 +1,16 @@
-# Base image with Python
+# Use official Playwright image with Python & Chromium
 FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
 
-# Set working directory
 WORKDIR /app
 
-# Copy app files
 COPY . .
 
-# Install Python packages
+# Install Python dependencies
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Install Playwright browser binaries
+# Install Playwright browser (Chromium only)
 RUN playwright install chromium
 
-# Expose the port for Flask
 ENV PORT=10000
 
-# Start your Flask app
 CMD ["python", "main.py"]
