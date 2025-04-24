@@ -14,16 +14,19 @@ URL = "https://messes.info/horaires/paroisse%20notre%20dame%20du%20Bois%20Renou?
 def home():
     return "Mass Schedule API is running!"
 
-from flask import Response
-import json
-
-@app.route('/schedule')
+@app.route("/schedule")
 def get_schedule():
     import nest_asyncio
     import asyncio
-    nest_asyncio.apply()  # allow nested loops
-    return asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
+    import traceback
 
+    nest_asyncio.apply()
+
+    try:
+        result = asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
+        return jsonify(result)
+    except Exception as e:
+        return f"<pre>{traceback.format_exc()}</pre>", 500
 
 async def fetch_and_clean_schedule():
     async with async_playwright() as p:
