@@ -18,10 +18,13 @@ from flask import Response
 import json
 
 @app.route('/schedule')
-async def get_schedule():
-    data = await fetch_and_clean_schedule()
-    return Response(json.dumps(data), mimetype='application/json')
-    
+def get_schedule():
+    import nest_asyncio
+    import asyncio
+    nest_asyncio.apply()  # allow nested loops
+    return asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
+
+
 async def fetch_and_clean_schedule():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
