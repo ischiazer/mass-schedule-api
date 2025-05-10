@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, send_file
 from bs4 import BeautifulSoup
 import nest_asyncio
 import asyncio
@@ -9,6 +9,7 @@ from datetime import datetime
 from flask_cors import CORS  # ✅ CORS import
 
 app = Flask(__name__)
+HTML_FILE_PATH = "latest.html"
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 nest_asyncio.apply()
@@ -101,6 +102,20 @@ async def fetch_and_clean_schedule():
             continue
 
     return jsonify(clean_schedule)
+
+@app.route("/upload_html", methods=["POST"])
+def upload_html():
+    html_content = request.get_data(as_text=True)
+    with open(HTML_FILE_PATH, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    return "HTML saved", 200
+
+@app.route("/latest")
+def latest():
+    if os.path.exists(HTML_FILE_PATH):
+        return send_file(HTML_FILE_PATH, mimetype="text/html")
+    else:
+        return "No HTML uploaded yet.", 404
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
