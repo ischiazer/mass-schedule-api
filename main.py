@@ -134,21 +134,25 @@ def latest():
     else:
         return "No HTML uploaded yet.", 404
 
-
 @app.route("/upload_attachment", methods=["POST"])
 def upload_attachment():
-    file = request.files.get("file")
+    uploaded_file = request.files.get("file")
     filename = request.form.get("filename")
 
-    if not file or not filename:
-        log_upload("FAIL", filename or "unknown", "Missing filename or file data")
+    if not uploaded_file or not filename:
+        log_upload("FAIL", filename or "unknown", "Missing file or filename in multipart/form-data")
         return "Missing file or filename", 400
 
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(filepath)
+    try:
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        uploaded_file.save(filepath)
 
-    log_upload("SUCCESS", filename)
-    return f"✅ File '{filename}' saved", 200
+        log_upload("SUCCESS", filename)
+        return f"✅ File '{filename}' saved", 200
+
+    except Exception as e:
+        log_upload("FAIL", filename, str(e))
+        return f"❌ Error saving file: {str(e)}", 500
 
 
 @app.route("/upload_log")
