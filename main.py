@@ -137,26 +137,19 @@ def latest():
 
 @app.route("/upload_attachment", methods=["POST"])
 def upload_attachment():
+    file = request.files.get("file")
     filename = request.form.get("filename")
-    file_b64 = request.form.get("file")
 
-    if not filename or not file_b64:
+    if not file or not filename:
         log_upload("FAIL", filename or "unknown", "Missing filename or file data")
-        return "Missing filename or file data", 400
+        return "Missing file or filename", 400
 
-    try:
-        file_bytes = base64.b64decode(file_b64)
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(filepath)
 
-        with open(filepath, "wb") as f:
-            f.write(file_bytes)
-        log_upload("SUCCESS", filename)
+    log_upload("SUCCESS", filename)
+    return f"✅ File '{filename}' saved", 200
 
-        return f"✅ File '{filename}' saved", 200
-
-    except Exception as e:
-        log_upload("FAIL", filename, str(e))
-        return f"❌ Failed to decode or write file: {str(e)}", 500
 
 @app.route("/upload_log")
 def show_log():
@@ -167,6 +160,10 @@ def show_log():
         log_content = f.read()
 
     return Response(f"<pre>{log_content}</pre>", mimetype="text/html")
+
+@app.errorhandler(413)
+def request_entity_too_large(error):
+    return "❌ File too large. Limit is 10MB.", 413
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
