@@ -3,5 +3,5 @@ services:
     name: mass-schedule-api
     env: python
     buildCommand: pip install -r requirements.txt && playwright install chromium
-    startCommand: python main.py
+    startCommand: gunicorn main:app --limit-request-line 0 --limit-request-field_size 0 --timeout 120
     plan: free
