@@ -17,10 +17,10 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Create the log file if it doesn't exist
-if not os.path.exists(LOG_FILE):
-    with open(LOG_FILE, "w", encoding="utf-8") as log:
+if not os.path.exists(UPLOAD_LOG_FILE):
+    with open(UPLOAD_LOG_FILE, "w", encoding="utf-8") as log:
         log.write("[INIT] Created log file\n")
-        
+
 nest_asyncio.apply()
 
 def log_upload(status, filename, detail=""):
