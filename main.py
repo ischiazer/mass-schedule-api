@@ -10,6 +10,7 @@ from datetime import datetime
 from flask_cors import CORS  # ✅ CORS import
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB
 HTML_FILE_PATH = "latest.html"
 UPLOAD_FOLDER = "uploaded_files"
 UPLOAD_LOG_FILE = "upload_log.txt"
