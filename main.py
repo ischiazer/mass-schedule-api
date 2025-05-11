@@ -5,14 +5,25 @@ import asyncio
 from playwright.async_api import async_playwright
 import json
 import os
+import base64
 from datetime import datetime
 from flask_cors import CORS  # ✅ CORS import
 
 app = Flask(__name__)
 HTML_FILE_PATH = "latest.html"
+UPLOAD_FOLDER = "uploaded_files"
+UPLOAD_LOG_FILE = "upload_log.txt"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 nest_asyncio.apply()
+
+def log_upload(status, filename, detail=""):
+    timestamp = datetime.utcnow().isoformat()
+    log_line = f"[{timestamp}] {status.upper()}: {filename} {detail}".strip() + "\n"
+    with open(UPLOAD_LOG_FILE, "a", encoding="utf-8") as log:
+        log.write(log_line)
+
 
 @app.route('/')
 def home():
@@ -116,6 +127,40 @@ def latest():
         return send_file(HTML_FILE_PATH, mimetype="text/html")
     else:
         return "No HTML uploaded yet.", 404
+
+
+@app.route("/upload_attachment", methods=["POST"])
+def upload_attachment():
+    filename = request.form.get("filename")
+    file_b64 = request.form.get("file")
+
+    if not filename or not file_b64:
+        log_upload("FAIL", filename or "unknown", "Missing filename or file data")
+        return "Missing filename or file data", 400
+
+    try:
+        file_bytes = base64.b64decode(file_b64)
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+
+        with open(filepath, "wb") as f:
+            f.write(file_bytes)
+        log_upload("SUCCESS", filename)
+
+        return f"✅ File '{filename}' saved", 200
+
+    except Exception as e:
+        log_upload("FAIL", filename, str(e))
+        return f"❌ Failed to decode or write file: {str(e)}", 500
+
+@app.route("/upload_log")
+def show_log():
+    if not os.path.exists(UPLOAD_LOG_FILE):
+        return "No log available yet.", 404
+
+    with open(UPLOAD_LOG_FILE, "r", encoding="utf-8") as f:
+        log_content = f.read()
+
+    return Response(f"<pre>{log_content}</pre>", mimetype="text/html")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
