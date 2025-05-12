@@ -5,4 +5,4 @@ beautifulsoup4
 flask-cors
 mammoth
 lxml
-PIL
+pillow
