@@ -1,7 +1,8 @@
-from flask import Flask, jsonify, request, send_file, Response
+from flask import Flask, jsonify, request, send_file, Response, send_file
 from bs4 import BeautifulSoup
 import nest_asyncio
 import asyncio
+import zipfile
 from playwright.async_api import async_playwright
 import json
 import os
@@ -168,6 +169,28 @@ def show_log():
 @app.errorhandler(413)
 def request_entity_too_large(error):
     return "❌ File too large. Limit is 10MB.", 413
+
+
+@app.route("/download_content")
+def download_content():
+    zip_buffer = io.BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for root, _, files in os.walk(UPLOAD_FOLDER):
+            for filename in files:
+                filepath = os.path.join(root, filename)
+                # Add file to zip with relative path
+                arcname = os.path.relpath(filepath, start=UPLOAD_FOLDER)
+                zipf.write(filepath, arcname=arcname)
+
+    zip_buffer.seek(0)
+    return send_file(
+        zip_buffer,
+        mimetype="application/zip",
+        as_attachment=True,
+        download_name="uploaded_content.zip"
+    )
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
