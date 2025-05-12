@@ -191,6 +191,19 @@ def download_content():
         download_name="uploaded_content.zip"
     )
 
+app.route("/show_dir")
+def show_dir():
+    base_path = "."  # Start from current working directory
+    file_list = []
 
+    for root, dirs, files in os.walk(base_path):
+        for name in files:
+            full_path = os.path.join(root, name)
+            file_list.append(os.path.relpath(full_path, start=base_path))
+
+    file_list.sort()
+    output = "\n".join(file_list)
+    return Response(f"<pre>{output}</pre>", mimetype="text/html")
+    
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
