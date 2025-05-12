@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request, send_file, Response, send_file
 from bs4 import BeautifulSoup
+import io
 import nest_asyncio
 import asyncio
 import zipfile
