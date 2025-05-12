@@ -16,6 +16,8 @@ import zipfile
 import io
 from lxml import etree
 from PIL import Image
+import tempfile
+
 
 ##################################################################
 # APP INITIALISATION
