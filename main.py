@@ -10,6 +10,12 @@ import os
 import base64
 from datetime import datetime
 from flask_cors import CORS  # ✅ CORS import
+import mammoth
+from pathlib import Path
+import zipfile
+import io
+from lxml import etree
+from PIL import Image
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB
