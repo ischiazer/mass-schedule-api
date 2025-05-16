@@ -90,15 +90,20 @@ def refresh_schedule():
     with open("static/schedule.json", "w", encoding="utf-8") as f:
         json.dump(data.get_json(), f, ensure_ascii=False, indent=2)
 
+    # Upload JSON to BlackBlaze
+    push_b2_file("static/schedule.json","horaires_messes.json")
+
     # Save last updated timestamp in French format
     now = datetime.now()
     formatted = now.strftime("%A %d %B %Y à %H:%M")
     with open("static/last_updated.txt", "w", encoding="utf-8") as f:
         f.write(formatted)
+    push_b2_file("static/last_updated.txt","horaires_messes_MAJ.txt")
 
     # Save heartbeat timestamp (ISO format)
     with open("static/heartbeat.txt", "w") as hb:
         hb.write(now.isoformat())
+    push_b2_file("static/heartbeat.txt","heartbeat.txt")
 
     return "Schedule updated and saved to static/schedule.json"
 
