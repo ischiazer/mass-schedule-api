@@ -40,13 +40,23 @@ nest_asyncio.apply()
 
 ##################################################################
 # CONNECT TO BLACKBLAZE
+def get_b2_bucket():
+    b2_info = InMemoryAccountInfo()
+    b2_api = B2Api(b2_info)
+    b2_application_key_id = os.getenv("B2_KEY_ID")
+    b2_application_key = os.getenv("B2_APPLICATION_KEY")
+    b2_api.authorize_account("production", b2_application_key_id, b2_application_key)
+    return b2_api.get_bucket_by_name("MeloirFiles")
 
-b2_info = InMemoryAccountInfo()
-b2_api = B2Api(b2_info)
-b2_application_key_id = os.getenv("B2_KEY_ID")
-b2_application_key = os.getenv("B2_APPLICATION_KEY")
-b2_api.authorize_account("production", b2_application_key_id, b2_application_key)
-b2_bucket = b2_api.get_bucket_by_name("MeloirFiles")
+##################################################################
+# UPLOAD FILE TO BLACKBLAZE
+def push_b2_file(file_local, file_server):
+    bucket = get_b2_bucket()
+    bucket.upload_local_file(
+        local_file=file_local,
+        file_name=file_server
+    )
+
 
 ##################################################################
 # FUNCTION TO UPDATE LOG OF FILES BEING UPLOADED
@@ -422,6 +432,9 @@ def deliver_word():
             # Also write to latest_html.html
             with open(latest_path, "w", encoding="utf-8") as f:
                 f.write(html)
+
+            # Push the HTML file to the BlackBlaze server
+            push_b2_file(latest_path, 'bulletin_paroissial.html'):
 
             log_upload("SUCCESS", filename)
             return f"✅ Processed and saved: {html_filename}", 200
