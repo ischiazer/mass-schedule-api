@@ -434,7 +434,7 @@ def deliver_word():
                 f.write(html)
 
             # Push the HTML file to the BlackBlaze server
-            push_b2_file(latest_path, 'bulletin_paroissial.html'):
+            push_b2_file(latest_path, 'bulletin_paroissial.html')
 
             log_upload("SUCCESS", filename)
             return f"✅ Processed and saved: {html_filename}", 200
