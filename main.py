@@ -17,6 +17,7 @@ import io
 from lxml import etree
 from PIL import Image
 import tempfile
+from b2sdk.v2 import InMemoryAccountInfo, B2Api
 
 
 ##################################################################
@@ -36,6 +37,16 @@ if not os.path.exists(UPLOAD_LOG_FILE):
     with open(UPLOAD_LOG_FILE, "w", encoding="utf-8") as log:
         log.write("[INIT] Created log file\n")
 nest_asyncio.apply()
+
+##################################################################
+# CONNECT TO BLACKBLAZE
+
+b2_info = InMemoryAccountInfo()
+b2_api = B2Api(b2_info)
+b2_application_key_id = os.getenv("B2_KEY_ID")
+b2_application_key = os.getenv("B2_APPLICATION_KEY")
+b2_api.authorize_account("production", b2_application_key_id, b2_application_key)
+b2_bucket = b2_api.get_bucket_by_name("MeloirFiles")
 
 ##################################################################
 # FUNCTION TO UPDATE LOG OF FILES BEING UPLOADED
