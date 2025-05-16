@@ -6,3 +6,4 @@ flask-cors
 mammoth
 lxml
 pillow
+b2sdk
