@@ -25,6 +25,7 @@ import schedule
 import threading
 import time
 from openai import OpenAI
+import feedparser
 
 
 ##################################################################
@@ -39,8 +40,10 @@ UPLOAD_LOG_FILE = "upload_log.txt"
 READINGS_PATH_LAST = 'readings_current.html'
 READINGS_PATH_STORE = 'readings_%s.html'
 PERPLEXITY_TABLE_LAST = "evenements.html"
-PERPLEXITY_TIMESTAMP = "evenements_MAJ.html"
+PERPLEXITY_TIMESTAMP = "evenements_MAJ.txt"
 PERPLEXITY_TABLE_STORE = "evenements_%s.html"
+NEWS_TABLE = "nouvelles_vatican.html"
+NEWS_TIMESTAMP = "nouvelles_MAJ.txt"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(WORD_FOLDER, exist_ok=True)
 os.makedirs(HTML_FOLDER, exist_ok=True)
@@ -747,7 +750,7 @@ def get_perplexity_events():
     logging.info(f"Perplexity query step 6h")
     push_b2_file(PERPLEXITY_TABLE_STORE % dt,"historique_evenements_%s.html" % dt)
     logging.info(f"Perplexity query step 6i")
-    push_b2_file(PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt" % dt)
+    push_b2_file(PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt")
     logging.info(f"Perplexity query step 6j")
     logging.info(f"Perplexity query done")
     return html_content
@@ -765,6 +768,73 @@ def force_fetch_perplexity():
     except Exception as e:
         logging.info(f"Perplexity step failed {str(e)}")
 
+##################################################################
+# FUNCTION - FETCH VATICAN NEWS
+def get_news():
+    # Set locale to French
+    try:
+        locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+    except locale.Error:
+        print("French locale not supported on this system.")
+
+    # URL of Vatican RSS
+    rss_url = "https://www.vaticannews.va/fr.rss.xml"
+    feed = feedparser.parse(rss_url)
+
+    # Start HTML table with inline CSS styling
+    html = '''
+    <table style="border-collapse: collapse; width: 100%;">
+        <tr style="border-bottom: 1px solid lightgrey;">
+            <th style="color: #3579BE; text-align: left; padding: 8px;">Date</th>
+            <th style="color: #3579BE; text-align: left; padding: 8px;">Titre</th>
+            <th style="color: #3579BE; text-align: left; padding: 8px;">Lien</th>
+        </tr>
+    '''
+
+    # Add each news item
+    for entry in feed.entries[:10]:
+        # Date of publication
+        locale.setlocale(locale.LC_TIME, 'en_US.UTF-8')
+        raw_date = entry.published
+        pub_date = datetime.strptime(raw_date, '%a, %d %b %Y %H:%M:%S %z')
+        locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+        news_dt = pub_date.strftime('%a %d %B %Y')
+
+        # Title of news
+        news_title = entry.title
+
+        # Link to article
+        news_link = entry.link
+
+        # Append to HTML table
+        html += f'''
+        <tr style="border-bottom: 1px solid lightgrey;">
+            <td style="padding: 8px;">{news_dt}</td>
+            <td style="padding: 8px;">{news_title}</td>
+            <td style="padding: 8px;"><a href="{news_link}" target="_blank">Cliquez ici</a></td>
+        </tr>
+        '''
+
+    # End of table
+    html += '</table>'
+    with open(NEWS_TABLE, "w") as f:
+        f.write(html)
+    time_now = datetime.now()
+    with open(NEWS_TIMESTAMP, 'w') as f:
+        f.write(time_now.strftime("%Y-%m-%d %H:%M:%S"))
+    push_b2_file(NEWS_TABLE,"nouvelles_vatican.html")
+    push_b2_file(NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt")
+
+
+##################################################################
+# QUERY - FETCH VATICAN NEWS
+@app.route('/fetch_vatican_news')
+def force_fetch_vatican_news():
+    logging.info("/fetch_vatican_news called")
+    try:
+        get_news()
+    except Exception as e:
+        logging.info(f"Vatican news step failed {str(e)}")
 
 ##################################################################
 # MAIN LOOP
