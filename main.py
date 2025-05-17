@@ -18,6 +18,7 @@ from lxml import etree
 from PIL import Image
 import tempfile
 from b2sdk.v2 import InMemoryAccountInfo, B2Api
+import locale
 
 
 ##################################################################
@@ -67,6 +68,22 @@ def fix_encoding(text):
     except (UnicodeEncodeError, UnicodeDecodeError):
         return text
 
+
+##################################################################
+# UTILITY: FORMAT A DATE
+def french_date(dt_string):
+    try:
+        locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+    except locale.Error:
+        locale.setlocale(locale.LC_TIME, 'fr_FR')
+
+    # Input string
+    date_obj = datetime.strptime(dt_string, "%Y-%m-%d")
+
+    # Format to full French date
+    return date_obj.strftime("%A %d %B %Y").capitalize()
+
+##################################################################
 # FUNCTION TO UPDATE LOG OF FILES BEING UPLOADED
 def log_upload(status, filename, detail=""):
     timestamp = datetime.utcnow().isoformat()
@@ -544,7 +561,7 @@ def fetch_readings():
             full_text = ''
         else:
             z = readings
-            full_text = ''
+            full_text = '<P>' + french_date(get_next_sunday()) + '</P?<BR>'
             list_sections = ['1e lecture', 'Psaume', '2e lecture','Evangile']
 
             for i, r in enumerate(readings[:4]):
@@ -555,7 +572,6 @@ def fetch_readings():
                 full_text += '</DIV>'
     except:
         full_text = ''
-    z = full_text
     with open(READINGS_PATH_LAST, "w", encoding="utf-8") as f:
         f.write(full_text)
     push_b2_file(READINGS_PATH_LAST, 'lectures.html')
@@ -563,6 +579,7 @@ def fetch_readings():
     with open(READINGS_PATH_STORE % get_next_sunday(), "w", encoding="utf-8") as f:
         f.write(full_text)
     push_b2_file(READINGS_PATH_STORE % get_next_sunday(), 'historique_lectures_%s.html' % get_next_sunday())
+    return full_text
 
 ##################################################################
 # QUERY - FETCH MASS SCHEDULE ON THE FLY
