@@ -513,18 +513,23 @@ def get_current_readings_URL():
 # SUB-FUNCTION TO FETCH READINGS VIA CHROMIUM
 
 async def readings_extract_all_sections(url):
+    logging.info("/fetch_readings async started")
     try:
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
             page = await browser.new_page()
+            logging.info("/fetch_readings async opening URL")
             await page.goto(url)
+            logging.info("/fetch_readings async opened URL")
             await page.wait_for_selector("h2")
+            logging.info("/fetch_readings async selector")
 
             # Get all h2s (titles of sections like Première lecture, Cantique, etc.)
             titles = await page.query_selector_all("h2")
             result = []
 
             for title_el in titles:
+                logging.info("/fetch_readings async title " + str(title_el))
                 title_text = await title_el.inner_text()
 
                 # Get the next sibling: h3 for reference
