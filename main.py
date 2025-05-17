@@ -26,6 +26,8 @@ import threading
 import time
 from openai import OpenAI
 import feedparser
+from babel.dates import format_datetime
+from email.utils import parsedate_to_datetime
 
 
 ##################################################################
@@ -771,12 +773,6 @@ def force_fetch_perplexity():
 ##################################################################
 # FUNCTION - FETCH VATICAN NEWS
 def get_news():
-    # Set locale to French
-    try:
-        locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
-    except locale.Error:
-        print("French locale not supported on this system.")
-
     # URL of Vatican RSS
     rss_url = "https://www.vaticannews.va/fr.rss.xml"
     feed = feedparser.parse(rss_url)
@@ -794,11 +790,9 @@ def get_news():
     # Add each news item
     for entry in feed.entries[:10]:
         # Date of publication
-        locale.setlocale(locale.LC_TIME, 'en_US.UTF-8')
         raw_date = entry.published
-        pub_date = datetime.strptime(raw_date, '%a, %d %b %Y %H:%M:%S %z')
-        locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
-        news_dt = pub_date.strftime('%a %d %B %Y')
+        pub_date = parsedate_to_datetime(raw_date)
+        news_dt = format_datetime(pub_date, "EEE d MMMM y", locale='fr_FR')
 
         # Title of news
         news_title = entry.title
