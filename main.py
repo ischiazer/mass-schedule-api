@@ -20,7 +20,7 @@ import tempfile
 from b2sdk.v2 import InMemoryAccountInfo, B2Api
 import locale
 import logging
-
+import pytz
 
 ##################################################################
 # APP INITIALISATION
@@ -98,6 +98,20 @@ def log_upload(status, filename, detail=""):
     log_line = f"[{timestamp}] {status.upper()}: {filename} {detail}".strip() + "\n"
     with open(UPLOAD_LOG_FILE, "a", encoding="utf-8") as log:
         log.write(log_line)
+
+##################################################################
+# UTILITY : HTML-FORMATTED TIME STAMP
+
+
+def get_time_stamp_HTML():
+    try:
+        locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+    except locale.Error:
+        locale.setlocale(locale.LC_TIME, 'fr_FR')
+    paris_tz = pytz.timezone("Europe/Paris")
+    now = datetime.now(paris_tz)
+    timestamp = now.strftime("%d-%b-%Y %H:%M:%S")
+    return f'<br><small>Mis à jour le {timestamp}</small>'
 
 ##################################################################
 # QUERY - BASE
@@ -603,6 +617,8 @@ def fetch_readings():
                 full_text += f"<I>{fix_encoding(r['title'])}</I><BR>\n"
                 full_text += '<p>' + fix_encoding(r['text'])+'<BR></P>\n'
                 full_text += '</DIV>'
+    full_text += get_time_stamp_HTML()
+
     except Exception as e:
         logging.info("/fetch_readings error %s" % str(e))
         full_text = ''
