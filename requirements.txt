@@ -11,3 +11,4 @@ pytz
 openai
 schedule
 feedparser
+babel
