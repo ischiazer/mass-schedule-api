@@ -19,6 +19,7 @@ from PIL import Image
 import tempfile
 from b2sdk.v2 import InMemoryAccountInfo, B2Api
 import locale
+import logging
 
 
 ##################################################################
@@ -40,7 +41,14 @@ if not os.path.exists(UPLOAD_LOG_FILE):
     with open(UPLOAD_LOG_FILE, "w", encoding="utf-8") as log:
         log.write("[INIT] Created log file\n")
 nest_asyncio.apply()
-
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.StreamHandler(),  # Console (Render logs)
+        logging.FileHandler("log.txt")  # Optional: file in your container
+    ]
+)
 ##################################################################
 # CONNECT TO BLACKBLAZE
 def get_b2_bucket():
@@ -555,26 +563,35 @@ async def readings_extract_all_sections(url):
 def fetch_readings():
     global z
     url = get_current_readings_URL()
+    logging.info("/fetch_readings URL defined")
     try:
         readings = asyncio.get_event_loop().run_until_complete(readings_extract_all_sections(url))
+        logging.info("/fetch_readings URL requested")
         if readings is None:
             full_text = ''
+            logging.info("/fetch_readings content empty")
         else:
+            logging.info("/fetch_readings content obtained")
             z = readings
             full_text = '<P>' + french_date(get_next_sunday()) + '</P?<BR>'
+            logging.info("/fetch_readings starting sections")
             list_sections = ['1e lecture', 'Psaume', '2e lecture','Evangile']
 
             for i, r in enumerate(readings[:4]):
+                logging.info("/fetch_readings processing section #%d" % i)
                 full_text += '<div class="sqs-block-content">'
                 full_text += f"<H3 class='sqs-block-title' style='color: rgb(55, 125, 197); margin-top: 2em; margin-bottom: 0.3em;'>{fix_encoding(list_sections[i])}</H3>\n"
                 full_text += f"<I>{fix_encoding(r['title'])}</I><BR>\n"
                 full_text += '<p>' + fix_encoding(r['text'])+'<BR></P>\n'
                 full_text += '</DIV>'
-    except:
+    except Exception e:
+        logging.info("/fetch_readings error %s" % str(e))
         full_text = ''
     with open(READINGS_PATH_LAST, "w", encoding="utf-8") as f:
         f.write(full_text)
+    logging.info("/fetch_readings local file written")
     push_b2_file(READINGS_PATH_LAST, 'lectures.html')
+    logging.info("/fetch_readings local file written uploaded to BB")
 
     with open(READINGS_PATH_STORE % get_next_sunday(), "w", encoding="utf-8") as f:
         f.write(full_text)
@@ -585,6 +602,7 @@ def fetch_readings():
 # QUERY - FETCH MASS SCHEDULE ON THE FLY
 @app.route('/fetch_readings')
 def force_fetch_readings():
+    logging.info("/fetch_readings called")
     return fetch_readings()
 
 
