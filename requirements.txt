@@ -7,3 +7,5 @@ mammoth
 lxml
 pillow
 b2sdk
+pytz
+openai
