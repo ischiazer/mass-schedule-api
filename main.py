@@ -21,6 +21,8 @@ from b2sdk.v2 import InMemoryAccountInfo, B2Api
 import locale
 import logging
 import pytz
+import schedule
+import threading
 
 ##################################################################
 # APP INITIALISATION
@@ -635,15 +637,30 @@ def fetch_readings():
     return full_text
 
 ##################################################################
-# QUERY - FETCH MASS SCHEDULE ON THE FLY
+# QUERY - FETCH READINGS
 @app.route('/fetch_readings')
 def force_fetch_readings():
     logging.info("/fetch_readings called")
     return fetch_readings()
+
+##################################################################
+# REGULAR CALL TO THE READINGS QUERY
+def periodic_query_readings():
+    while True:
+        fetch_readings()
+        time.sleep(1 * 60 * 60)  # Sleep 1 hours
 
 
 ##################################################################
 # MAIN LOOP
 
 if __name__ == "__main__":
+    thread = threading.Thread(target=periodic_query_readings, daemon=True)
+    thread.start()
+
     app.run(host="0.0.0.0", port=10000)
+
+
+    while True:
+        schedule.run_pending()
+        time.sleep(60)
