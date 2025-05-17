@@ -39,6 +39,7 @@ UPLOAD_LOG_FILE = "upload_log.txt"
 READINGS_PATH_LAST = 'readings_current.html'
 READINGS_PATH_STORE = 'readings_%s.html'
 PERPLEXITY_TABLE_LAST = "evenements.html"
+PERPLEXITY_TIMESTAMP = "evenements_MAJ.html"
 PERPLEXITY_TABLE_STORE = "evenements_%s.html"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(WORD_FOLDER, exist_ok=True)
@@ -725,21 +726,24 @@ def get_perplexity_events():
 
     # 6 - Check that the HTML code is correct
     logging.info(f"Perplexity query step 6")
-    try:
-        soup = BeautifulSoup(html_content, "html5lib")
-        print("HTML parsed successfully — no fatal errors.")
-        with open(PERPLEXITY_TABLE_LAST, "w") as f:
-            f.write(html_content)
-        dt = datetime.now().strftime("%Y-%m-%d")
-        with open(PERPLEXITY_TABLE_STORE % dt, "w") as f:
-            f.write(html_content)
-        push_b2_file("PERPLEXITY_TABLE_LAST","evenements.html")
-        push_b2_file("PERPLEXITY_TABLE_LAST","historique_evenements_%s.html" % dt)
-        logging.info(f"Perplexity query done")
-        return html_content
+    #try:
+    #    soup = BeautifulSoup(html_content, "html5lib")
+    #    print("HTML parsed successfully — no fatal errors.")
+    with open(PERPLEXITY_TABLE_LAST, "w") as f:
+        f.write(html_content)
+    dt = datetime.now().strftime("%Y-%m-%d")
+    with open(PERPLEXITY_TABLE_STORE % dt, "w") as f:
+        f.write(html_content)
+    with open(PERPLEXITY_TIMESTAMP, 'w') as f:
+        f.write(now.strftime("%Y-%m-%d %H:%M:%S"))
+    push_b2_file("PERPLEXITY_TABLE_LAST","evenements.html")
+    push_b2_file("PERPLEXITY_TABLE_LAST","historique_evenements_%s.html" % dt)
+    push_b2_file("PERPLEXITY_TIMESTAMP","evenements_MAJ.txt" % dt)
+    logging.info(f"Perplexity query done")
+    return html_content
 
-    except Exception as e:
-        logging.info(f"Perplexity HTML incorrect {str(e)}")
+    #except Exception as e:
+    #    logging.info(f"Perplexity HTML incorrect {str(e)}")
 
 ##################################################################
 # QUERY - FETCH PERPLEXITY
