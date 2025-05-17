@@ -8,7 +8,7 @@ from playwright.async_api import async_playwright
 import json
 import os
 import base64
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from flask_cors import CORS
 import mammoth
 from pathlib import Path
