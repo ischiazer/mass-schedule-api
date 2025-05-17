@@ -291,6 +291,20 @@ def show_dir():
     for root, dirs, files in os.walk(base_path):
         for name in files:
             full_path = os.path.join(root, name)
+            try:
+                size = os.path.getsize(full_path)
+            except OSError:
+                size = -1  # Could not access file size
+
+            relative_path = os.path.relpath(full_path, start=base_path)
+            file_list.append(f"{relative_path} ({size} bytes)")
+
+    file_list.sort()
+    output = "\n".join(file_list)
+
+    for root, dirs, files in os.walk(base_path):
+        for name in files:
+            full_path = os.path.join(root, name)
             file_list.append(os.path.relpath(full_path, start=base_path))
 
     file_list.sort()
@@ -594,8 +608,9 @@ def fetch_readings():
         full_text = ''
     with open(READINGS_PATH_LAST, "w", encoding="utf-8") as f:
         f.write(full_text)
-    logging.info("/fetch_readings local file written")
+    logging.info(f"/fetch_readings local file written ({len(full_text)} length)")
     push_b2_file(READINGS_PATH_LAST, 'lectures.html')
+    logging.info(f"/fetch_readings local file size {os.path.getsize(READINGS_PATH_LAST)} bytes")
     logging.info("/fetch_readings local file written uploaded to BB")
 
     with open(READINGS_PATH_STORE % get_next_sunday(), "w", encoding="utf-8") as f:
