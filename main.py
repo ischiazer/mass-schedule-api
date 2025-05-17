@@ -8,8 +8,8 @@ from playwright.async_api import async_playwright
 import json
 import os
 import base64
-from datetime import datetime
-from flask_cors import CORS  # ✅ CORS import
+from datetime import datetime, timedelta
+from flask_cors import CORS
 import mammoth
 from pathlib import Path
 import zipfile
@@ -29,6 +29,8 @@ UPLOAD_FOLDER = "uploaded_files"
 WORD_FOLDER = "uploaded_word"
 HTML_FOLDER = "created_HTML"
 UPLOAD_LOG_FILE = "upload_log.txt"
+READINGS_PATH_LAST = 'readings_current.html'
+READINGS_PATH_STORE = 'readings_%s.html'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(WORD_FOLDER, exist_ok=True)
 os.makedirs(HTML_FOLDER, exist_ok=True)
@@ -458,6 +460,110 @@ def latest_word_html():
         return "No HTML has been generated yet.", 404
 
     return send_file(latest_path, mimetype="text/html")
+
+##################################################################
+# SUBFUNCTION FOR READINGS: DATE OP NEXT SUNDAY
+
+def get_next_sunday():
+    today = date.today()
+    days_until_sunday = (6 - today.weekday()) % 7
+    next_sunday = today + timedelta(days=days_until_sunday)
+    return next_sunday.strftime('%Y-%m-%d')
+
+##################################################################
+# SUBFUNCTION FOR READINGS: GIVE CURRENT URL TO READ
+
+def get_current_readings_URL():
+    base_url = "https://levangileauquotidien.org/FR/gospel/"
+    return base_url + get_next_sunday()
+
+
+##################################################################
+# SUB-FUNCTION TO FETCH READINGS VIA CHROMIUM
+
+async def readings_extract_all_sections(url):
+    try:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page()
+            await page.goto(url)
+            await page.wait_for_selector("h2")
+
+            # Get all h2s (titles of sections like Première lecture, Cantique, etc.)
+            titles = await page.query_selector_all("h2")
+            result = []
+
+            for title_el in titles:
+                title_text = await title_el.inner_text()
+
+                # Get the next sibling: h3 for reference
+                parent = await title_el.evaluate_handle("node => node.parentElement")
+                h3 = await parent.query_selector("h3")
+                reference = await h3.inner_text() if h3 else ""
+
+                # Now get the div.reading-text that follows the title
+                # We'll look for the next sibling with that class
+                reading_text_el = await parent.evaluate_handle('node => node.parentElement.querySelector(".reading-text")')
+                text = await reading_text_el.inner_text() if reading_text_el else ""
+
+                result.append({
+                    "title": title_text,
+                    "reference": reference,
+                    "text": text
+                })
+
+            # Get the commentary separately
+            comment_el = await page.query_selector("div.comment-text")
+            commentary = await comment_el.inner_text() if comment_el else "(Pas de commentaire trouvé)"
+            result.append({
+                "title": "Commentaire",
+                "reference": "",
+                "text": commentary
+            })
+
+            await browser.close()
+            return result
+    except:
+        return None
+
+##################################################################
+# MAIN FUNCTION TO FETCH READINGS
+
+def fetch_readings():
+    global z
+    url = get_current_readings_URL()
+    try:
+        readings = asyncio.get_event_loop().run_until_complete(readings_extract_all_sections(url))
+        if readings is None:
+            full_text = ''
+        else:
+            z = readings
+            full_text = ''
+            list_sections = ['1e lecture', 'Psaume', '2e lecture','Evangile']
+
+            for i, r in enumerate(readings[:4]):
+                full_text += '<div class="sqs-block-content">'
+                full_text += f"<H3 class='sqs-block-title' style='color: rgb(55, 125, 197); margin-top: 2em; margin-bottom: 0.3em;'>{list_sections[i]}</H3>\n"
+                full_text += f"<I>{r['title']}</I><BR>\n"
+                full_text += '<p>' + r['text']+'<BR></P>\n'
+                full_text += '</DIV>'
+    except:
+        full_text = ''
+    z = full_text
+    with open(READINGS_PATH_LAST, "w", encoding="utf-8") as f:
+        f.write(full_text)
+    push_b2_file(READINGS_PATH_LAST, 'lectures.html')
+
+    with open(READINGS_PATH_STORE % get_next_sunday(), "w", encoding="utf-8") as f:
+        f.write(full_text)
+    push_b2_file(READINGS_PATH_STORE % get_next_sunday(), 'historique_lectures_%s.html' % get_next_sunday())
+
+##################################################################
+# QUERY - FETCH MASS SCHEDULE ON THE FLY
+@app.route('/fetch_readings')
+def force_fetch_readings():
+    return fetch_readings()
+
 
 ##################################################################
 # MAIN LOOP
