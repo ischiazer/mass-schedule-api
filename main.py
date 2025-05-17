@@ -584,7 +584,7 @@ def fetch_readings():
                 full_text += f"<I>{fix_encoding(r['title'])}</I><BR>\n"
                 full_text += '<p>' + fix_encoding(r['text'])+'<BR></P>\n'
                 full_text += '</DIV>'
-    except Exception e:
+    except Exception as e:
         logging.info("/fetch_readings error %s" % str(e))
         full_text = ''
     with open(READINGS_PATH_LAST, "w", encoding="utf-8") as f:
