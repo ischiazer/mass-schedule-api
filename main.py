@@ -59,8 +59,14 @@ def push_b2_file(file_local, file_server):
         file_name=file_server
     )
 
-
 ##################################################################
+# UTILITY: RE-ENCODING LATIN / UTF-8
+def fix_encoding(text):
+    try:
+        return text.encode('latin1').decode('utf-8')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return text
+
 # FUNCTION TO UPDATE LOG OF FILES BEING UPLOADED
 def log_upload(status, filename, detail=""):
     timestamp = datetime.utcnow().isoformat()
@@ -543,9 +549,9 @@ def fetch_readings():
 
             for i, r in enumerate(readings[:4]):
                 full_text += '<div class="sqs-block-content">'
-                full_text += f"<H3 class='sqs-block-title' style='color: rgb(55, 125, 197); margin-top: 2em; margin-bottom: 0.3em;'>{list_sections[i]}</H3>\n"
-                full_text += f"<I>{r['title']}</I><BR>\n"
-                full_text += '<p>' + r['text']+'<BR></P>\n'
+                full_text += f"<H3 class='sqs-block-title' style='color: rgb(55, 125, 197); margin-top: 2em; margin-bottom: 0.3em;'>{fix_encoding(list_sections[i])}</H3>\n"
+                full_text += f"<I>{fix_encoding(r['title'])}</I><BR>\n"
+                full_text += '<p>' + fix_encoding(r['text'])+'<BR></P>\n'
                 full_text += '</DIV>'
     except:
         full_text = ''
