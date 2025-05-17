@@ -24,6 +24,8 @@ import pytz
 import schedule
 import threading
 import time
+from openai import OpenAI
+
 
 ##################################################################
 # APP INITIALISATION
@@ -36,6 +38,8 @@ HTML_FOLDER = "created_HTML"
 UPLOAD_LOG_FILE = "upload_log.txt"
 READINGS_PATH_LAST = 'readings_current.html'
 READINGS_PATH_STORE = 'readings_%s.html'
+PERPLEXITY_TABLE_LAST = "evenements.html"
+PERPLEXITY_TABLE_STORE = "evenements_%s.html"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(WORD_FOLDER, exist_ok=True)
 os.makedirs(HTML_FOLDER, exist_ok=True)
@@ -650,6 +654,102 @@ def periodic_query_readings():
     while True:
         fetch_readings()
         time.sleep(1 * 60 * 60)  # Sleep 1 hours
+
+##################################################################
+# FUNCTION CALLING PERPLEXITY TO FIND NEARBY EVENTS
+def get_perplexity_events():
+    # Initialise the Perplexity connection
+    api_key = os.getenv("PERPLEXITY_KEY")
+    client = OpenAI(api_key=api_key, base_url="https://api.perplexity.ai")
+
+    # 1 -- Base query
+    logging.info(f"Perplexity query step 1")
+    query = "Pouvez-vous me donner la liste des événements religieux catholiques tels que pélerinages, processions, ou retraites organisés autour de Saint Malo ou du Mont Saint Michel, Saint Méloir des Ondes, l'abbaye de Beaufort (Plerguer) dans le mois à venir. Je souhaiterais au moins trois événements"
+    response = client.chat.completions.create(
+        model="llama-3.1-sonar-large-128k-online",  # Or another available Perplexity model
+        messages=[
+            {"role": "user", "content": query}
+        ]
+    )
+    history = [
+        {"role": "user", "content": query},
+        {"role": "assistant", "content": response.choices[0].message.content}
+    ]
+
+    # 2 -- Add locations we like
+    logging.info(f"Perplexity query step 2")
+    query_additions = ("Si il y a des événements religieux catholiques pertinents dans le mois à venir dans les abbayes suivantes, pouvez-vous les ajouter à ce que vous venez de me donner? \n"
+        "- Monastère de Beaufort (https://www.monastere-beaufort.com/accueil.php)\n"
+        "- Abbaye de Saint Jacut (https://www.abbaye-st-jacut.com/)\n"
+        "- Abbaye du Mont Saint Michel\n")
+    history.append({"role": "user", "content": query_additions})
+    response2 = client.chat.completions.create(
+        model="llama-3.1-sonar-large-128k-online",
+        messages=history
+    )
+    history.append({"role": "assistant", "content": response2.choices[0].message.content})
+
+    # 3 -- Filter the results
+    logging.info(f"Perplexity query step 3")
+    results = response.choices[0].message.content+'\n\n'+response2.choices[0].message.content
+    post_process_instruction = (
+        "Voici les événements catholiques que vous avez trouvé:\n\n"
+        f"{results}\n\n"
+        "Veuillez filtrer cette liste pour n'inclure que les événements poru lesquels vous connaissez le lieu; pour lesquels le lieu est à moins de 100km de Saint Malo; et pour lesquels les dates sont disponibles "
+    )
+    history.append({"role": "user", "content": post_process_instruction})
+    post_process_response = client.chat.completions.create(
+        model="llama-3.1-sonar-large-128k-online",  # or your chosen model
+        messages=history
+    )
+    history.append({"role": "assistant", "content": post_process_response.choices[0].message.content})
+
+    # 4 -- Formatting
+    logging.info(f"Perplexity query step 4")
+    results_filtered = post_process_response.choices[0]
+    formatting_instruction = (
+        "Voici ce que vous avez trouvé:"
+        f"{results}\n\n"
+        "Donnez-moi s'il vous plaît une table HTML en français avec une ligne pour chaque événement, et des colonnes pour (a) Date; (b) Lieu; (c) Description; (d) lien URL (il doit uniquement apparaître le mot 'Cliquez ici'). N'incluez pas les citations / références"
+    )
+    history.append({"role": "user", "content": formatting_instruction})
+    formatted_response = client.chat.completions.create(
+        model="llama-3.1-sonar-large-128k-online",  # or your chosen model
+        messages=history
+    )
+    html_content = formatted_response.choices[0].message.content
+
+    # 5 - Only keep the HTML content
+    logging.info(f"Perplexity query step 5")
+    html_content = html_content[html_content.upper().find('<TABLE'):html_content.upper().find('</TABLE')+8]
+
+    # 6 - Check that the HTML code is correct
+    logging.info(f"Perplexity query step 6")
+    try:
+        soup = BeautifulSoup(html_content, "html5lib")
+        print("HTML parsed successfully — no fatal errors.")
+        with open(PERPLEXITY_TABLE_LAST, "w") as f:
+            f.write(html_content)
+        dt = datetime.now().strftime("%Y-%m-%d")
+        with open(PERPLEXITY_TABLE_STORE % dt, "w") as f:
+            f.write(html_content)
+        push_b2_file("PERPLEXITY_TABLE_LAST","evenements.html")
+        push_b2_file("PERPLEXITY_TABLE_LAST","historique_evenements_%s.html" % dt)
+        logging.info(f"Perplexity query done")
+        return html_content
+
+    except Exception as e:
+        logging.info(f"Perplexity HTML incorrect {str(e)}")
+
+##################################################################
+# QUERY - FETCH PERPLEXITY
+@app.route('/fetch_perplexity')
+def force_fetch_perplexity():
+    logging.info("/fetch_perplexity called")
+    try:
+        get_perplexity_events()
+    except Exception as e:
+        logging.info(f"Perplexity step failed {str(e)}")
 
 
 ##################################################################
