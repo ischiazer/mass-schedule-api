@@ -711,7 +711,7 @@ def get_perplexity_events():
     formatting_instruction = (
         "Voici ce que vous avez trouvé:"
         f"{results}\n\n"
-        "Donnez-moi s'il vous plaît une table HTML en français avec une ligne pour chaque événement, et des colonnes pour (a) Date; (b) Lieu; (c) Description; (d) lien URL (il doit uniquement apparaître le mot 'Cliquez ici'). N'incluez pas les citations / références"
+        "Donnez-moi s'il vous plaît une table HTML en français avec une ligne pour chaque événement, et des colonnes pour (a) Date; (b) Lieu; (c) Description; (d) lien URL (il doit uniquement apparaître le mot 'Cliquez ici'). N'incluez pas les citations / références. La table HTML ne doit pas montrer de lignes verticales, et les lignes horizontales doivent être grises. La ligne de titres doit utiliser la couleur RGB 3579BE pour les caractères (sur fond transparent)"
     )
     history.append({"role": "user", "content": formatting_instruction})
     formatted_response = client.chat.completions.create(
