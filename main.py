@@ -617,7 +617,7 @@ def fetch_readings():
                 full_text += f"<I>{fix_encoding(r['title'])}</I><BR>\n"
                 full_text += '<p>' + fix_encoding(r['text'])+'<BR></P>\n'
                 full_text += '</DIV>'
-    full_text += get_time_stamp_HTML()
+        full_text += get_time_stamp_HTML()
 
     except Exception as e:
         logging.info("/fetch_readings error %s" % str(e))
