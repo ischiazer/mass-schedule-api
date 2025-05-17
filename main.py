@@ -737,9 +737,9 @@ def get_perplexity_events():
     time_now = datetime.now()
     with open(PERPLEXITY_TIMESTAMP, 'w') as f:
         f.write(time_now.strftime("%Y-%m-%d %H:%M:%S"))
-    push_b2_file("PERPLEXITY_TABLE_LAST","evenements.html")
-    push_b2_file("PERPLEXITY_TABLE_LAST","historique_evenements_%s.html" % dt)
-    push_b2_file("PERPLEXITY_TIMESTAMP","evenements_MAJ.txt" % dt)
+    push_b2_file(PERPLEXITY_TABLE_LAST,"evenements.html")
+    push_b2_file(PERPLEXITY_TABLE_STORE % dt,"historique_evenements_%s.html" % dt)
+    push_b2_file(PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt" % dt)
     logging.info(f"Perplexity query done")
     return html_content
 
