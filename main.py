@@ -731,15 +731,24 @@ def get_perplexity_events():
     #    print("HTML parsed successfully — no fatal errors.")
     with open(PERPLEXITY_TABLE_LAST, "w") as f:
         f.write(html_content)
+    logging.info(f"Perplexity query step 6b")
     dt = datetime.now().strftime("%Y-%m-%d")
+    logging.info(f"Perplexity query step 6c")
     with open(PERPLEXITY_TABLE_STORE % dt, "w") as f:
         f.write(html_content)
+    logging.info(f"Perplexity query step 6d")
+    logging.info(f"Perplexity query step 6e")
     time_now = datetime.now()
+    logging.info(f"Perplexity query step 6f")
     with open(PERPLEXITY_TIMESTAMP, 'w') as f:
         f.write(time_now.strftime("%Y-%m-%d %H:%M:%S"))
+    logging.info(f"Perplexity query step 6g")
     push_b2_file(PERPLEXITY_TABLE_LAST,"evenements.html")
+    logging.info(f"Perplexity query step 6h")
     push_b2_file(PERPLEXITY_TABLE_STORE % dt,"historique_evenements_%s.html" % dt)
+    logging.info(f"Perplexity query step 6i")
     push_b2_file(PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt" % dt)
+    logging.info(f"Perplexity query step 6j")
     logging.info(f"Perplexity query done")
     return html_content
 
