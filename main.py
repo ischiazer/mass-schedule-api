@@ -337,6 +337,7 @@ def download_content():
 # QUERY - FETCH DIR (LISTING OF FILES)
 @app.route("/show_dir")
 def show_dir():
+    logging.info('(Web access) show_dir')
     base_path = "."  # Start from current working directory
     file_list = []
 
@@ -868,24 +869,28 @@ def periodic_query_vatican_news():
 # QUERY - STATIC PERFPLEXITY NEWS
 @app.route('/static_news_nearby')
 def query_static_perplexity():
+    logging.info('(Web access) static_news_nearby')
     throw_static_file(PERPLEXITY_TABLE_LAST,"evenements.html", "/query_static_perplexity called")
 
 ##################################################################
 # QUERY - STATIC PERFPLEXITY NEWS
 @app.route('/static_news_nearby_timestamp')
 def query_static_perplexity_timestamp():
+    logging.info('(Web access) static_news_nearby_timestamp')
     throw_static_file(PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt", "/static_news_nearby_timestamp called")
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS
 @app.route('/static_news_vatican')
 def query_static_vatican():
+    logging.info('(Web access) static_news_vatican')
     throw_static_file(NEWS_TABLE,"nouvelles_vatican.html", "/static_news_vatican called")
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS TIMESTAMP
 @app.route('/static_news_vatican_timestamp')
 def static_news_vatican_timestamp():
+    logging.info('(Web access) static_news_vatican_timestamp')
     throw_static_file(NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt", "/static_news_vatican_timestamp called")
 
 
@@ -893,6 +898,7 @@ def static_news_vatican_timestamp():
 # QUERY - STATIC READINGS
 @app.route('/static_readings')
 def query_static_readings():
+    logging.info('(Web access) static_readings')
     throw_static_file(READINGS_PATH_LAST,"lectures.html", "/query_static_readings called")
 
 
