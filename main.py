@@ -793,6 +793,7 @@ def force_fetch_perplexity():
     try:
         get_perplexity_events()
     except Exception as e:
+        logging.info('Error running get_perplexity_events')
 
 ##################################################################
 # FUNCTION - FETCH VATICAN NEWS
