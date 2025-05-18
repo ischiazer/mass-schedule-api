@@ -103,8 +103,9 @@ def download_file_from_b2_if_absent(file_name, local_path):
 def throw_static_file(local_file, BB_file, message):
     logging.info(message)
     download_file_from_b2_if_absent(BB_file, local_file)
+    logging.info('Returning content for ', local_file)
+    logging.info('      File size =  ', os.path.getsize(local_file))
     return send_file(local_file, mimetype="text/html")
-
 
 ##################################################################
 # UTILITY: RE-ENCODING LATIN / UTF-8
@@ -899,28 +900,28 @@ def periodic_query_vatican_news():
 @app.route('/static_news_nearby')
 def query_static_perplexity():
     logging.info('(Web access) static_news_nearby')
-    throw_static_file(PERPLEXITY_TABLE_LAST,"evenements.html", "/query_static_perplexity called")
+    return throw_static_file(PERPLEXITY_TABLE_LAST,"evenements.html", "/query_static_perplexity called")
 
 ##################################################################
 # QUERY - STATIC PERFPLEXITY NEWS
 @app.route('/static_news_nearby_timestamp')
 def query_static_perplexity_timestamp():
     logging.info('(Web access) static_news_nearby_timestamp')
-    throw_static_file(PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt", "/static_news_nearby_timestamp called")
+    return throw_static_file(PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt", "/static_news_nearby_timestamp called")
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS
 @app.route('/static_news_vatican')
 def query_static_vatican():
     logging.info('(Web access) static_news_vatican')
-    throw_static_file(NEWS_TABLE,"nouvelles_vatican.html", "/static_news_vatican called")
+    return throw_static_file(NEWS_TABLE,"nouvelles_vatican.html", "/static_news_vatican called")
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS TIMESTAMP
 @app.route('/static_news_vatican_timestamp')
 def static_news_vatican_timestamp():
     logging.info('(Web access) static_news_vatican_timestamp')
-    throw_static_file(NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt", "/static_news_vatican_timestamp called")
+    return throw_static_file(NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt", "/static_news_vatican_timestamp called")
 
 
 ##################################################################
@@ -928,7 +929,7 @@ def static_news_vatican_timestamp():
 @app.route('/static_readings')
 def query_static_readings():
     logging.info('(Web access) static_readings')
-    throw_static_file(READINGS_PATH_LAST,"lectures.html", "/query_static_readings called")
+    return throw_static_file(READINGS_PATH_LAST,"lectures.html", "/query_static_readings called")
 
 
 ##################################################################
