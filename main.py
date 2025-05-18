@@ -103,8 +103,8 @@ def download_file_from_b2_if_absent(file_name, local_path):
 def throw_static_file(local_file, BB_file, message):
     logging.info(message)
     download_file_from_b2_if_absent(BB_file, local_file)
-    logging.info('Returning content for ', local_file)
-    logging.info('      File size =  ', os.path.getsize(local_file))
+    logging.info('Returning content for ' + str(local_file))
+    logging.info('      File size =  ' + str(os.path.getsize(local_file)))
     return send_file(local_file, mimetype="text/html")
 
 ##################################################################
@@ -893,6 +893,12 @@ def periodic_query_vatican_news():
         force_fetch_vatican_news()
         time.sleep(30 * 60)
 
+##################################################################
+# REGULAR CALL TO PERPLEXITY
+def periodic_query_perplexity():
+    while True:
+        force_fetch_perplexity()
+        time.sleep(12 * 60 * 60)
 
 
 ##################################################################
@@ -936,8 +942,10 @@ def query_static_readings():
 # MAIN LOOP
 
 if __name__ == "__main__":
-    thread = threading.Thread(target=periodic_query_readings, daemon=True)
-    thread.start()
+    # Define functions to be called at regular intervals
+    for func in [periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity]:
+        thread = threading.Thread(target=func, daemon=True)
+        thread.start()
 
     app.run(host="0.0.0.0", port=10000)
 
