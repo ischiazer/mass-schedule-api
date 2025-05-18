@@ -102,7 +102,7 @@ def download_file_from_b2_if_absent(file_name, local_path):
 # UTILITY FUNCTION - POST FILE (USING LOCAL IF AVAILABLE)
 def throw_static_file(local_file, BB_file, message):
     logging.info(message)
-    download_file_from_b2_if_absent(BB_file, local_file, message)
+    download_file_from_b2_if_absent(BB_file, local_file)
     return send_file(local_file, mimetype="text/html")
 
 
@@ -502,7 +502,32 @@ def convert_docx_to_html_with_cropped_images(docx_path, output_html_path, pic_fi
     with open(output_html_path, "w", encoding="utf-8") as f:
         f.write(html_wrapped)
     return html_wrapped
+##################################################################
+# UTILITY FUNCTION - REFORMAT HTML TABLE
+def reformat_html_table(html_code):
+    # Define your CSS styles
+    style = """
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th, td {
+        border: none;
+        border-bottom: 1px solid grey;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        color: #3579BE;
+      }
+    </style>
+    """
 
+    # Parse the HTML and add the style
+    soup = BeautifulSoup(html_code, "html.parser")
+    full_html = f"{style}{str(soup)}"
+    return full_html
 
 ##################################################################
 # QUERY - RECEIVE WORD FILE AND PROCESS INTO HTML
@@ -754,6 +779,10 @@ def get_perplexity_events():
     # 5 - Only keep the HTML content
     logging.info(f"Perplexity query step 5")
     html_content = html_content[html_content.upper().find('<TABLE'):html_content.upper().find('</TABLE')+8]
+
+    # 5B - Reformat the HTML table
+    logging.info(f"Perplexity query step 5b")
+    html_content = reformat_html_table(html_content)
 
     # 6 - Check that the HTML code is correct
     logging.info(f"Perplexity query step 6")
