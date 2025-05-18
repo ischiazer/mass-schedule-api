@@ -82,6 +82,31 @@ def push_b2_file(file_local, file_server):
     )
 
 ##################################################################
+# DOWNLOAD FILE FROM BLACKBLAZE
+def download_file_from_b2(file_name, local_path):
+    bucket = get_b2_bucket()
+    bucket.download_file_by_name(file_name).save_to(local_path)
+    print(f"Downloaded '{file_name}' to '{local_path}'")
+
+##################################################################
+# DOWNLOAD FILE FROM BLACKBLAZE ONLY IF ABSENT LOCALLY
+def download_file_from_b2_if_absent(file_name, local_path):
+    if os.path.exists(local_path):
+        logging.info('File already present: ', local_path)
+    else:
+        logging.info('Downloading from BB: ', local_path, ' | ', file_name)
+        download_file_from_b2(file_name, local_path)
+        logging.info('\t\tDone')
+
+##################################################################
+# UTILITY FUNCTION - POST FILE (USING LOCAL IF AVAILABLE)
+def throw_static_file(local_file, BB_file, message):
+    logging.info(message)
+    download_file_from_b2_if_absent(BB_file, local_file, message)
+    return send_file(local_file, mimetype="text/html")
+
+
+##################################################################
 # UTILITY: RE-ENCODING LATIN / UTF-8
 def fix_encoding(text):
     try:
@@ -768,7 +793,6 @@ def force_fetch_perplexity():
     try:
         get_perplexity_events()
     except Exception as e:
-        logging.info(f"Perplexity step failed {str(e)}")
 
 ##################################################################
 # FUNCTION - FETCH VATICAN NEWS
@@ -829,6 +853,47 @@ def force_fetch_vatican_news():
         get_news()
     except Exception as e:
         logging.info(f"Vatican news step failed {str(e)}")
+
+##################################################################
+# REGULAR CALL TO THE VATICAN NEWS QUERY
+def periodic_query_vatican_news():
+    while True:
+        force_fetch_vatican_news()
+        time.sleep(30 * 60)
+
+
+
+##################################################################
+# QUERY - STATIC PERFPLEXITY NEWS
+@app.route('/static_news_nearby')
+def query_static_perplexity():
+    throw_static_file(PERPLEXITY_TABLE_LAST,"evenements.html", "/query_static_perplexity called")
+
+##################################################################
+# QUERY - STATIC PERFPLEXITY NEWS
+@app.route('/static_news_nearby_timestamp')
+def query_static_perplexity_timestamp():
+    throw_static_file(PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt", "/static_news_nearby_timestamp called")
+
+##################################################################
+# QUERY - STATIC VATICAN NEWS
+@app.route('/static_news_vatican')
+def query_static_vatican():
+    throw_static_file(NEWS_TABLE,"nouvelles_vatican.html", "/static_news_vatican called")
+
+##################################################################
+# QUERY - STATIC VATICAN NEWS TIMESTAMP
+@app.route('/static_news_vatican_timestamp')
+def static_news_vatican_timestamp():
+    throw_static_file(NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt", "/static_news_vatican_timestamp called")
+
+
+##################################################################
+# QUERY - STATIC READINGS
+@app.route('/static_readings')
+def query_static_readings():
+    throw_static_file(READINGS_PATH_LAST,"lectures.html", "/query_static_readings called")
+
 
 ##################################################################
 # MAIN LOOP
