@@ -39,6 +39,7 @@ UPLOAD_FOLDER = "uploaded_files"
 WORD_FOLDER = "uploaded_word"
 HTML_FOLDER = "created_HTML"
 UPLOAD_LOG_FILE = "upload_log.txt"
+PATH_BULLETIN = 'bulletin_paroissial.html'
 READINGS_PATH_LAST = 'readings_current.html'
 READINGS_PATH_STORE = 'readings_%s.html'
 PERPLEXITY_TABLE_LAST = "evenements.html"
@@ -131,6 +132,15 @@ def french_date(dt_string):
     return date_obj.strftime("%A %d %B %Y").capitalize()
 
 ##################################################################
+# UTILITY: CURRENT DATE AND TIME IN FRENCH, USING BABEL
+def get_now_french():
+    paris_tz = pytz.timezone('Europe/Paris')
+    now_paris = datetime.now(paris_tz)
+    formatted = format_datetime(now_paris, "EEE d MMMM y 'à' HH:mm", locale='fr_FR')
+    return formatted
+
+
+##################################################################
 # FUNCTION TO UPDATE LOG OF FILES BEING UPLOADED
 def log_upload(status, filename, detail=""):
     timestamp = datetime.utcnow().isoformat()
@@ -140,8 +150,6 @@ def log_upload(status, filename, detail=""):
 
 ##################################################################
 # UTILITY : HTML-FORMATTED TIME STAMP
-
-
 def get_time_stamp_HTML():
     try:
         locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
@@ -564,6 +572,10 @@ def deliver_word():
             with open(latest_path, "w", encoding="utf-8") as f:
                 f.write(html)
 
+            # Also write to bulletin_paroissial.html
+            with open(PATH_BULLETIN, "w", encoding="utf-8") as f:
+                f.write(html)
+
             # Push the HTML file to the BlackBlaze server
             push_b2_file(latest_path, 'bulletin_paroissial.html')
 
@@ -587,7 +599,6 @@ def latest_word_html():
 
 ##################################################################
 # SUBFUNCTION FOR READINGS: DATE OP NEXT SUNDAY
-
 def get_next_sunday():
     today = date.today()
     days_until_sunday = (6 - today.weekday()) % 7
@@ -596,7 +607,6 @@ def get_next_sunday():
 
 ##################################################################
 # SUBFUNCTION FOR READINGS: GIVE CURRENT URL TO READ
-
 def get_current_readings_URL():
     base_url = "https://levangileauquotidien.org/FR/gospel/"
     return base_url + get_next_sunday()
@@ -604,7 +614,6 @@ def get_current_readings_URL():
 
 ##################################################################
 # SUB-FUNCTION TO FETCH READINGS VIA CHROMIUM
-
 async def readings_extract_all_sections(url):
     logging.info("/fetch_readings async started")
     try:
@@ -657,7 +666,6 @@ async def readings_extract_all_sections(url):
 
 ##################################################################
 # MAIN FUNCTION TO FETCH READINGS
-
 def fetch_readings():
     global z
     url = get_current_readings_URL()
@@ -900,9 +908,8 @@ def periodic_query_perplexity():
         force_fetch_perplexity()
         time.sleep(12 * 60 * 60)
 
-
 ##################################################################
-# QUERY - STATIC PERFPLEXITY NEWS
+# QUERY - STATIC PERPLEXITY NEWS
 @app.route('/static_news_nearby')
 def query_static_perplexity():
     logging.info('(Web access) static_news_nearby')
@@ -936,6 +943,14 @@ def static_news_vatican_timestamp():
 def query_static_readings():
     logging.info('(Web access) static_readings')
     return throw_static_file(READINGS_PATH_LAST,"lectures.html", "/query_static_readings called")
+
+
+##################################################################
+# QUERY - STATIC PARISH PAPER
+@app.route('/static_bulletin')
+def query_static_bulletin():
+    logging.info('(Web access) query_static_bulletin')
+    return throw_static_file(PATH_BULLETIN,"bulletin_paroissial.html", "/query_static_bulletin called")
 
 
 ##################################################################
