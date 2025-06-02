@@ -928,14 +928,14 @@ def get_city_mapping():
 # SUB-FUNCTION - GET FROM WEB HTML FILE WITH TEMPERATURE FOR ONE CITY
 
 async def temperature_fetch_full_text(city):
-    logging.info("[City] " + str(city + ' start')
+    logging.info("[City] " + str(city) + ' start')
     url = get_city_mapping()[city]
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         await page.goto(url)
         await page.wait_for_selector("body")  # Wait for the main body to load
-        logging.info("[City] " + str(city + ' end')
+        logging.info("[City] " + str(city) + ' end')
         return await page.inner_text("body")
 
 ##################################################################
