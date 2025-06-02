@@ -943,7 +943,7 @@ def temperature_current():
     temps = pd.DataFrame(index=[k for k in get_city_mapping()], columns=[dt_str])
     for city in temps.index:
         print(city)
-        html = run_async(temperature_fetch_full_text(city))
+        html = temperature_fetch_full_text(city)
         html = html[html.index('(Today)'):]
         html = html[:html.index('°C')]
         html = html[html.index('\n')+1:]
@@ -1001,6 +1001,7 @@ def query_historical_temperature():
         return throw_static_file(TEMPERATURE_CSV,TEMPERATURE_CSV, "/fetch_temperature_history called")
     except Exception as e:
         logging.info(f"Current temperature failed {str(e)}")
+        return "Error " + str(e)
 
 
 ##################################################################
