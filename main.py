@@ -46,6 +46,7 @@ READINGS_PATH_STORE = 'readings_%s.html'
 PERPLEXITY_TABLE_LAST = "evenements.html"
 PERPLEXITY_TIMESTAMP = "evenements_MAJ.txt"
 PERPLEXITY_TABLE_STORE = "evenements_%s.html"
+TEMPERATURE_CSV = 'temperatures.csv'
 NEWS_TABLE = "nouvelles_vatican.html"
 NEWS_TIMESTAMP = "nouvelles_MAJ.txt"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -978,6 +979,29 @@ def update_temperatures():
 # FUNCTION: CALL THE SEA TEMPERATURE UPDATE
 def force_fetch_temperature():
     update_temperature()
+
+##################################################################
+# QUERY - FETCH CURRENT TEMPERATURE
+@app.route('/fetch_current_temperature')
+def query_current_temperature():
+    logging.info("/fetch_vatican_news called")
+    try:
+        x = temperature_current()
+        return str(x)
+    except Exception as e:
+        logging.info(f"Current temperature failed {str(e)}")
+
+##################################################################
+# QUERY - FETCH TEMPERATURE HISTORY
+@app.route('/fetch_temperature_history')
+def query_current_temperature():
+    logging.info("/fetch_temperature_history called")
+    try:
+        x = update_temperature()
+        return throw_static_file(TEMPERATURE_CSV,TEMPERATURE_CSV, "/fetch_temperature_history called")
+    except Exception as e:
+        logging.info(f"Current temperature failed {str(e)}")
+
 
 ##################################################################
 # QUERY - FETCH VATICAN NEWS
