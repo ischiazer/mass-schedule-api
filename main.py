@@ -990,7 +990,7 @@ def update_temperatures():
 ##################################################################
 # FUNCTION: CALL THE SEA TEMPERATURE UPDATE
 def force_fetch_temperature():
-    logging.info("force_fetch_temperature')
+    logging.info("force_fetch_temperature")
     update_temperatures()
 
 ##################################################################
@@ -998,9 +998,9 @@ def force_fetch_temperature():
 @app.route('/fetch_current_temperature')
 def query_current_temperature():
     try:
-        logging.info("fetch_current_temperature start')
+        logging.info("fetch_current_temperature start")
         result = asyncio.run(temperature_current())
-        logging.info("fetch_current_temperature end')
+        logging.info("fetch_current_temperature end")
         return result.to_csv()
     except Exception as e:
         logging.error(f"Current temperature failed: {e}")
@@ -1010,7 +1010,7 @@ def query_current_temperature():
 # QUERY - FETCH TEMPERATURE HISTORY
 @app.route('/fetch_temperature_history')
 def query_historical_temperature():
-    logging.info("fetch_temperature_history')
+    logging.info("fetch_temperature_history")
     try:
         return throw_static_file(TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
     except Exception as e:
