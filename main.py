@@ -938,7 +938,7 @@ async def temperature_fetch_full_text(city):
 
 ##################################################################
 # SUB-FUNCTION - GET FROM WEB CURRENT TEMPERATURE
-def temperature_current():
+async def temperature_current():
     dt_str = datetime.today().strftime('%Y-%m-%d')
     temps = pd.DataFrame(index=[k for k in get_city_mapping()], columns=[dt_str])
     for city in temps.index:
