@@ -988,7 +988,7 @@ def update_temperatures():
     else:
         logging.info('Starting join...')
         temps_updated = temps_new.join(temps_existing, how='outer')
-        logging.info(...done joining')
+        logging.info('...done joining')
     logging.info("...Done")
 
     # Save and upload
