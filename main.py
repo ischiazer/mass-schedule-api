@@ -962,7 +962,7 @@ def update_temperatures():
     temps_existing = pd.read_csv(TEMPERATURE_CSV,index_col=0)
 
     # Get current temperatures
-    temps_new = temperature_current()
+    temps_new = asyncio.run(temperature_current())
 
     # Add current temperatures to existing
     if temps_new.columns[0] in temps_existing.columns:
