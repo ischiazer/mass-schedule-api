@@ -928,17 +928,20 @@ def get_city_mapping():
 # SUB-FUNCTION - GET FROM WEB HTML FILE WITH TEMPERATURE FOR ONE CITY
 
 async def temperature_fetch_full_text(city):
+    logging.info("[City] " + str(city + ' start')
     url = get_city_mapping()[city]
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         await page.goto(url)
         await page.wait_for_selector("body")  # Wait for the main body to load
+        logging.info("[City] " + str(city + ' end')
         return await page.inner_text("body")
 
 ##################################################################
 # SUB-FUNCTION - GET FROM WEB CURRENT TEMPERATURE
 async def temperature_current():
+    logging.info("[Current temp] Start]")
     dt_str = datetime.today().strftime('%Y-%m-%d')
     temps = pd.DataFrame(index=[k for k in get_city_mapping()], columns=[dt_str])
     for city in temps.index:
@@ -952,32 +955,42 @@ async def temperature_current():
             logging.warning(f"Failed to fetch temperature for {city}: {e}")
             t = np.nan
         temps.loc[city, dt_str] = t
+    logging.info("[Current temp] End]")
     return temps
 
 ##################################################################
 # FUNCTION - UPDATE SEA TEMPERATURE FILE
 def update_temperatures():
     # Load existing history of temperatures
+    logging.info("Downloading temperature file...")
     download_file_from_b2(TEMPERATURE_CSV, TEMPERATURE_CSV)
+    logging.info("Done")
     temps_existing = pd.read_csv(TEMPERATURE_CSV,index_col=0)
+    logging.info("Converted to dataframe")
 
     # Get current temperatures
+    logging.info("Getting current...")
     temps_new = asyncio.run(temperature_current())
+    logging.info("...done")
 
     # Add current temperatures to existing
+    logging.info("Joining...")
     if temps_new.columns[0] in temps_existing.columns:
         print('Date %s already present' % temps_new.columns[0])
         temps_updated = temps_existing.copy()
     else:
         temps_updated = temps_new.join(temps_existing, how='outer')
+    logging.info("...Done")
 
     # Save and upload
+    logging.info("...Done")
     temps_updated.to_csv(TEMPERATURE_CSV)
     push_b2_file(TEMPERATURE_CSV,TEMPERATURE_CSV)
 
 ##################################################################
 # FUNCTION: CALL THE SEA TEMPERATURE UPDATE
 def force_fetch_temperature():
+    logging.info("force_fetch_temperature')
     update_temperatures()
 
 ##################################################################
@@ -985,7 +998,9 @@ def force_fetch_temperature():
 @app.route('/fetch_current_temperature')
 def query_current_temperature():
     try:
+        logging.info("fetch_current_temperature start')
         result = asyncio.run(temperature_current())
+        logging.info("fetch_current_temperature end')
         return result.to_csv()
     except Exception as e:
         logging.error(f"Current temperature failed: {e}")
@@ -995,6 +1010,7 @@ def query_current_temperature():
 # QUERY - FETCH TEMPERATURE HISTORY
 @app.route('/fetch_temperature_history')
 def query_historical_temperature():
+    logging.info("fetch_temperature_history')
     try:
         return throw_static_file(TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
     except Exception as e:
@@ -1082,9 +1098,13 @@ def query_static_bulletin():
 
 
 def start_background_loop_temperature():
+    logging.info("/start_background_loop_temperature 1")
     loop = asyncio.new_event_loop()
+    logging.info("/start_background_loop_temperature 2")
     asyncio.set_event_loop(loop)
+    logging.info("/start_background_loop_temperature 3")
     loop.run_until_complete(periodic_query_temperature())
+    logging.info("/start_background_loop_temperature 4")
 
 ##################################################################
 # MAIN LOOP
