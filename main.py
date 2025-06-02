@@ -87,8 +87,14 @@ def push_b2_file(file_local, file_server):
 ##################################################################
 # DOWNLOAD FILE FROM BLACKBLAZE
 def download_file_from_b2(file_name, local_path):
+    logging.info('Getting bucket...')
     bucket = get_b2_bucket()
-    bucket.download_file_by_name(file_name).save_to(local_path)
+    logging.info('Done')
+    logging.info('Downloading file '+ str(file_name))
+    x = bucket.download_file_by_name(file_name).
+    logging.info('Save file '+ str(local_path))
+    x.save_to(local_path)
+    logging.info('Done')
     print(f"Downloaded '{file_name}' to '{local_path}'")
 
 ##################################################################
@@ -97,7 +103,7 @@ def download_file_from_b2_if_absent(file_name, local_path):
     if os.path.exists(local_path):
         logging.info('File already present: ', local_path)
     else:
-        logging.info('Downloading from BB: ', local_path, ' | ', file_name)
+        logging.info('Downloading from BB: ' + str(local_path) + ' | ' + str(file_name))
         download_file_from_b2(file_name, local_path)
         logging.info('\t\tDone')
 
