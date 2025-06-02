@@ -942,14 +942,14 @@ async def temperature_current():
     dt_str = datetime.today().strftime('%Y-%m-%d')
     temps = pd.DataFrame(index=[k for k in get_city_mapping()], columns=[dt_str])
     for city in temps.index:
-        print(city)
-        html = await temperature_fetch_full_text(city)
-        html = html[html.index('(Today)'):]
-        html = html[:html.index('°C')]
-        html = html[html.index('\n')+1:]
         try:
+            html = await temperature_fetch_full_text(city)
+            html = html[html.index('(Today)'):]
+            html = html[:html.index('°C')]
+            html = html[html.index('\n')+1:]
             t = float(html)
-        except:
+        except Exception as e:
+            logging.warning(f"Failed to fetch temperature for {city}: {e}")
             t = np.nan
         temps.loc[city, dt_str] = t
     return temps
@@ -984,24 +984,22 @@ def force_fetch_temperature():
 # QUERY - FETCH CURRENT TEMPERATURE
 @app.route('/fetch_current_temperature')
 def query_current_temperature():
-    logging.info("/fetch_vatican_news called")
     try:
-        x = temperature_current()
-        return str(x)
+        result = asyncio.run(temperature_current())
+        return result.to_csv()
     except Exception as e:
-        logging.info(f"Current temperature failed {str(e)}")
+        logging.error(f"Current temperature failed: {e}")
+        return "Error fetching temperature", 500
 
 ##################################################################
 # QUERY - FETCH TEMPERATURE HISTORY
 @app.route('/fetch_temperature_history')
 def query_historical_temperature():
-    logging.info("/fetch_temperature_history called")
     try:
-        #x = update_temperatures()
-        return throw_static_file(TEMPERATURE_CSV,TEMPERATURE_CSV, "/fetch_temperature_history called")
+        return throw_static_file(TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
     except Exception as e:
-        logging.info(f"Current temperature failed {str(e)}")
-        return "Error " + str(e)
+        logging.error(f"History fetch failed: {e}")
+        return "Error fetching history", 500
 
 
 ##################################################################
@@ -1030,11 +1028,13 @@ def periodic_query_perplexity():
 
 ##################################################################
 # REGULAR CALL TO THE SEA TEMPERATURE
-def periodic_query_temperature():
+async def periodic_query_temperature():
     while True:
-        force_fetch_temperature()
-        time.sleep(60 * 60 * 12)
-
+        try:
+            await temperature_current()
+        except Exception as e:
+            logging.warning(f"Periodic fetch failed: {e}")
+        await asyncio.sleep(60 * 60 * 12)
 
 ##################################################################
 # QUERY - STATIC PERPLEXITY NEWS
@@ -1081,12 +1081,17 @@ def query_static_bulletin():
     return throw_static_file(PATH_BULLETIN,"bulletin_paroissial.html", "/query_static_bulletin called")
 
 
+def start_background_loop_temperature():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(periodic_query_temperature())
+
 ##################################################################
 # MAIN LOOP
 
 if __name__ == "__main__":
     # Define functions to be called at regular intervals
-    for func in [periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity]:
+    for func in [periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, start_background_loop_temperature]:
         thread = threading.Thread(target=func, daemon=True)
         thread.start()
 
