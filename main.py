@@ -95,7 +95,7 @@ def download_file_from_b2(file_name, local_path):
     logging.info('Save file '+ str(local_path))
     x.save_to(local_path)
     logging.info('Done')
-    print(f"Downloaded '{file_name}' to '{local_path}'")
+    logging.info(f"Downloaded '{file_name}' to '{local_path}'")
 
 ##################################################################
 # DOWNLOAD FILE FROM BLACKBLAZE ONLY IF ABSENT LOCALLY
@@ -433,7 +433,7 @@ def extract_cropped_images_proportional(docx_path, output_dir, logo_details):
                 try:
                     img = Image.open(io.BytesIO(media_files[image_path])).convert("RGB")
                 except:
-                    print('Image %s skipped' % image_name)
+                    logging.info('Image %s skipped' % image_name)
                     results.append((image_name, Path(output_dir)/Path(image_path)))
                 else:
                     width_px, height_px = img.size
@@ -457,7 +457,7 @@ def extract_cropped_images_proportional(docx_path, output_dir, logo_details):
                         cropped.save(out_path)
                         results.append((image_name, out_path))
                     except Exception as e:
-                        print(f"Failed cropping {image_name}: {e}")
+                        logging.info(f"Failed cropping {image_name}: {e}")
                         continue
 
         return results
@@ -480,10 +480,10 @@ def convert_docx_to_html_with_cropped_images(docx_path, output_html_path, pic_fi
                 b64 = base64.b64encode(f.read()).decode("utf-8")
             return {"src": f"data:image/{ext};base64,{b64}"}
         except StopIteration:
-            print("⚠️ More images in DOCX than available cropped images. Falling back.")
+            logging.info("⚠️ More images in DOCX than available cropped images. Falling back.")
             return {}
         except Exception as e:
-            print(f"⚠️ Error processing image: {e}")
+            logging.info(f"⚠️ Error processing image: {str(e)}")
             return {}
 
     result = mammoth.convert_to_html(docx_path, convert_image=mammoth.images.inline(convert_image))
@@ -982,10 +982,13 @@ def update_temperatures():
     # Add current temperatures to existing
     logging.info("Joining...")
     if temps_new.columns[0] in temps_existing.columns:
-        print('Date %s already present' % temps_new.columns[0])
+        logging.info('Date %s already present' % str(temps_new.columns[0]))
         temps_updated = temps_existing.copy()
+        logging.info('copied')
     else:
+        logging.info('Starting join...')
         temps_updated = temps_new.join(temps_existing, how='outer')
+        logging.info(...done joining')
     logging.info("...Done")
 
     # Save and upload
@@ -1057,14 +1060,14 @@ def force_fetch_vatican_news():
 def periodic_query_vatican_news():
     while True:
         force_fetch_vatican_news()
-        time.sleep(30 * 60)
+        time.sleep(90 * 60)
 
 ##################################################################
 # REGULAR CALL TO PERPLEXITY
 def periodic_query_perplexity():
     while True:
         force_fetch_perplexity()
-        time.sleep(12 * 60 * 60)
+        time.sleep(24 * 60 * 60)
 
 ##################################################################
 # REGULAR CALL TO THE SEA TEMPERATURE
