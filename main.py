@@ -91,7 +91,7 @@ def download_file_from_b2(file_name, local_path):
     bucket = get_b2_bucket()
     logging.info('Done')
     logging.info('Downloading file '+ str(file_name))
-    x = bucket.download_file_by_name(file_name).
+    x = bucket.download_file_by_name(file_name)
     logging.info('Save file '+ str(local_path))
     x.save_to(local_path)
     logging.info('Done')
