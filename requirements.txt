@@ -12,3 +12,5 @@ openai
 schedule
 feedparser
 babel
+numpy
+pandas
