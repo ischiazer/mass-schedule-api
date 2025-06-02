@@ -943,7 +943,7 @@ def temperature_current():
     temps = pd.DataFrame(index=[k for k in get_city_mapping()], columns=[dt_str])
     for city in temps.index:
         print(city)
-        html = temperature_fetch_full_text(city)
+        html = await temperature_fetch_full_text(city)
         html = html[html.index('(Today)'):]
         html = html[:html.index('°C')]
         html = html[html.index('\n')+1:]
