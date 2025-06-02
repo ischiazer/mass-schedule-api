@@ -994,7 +994,7 @@ def query_current_temperature():
 ##################################################################
 # QUERY - FETCH TEMPERATURE HISTORY
 @app.route('/fetch_temperature_history')
-def query_current_temperature():
+def query_historical_temperature():
     logging.info("/fetch_temperature_history called")
     try:
         x = update_temperature()
