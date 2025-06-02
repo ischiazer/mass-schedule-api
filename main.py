@@ -989,9 +989,12 @@ def update_temperatures():
     logging.info("...Done")
 
     # Save and upload
-    logging.info("...Done")
+    logging.info("Saving CSV...")
     temps_updated.to_csv(TEMPERATURE_CSV)
+    logging.info("...Done")
+    logging.info(Pushing BB file...")
     push_b2_file(TEMPERATURE_CSV,TEMPERATURE_CSV)
+    logging.info("...Done")
 
 ##################################################################
 # FUNCTION: CALL THE SEA TEMPERATURE UPDATE
