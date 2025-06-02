@@ -1023,6 +1023,21 @@ def query_historical_temperature():
         logging.error(f"History fetch failed: {e}")
         return "Error fetching history", 500
 
+##################################################################
+# QUERY - FORCE UPDATE Y
+@app.route('/update_temperature')
+def query_update_temperature():
+    logging.info("force update_temperature")
+    try:
+        update_temperatures()
+        logging.info("update done")
+        logging.info("Getting file...")
+        x = throw_static_file(TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
+        logging.info("...done")
+        return x
+    except Exception as e:
+        logging.error(f"Force update failed: {e}")
+        return "Error Force update", 500
 
 ##################################################################
 # QUERY - FETCH VATICAN NEWS
