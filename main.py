@@ -737,7 +737,7 @@ def get_perplexity_events():
     client = OpenAI(api_key=api_key, base_url="https://api.perplexity.ai")
 
     # 1 -- Base query
-    logging.info(f"Perplexity query step 1")
+    logging.info("Perplexity query step 1")
     query = "Pouvez-vous me donner la liste des événements religieux catholiques tels que pélerinages, processions, ou retraites organisés autour de Saint Malo ou du Mont Saint Michel, Saint Méloir des Ondes, l'abbaye de Beaufort (Plerguer) dans le mois à venir. Je souhaiterais au moins trois événements"
     response = client.chat.completions.create(
         model="llama-3.1-sonar-large-128k-online",  # Or another available Perplexity model
@@ -751,7 +751,7 @@ def get_perplexity_events():
     ]
 
     # 2 -- Add locations we like
-    logging.info(f"Perplexity query step 2")
+    logging.info("Perplexity query step 2")
     query_additions = ("Si il y a des événements religieux catholiques pertinents dans le mois à venir dans les abbayes suivantes, pouvez-vous les ajouter à ce que vous venez de me donner? \n"
         "- Monastère de Beaufort (https://www.monastere-beaufort.com/accueil.php)\n"
         "- Abbaye de Saint Jacut (https://www.abbaye-st-jacut.com/)\n"
@@ -764,7 +764,7 @@ def get_perplexity_events():
     history.append({"role": "assistant", "content": response2.choices[0].message.content})
 
     # 3 -- Filter the results
-    logging.info(f"Perplexity query step 3")
+    logging.info("Perplexity query step 3")
     results = response.choices[0].message.content+'\n\n'+response2.choices[0].message.content
     post_process_instruction = (
         "Voici les événements catholiques que vous avez trouvé:\n\n"
@@ -779,7 +779,7 @@ def get_perplexity_events():
     history.append({"role": "assistant", "content": post_process_response.choices[0].message.content})
 
     # 4 -- Formatting
-    logging.info(f"Perplexity query step 4")
+    logging.info("Perplexity query step 4")
     results_filtered = post_process_response.choices[0]
     formatting_instruction = (
         "Voici ce que vous avez trouvé:"
@@ -794,39 +794,39 @@ def get_perplexity_events():
     html_content = formatted_response.choices[0].message.content
 
     # 5 - Only keep the HTML content
-    logging.info(f"Perplexity query step 5")
+    logging.info("Perplexity query step 5")
     html_content = html_content[html_content.upper().find('<TABLE'):html_content.upper().find('</TABLE')+8]
 
     # 5B - Reformat the HTML table
-    logging.info(f"Perplexity query step 5b")
+    logging.info("Perplexity query step 5b")
     html_content = reformat_html_table(html_content)
 
     # 6 - Check that the HTML code is correct
-    logging.info(f"Perplexity query step 6")
+    logging.info("Perplexity query step 6")
     #try:
     #    soup = BeautifulSoup(html_content, "html5lib")
     #    print("HTML parsed successfully — no fatal errors.")
     with open(PERPLEXITY_TABLE_LAST, "w") as f:
         f.write(html_content)
-    logging.info(f"Perplexity query step 6b")
+    logging.info("Perplexity query step 6b")
     dt = datetime.now().strftime("%Y-%m-%d")
-    logging.info(f"Perplexity query step 6c")
+    logging.info("Perplexity query step 6c")
     with open(PERPLEXITY_TABLE_STORE % dt, "w") as f:
         f.write(html_content)
-    logging.info(f"Perplexity query step 6d")
-    logging.info(f"Perplexity query step 6e")
+    logging.info("Perplexity query step 6d")
+    logging.info("Perplexity query step 6e")
     time_now = datetime.now()
-    logging.info(f"Perplexity query step 6f")
+    logging.info("Perplexity query step 6f")
     with open(PERPLEXITY_TIMESTAMP, 'w') as f:
         f.write(time_now.strftime("%Y-%m-%d %H:%M:%S"))
-    logging.info(f"Perplexity query step 6g")
+    logging.info("Perplexity query step 6g")
     push_b2_file(PERPLEXITY_TABLE_LAST,"evenements.html")
-    logging.info(f"Perplexity query step 6h")
+    logging.info("Perplexity query step 6h")
     push_b2_file(PERPLEXITY_TABLE_STORE % dt,"historique_evenements_%s.html" % dt)
-    logging.info(f"Perplexity query step 6i")
+    logging.info("Perplexity query step 6i")
     push_b2_file(PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt")
-    logging.info(f"Perplexity query step 6j")
-    logging.info(f"Perplexity query done")
+    logging.info("Perplexity query step 6j")
+    logging.info("Perplexity query done")
     return html_content
 
     #except Exception as e:
@@ -995,7 +995,7 @@ def update_temperatures():
     logging.info("Saving CSV...")
     temps_updated.to_csv(TEMPERATURE_CSV)
     logging.info("...Done")
-    logging.info(Pushing BB file...")
+    logging.info("Pushing BB file...")
     push_b2_file(TEMPERATURE_CSV,TEMPERATURE_CSV)
     logging.info("...Done")
 
