@@ -978,7 +978,7 @@ def update_temperatures():
 ##################################################################
 # FUNCTION: CALL THE SEA TEMPERATURE UPDATE
 def force_fetch_temperature():
-    update_temperature()
+    update_temperatures()
 
 ##################################################################
 # QUERY - FETCH CURRENT TEMPERATURE
@@ -997,7 +997,7 @@ def query_current_temperature():
 def query_historical_temperature():
     logging.info("/fetch_temperature_history called")
     try:
-        x = update_temperature()
+        #x = update_temperatures()
         return throw_static_file(TEMPERATURE_CSV,TEMPERATURE_CSV, "/fetch_temperature_history called")
     except Exception as e:
         logging.info(f"Current temperature failed {str(e)}")
