@@ -101,7 +101,7 @@ def download_file_from_b2(file_name, local_path):
 # DOWNLOAD FILE FROM BLACKBLAZE ONLY IF ABSENT LOCALLY
 def download_file_from_b2_if_absent(file_name, local_path):
     if os.path.exists(local_path):
-        logging.info('File already present: ', local_path)
+        logging.info('File already present: '+str(local_path))
     else:
         logging.info('Downloading from BB: ' + str(local_path) + ' | ' + str(file_name))
         download_file_from_b2(file_name, local_path)
@@ -1026,7 +1026,7 @@ def query_historical_temperature():
     try:
         return throw_static_file(TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
     except Exception as e:
-        logging.error(f"History fetch failed: {e}")
+        logging.error(f"History fetch failed: {str(e)}")
         return "Error fetching history", 500
 
 ##################################################################
@@ -1042,7 +1042,7 @@ def query_update_temperature():
         logging.info("...done")
         return x
     except Exception as e:
-        logging.error(f"Force update failed: {e}")
+        logging.error(f"Force update failed: {str(e)}")
         return "Error Force update", 500
 
 ##################################################################
