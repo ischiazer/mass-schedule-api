@@ -1074,7 +1074,7 @@ def periodic_query_perplexity():
 async def periodic_query_temperature():
     while True:
         try:
-            await temperature_current()
+            update_temperatures()
         except Exception as e:
             logging.warning(f"Periodic fetch failed: {e}")
         await asyncio.sleep(60 * 60 * 12)
