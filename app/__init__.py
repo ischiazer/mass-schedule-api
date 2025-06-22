@@ -3,10 +3,12 @@ from flask_cors import CORS
 import logging
 import nest_asyncio
 from .temperature import bp_temperature
-from .meloir import bp_meloir, meloir_initialise
+from .meloir import bp_meloir
+from .meloir import meloir_initialise
 from .temperature_functions import background_loop_temperature
 from .meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity
-from .berger import bp_berger, berger_initialise
+from .berger import bp_berger
+from .berger import berger_initialise
 import threading
 
 ##################################################################
