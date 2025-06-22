@@ -240,12 +240,6 @@ def fetch_readings():
     return full_text
 
 
-##################################################################
-# REGULAR CALL TO THE READINGS QUERY
-def periodic_query_readings():
-    while True:
-        fetch_readings()
-        time.sleep(1 * 60 * 60)  # Sleep 1 hours
 
 ##################################################################
 # FUNCTION CALLING PERPLEXITY TO FIND NEARBY EVENTS
@@ -405,6 +399,7 @@ def get_news():
 ##################################################################
 # REGULAR CALL TO THE VATICAN NEWS QUERY
 def periodic_query_vatican_news():
+    time.sleep(27 * 60)
     while True:
         get_news()
         time.sleep(90 * 60)
@@ -412,6 +407,15 @@ def periodic_query_vatican_news():
 ##################################################################
 # REGULAR CALL TO PERPLEXITY
 def periodic_query_perplexity():
+    time.sleep(2 * 60 * 60)
     while True:
         get_perplexity_events()
         time.sleep(24 * 60 * 60)
+
+##################################################################
+# REGULAR CALL TO THE READINGS QUERY
+def periodic_query_readings():
+    time.sleep(.25 * 60 * 60) 
+    while True:
+        fetch_readings()
+        time.sleep(1 * 60 * 60)  # Sleep 1 hours

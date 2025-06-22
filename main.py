@@ -24,6 +24,7 @@ print('*app created*')
 # SCHEDULE TASKS
 def start_background_threads():
     # Define functions to be called at regular intervals
+    print('--- beginning of function for background threads')
     for func in [background_loop_temperature, periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity]:
         try:
             logging.info(f"Starting background thread: {func.__name__}")

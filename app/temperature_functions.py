@@ -127,6 +127,7 @@ def force_fetch_temperature():
 ##################################################################
 # REGULAR CALL TO THE SEA TEMPERATURE
 async def periodic_query_temperature():
+    await asyncio.sleep(60 * 60 * 3)   
     while True:
         try:
             update_temperatures()
