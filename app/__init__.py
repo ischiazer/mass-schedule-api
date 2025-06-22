@@ -11,6 +11,9 @@ from .berger import bp_berger
 from .berger import berger_initialise
 import threading
 
+print('* Check after import *')
+print("Routes in bp_berger:", len(bp_berger.deferred_functions))
+print('* Done *')
 ##################################################################
 # APP INITIALISATION
 def create_app():
