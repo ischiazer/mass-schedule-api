@@ -14,11 +14,6 @@ from .utilities import log_upload, extract_cropped_images_proportional, convert_
 from flask import request, send_file, Response
 
 
-##################################################################
-# REGISTER BLUEPRINT
-bp_meloir = Blueprint("bp_meloir", __name__)
-logging.info('Blueprint Meloir done')
-print("Registering bp_meloir") 
 
 ##################################################################
 # INITIALISATION OF MODULE
@@ -307,3 +302,8 @@ def query_static_bulletin():
     logging.info('(Web access) query_static_bulletin')
     return throw_static_file('meloir',PATH_BULLETIN,"bulletin_paroissial.html", "/query_static_bulletin called")
 
+##################################################################
+# REGISTER BLUEPRINT
+bp_meloir = Blueprint("bp_meloir", __name__)
+logging.info('Blueprint Meloir done')
+print("Registering bp_meloir") 

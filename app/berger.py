@@ -7,11 +7,6 @@ from .utilities import download_file_from_b2_if_absent
 from flask import request, jsonify, send_file, Response
 import logging
 
-##################################################################
-# REGISTER BLUEPRINT
-bp_berger = Blueprint("bp_berger", __name__)
-logging.info('BP Berger started')
-print("Registering bp_berger") 
 
 ##################################################################
 # INITIALISATION OF MODULE
@@ -191,3 +186,8 @@ def check_page():
     logging.info('...done')
     return html
 
+##################################################################
+# REGISTER BLUEPRINT
+bp_berger = Blueprint("bp_berger", __name__)
+logging.info('BP Berger started')
+print("Registering bp_berger") 
