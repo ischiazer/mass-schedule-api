@@ -1,3 +1,4 @@
+gunicorn
 flask
 nest_asyncio
 playwright
