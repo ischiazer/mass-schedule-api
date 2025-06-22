@@ -32,19 +32,24 @@ def start_background_threads():
 # MAIN
 if __name__ == "__main__":
     logging.info('Starting the app...')
+    print('*starting the app*')
     app = create_app()
+    print('*app created*')
     initialise_modules()
+    print('*modules initialised*')
     logging.info('... started')
     logging.info('Starting background threads...')
     start_background_threads()
     logging.info('...done')
     if os.getenv("LOCAL_LAPTOP")=='':
+        print('* on server *')
         logging.info("Starting Flask server on remote location")
         port = int(os.environ.get("PORT", 10000))
         logging.info('Port = ' + str(port))
         app.run(host="0.0.0.0", port=port)
         logging.info("Flask server started")
     else:
+        print('* is local *')
         logging.info("Starting Flask server locally on port 5050")
         app.run(debug=True, port=5050)
         logging.info("Flask server started")

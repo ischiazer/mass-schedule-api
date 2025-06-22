@@ -14,9 +14,11 @@ logging.info('BP Berger started')
 print("Registering bp_berger") 
 
 ##################################################################
-# INITIALISE
+# INITIALISATION OF MODULE
 def berger_initialise():
+    print('Checking if Berger DB is present...')
     download_file_from_b2_if_absent('berger',DB_NAME, DB_NAME)
+    print('...done')
 
 ##################################################################
 # QUERY - Process request for synthetic summary
