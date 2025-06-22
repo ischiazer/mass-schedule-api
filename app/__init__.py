@@ -2,18 +2,29 @@ from flask import Flask
 from flask_cors import CORS
 import logging
 import nest_asyncio
-from .temperature import bp_temperature
-from .meloir import bp_meloir
 from .meloir import meloir_initialise
 from .temperature_functions import background_loop_temperature
 from .meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity
-from .berger import bp_berger
 from .berger import berger_initialise
 import threading
 
 print('* Check after import *')
 print("Routes in bp_berger:", len(bp_berger.deferred_functions))
 print('* Done *')
+
+##################################################################
+# BLUEPRINT REGISTRATIONS
+def register_blueprints(app):
+    print('/ register_bluperint function/')
+    from .berger import bp_berger
+    from .meloir import bp_meloir
+    from .temperature import bp_temperature
+
+    app.register_blueprint(bp_berger, url_prefix="")
+    app.register_blueprint(bp_meloir, url_prefix="")
+    app.register_blueprint(bp_temperature, url_prefix="")
+    print('/ end of register_bluperint function/')
+
 ##################################################################
 # APP INITIALISATION
 def create_app():
@@ -25,15 +36,9 @@ def create_app():
     logging.info('create_app: Flask done')
 
     # Register the blue prints
-    logging.info('create_app: registering BPs')
-    print('create_app: __init__ registering blueprints')
-    app.register_blueprint(bp_meloir, url_prefix="")
-    print('create_app: __init__ 1')
-    app.register_blueprint(bp_temperature, url_prefix="")
-    print('create_app: __init__ 2')
-    app.register_blueprint(bp_berger, url_prefix="")
-    print('create_app: __init__ 3')
-    print('create_app: __init__ registering blueprints done')
+    register_blueprints(app)
+
+    
     logging.info('create_app: BPs registered')
     print('\n\nRoutes registered:')
     for rule in app.url_map.iter_rules():
