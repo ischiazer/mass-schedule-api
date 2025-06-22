@@ -8,7 +8,7 @@ import asyncio
 import time
 import feedparser
 from openai import OpenAI
-from utilities import get_time_stamp_HTML, french_date, fix_encoding, push_b2_file,parsedate_to_datetime, format_datetime
+from .utilities import get_time_stamp_HTML, french_date, fix_encoding, push_b2_file,parsedate_to_datetime, format_datetime
 
 
 ##################################################################
@@ -227,13 +227,13 @@ def fetch_readings():
     with open(READINGS_PATH_LAST, "w", encoding="utf-8") as f:
         f.write(full_text)
     logging.info(f"/fetch_readings local file written ({len(full_text)} length)")
-    push_b2_file(READINGS_PATH_LAST, 'lectures.html')
+    push_b2_file('meloir',READINGS_PATH_LAST, 'lectures.html')
     logging.info(f"/fetch_readings local file size {os.path.getsize(READINGS_PATH_LAST)} bytes")
     logging.info("/fetch_readings local file written uploaded to BB")
 
     with open(READINGS_PATH_STORE % get_next_sunday(), "w", encoding="utf-8") as f:
         f.write(full_text)
-    push_b2_file(READINGS_PATH_STORE % get_next_sunday(), 'historique_lectures_%s.html' % get_next_sunday())
+    push_b2_file('meloir',READINGS_PATH_STORE % get_next_sunday(), 'historique_lectures_%s.html' % get_next_sunday())
     return full_text
 
 
@@ -335,11 +335,11 @@ def get_perplexity_events():
     with open(PERPLEXITY_TIMESTAMP, 'w') as f:
         f.write(time_now.strftime("%Y-%m-%d %H:%M:%S"))
     logging.info("Perplexity query step 6g")
-    push_b2_file(PERPLEXITY_TABLE_LAST,"evenements.html")
+    push_b2_file('meloir',PERPLEXITY_TABLE_LAST,"evenements.html")
     logging.info("Perplexity query step 6h")
-    push_b2_file(PERPLEXITY_TABLE_STORE % dt,"historique_evenements_%s.html" % dt)
+    push_b2_file('meloir',PERPLEXITY_TABLE_STORE % dt,"historique_evenements_%s.html" % dt)
     logging.info("Perplexity query step 6i")
-    push_b2_file(PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt")
+    push_b2_file('meloir',PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt")
     logging.info("Perplexity query step 6j")
     logging.info("Perplexity query done")
     return html_content
@@ -394,8 +394,8 @@ def get_news():
     time_now = datetime.now()
     with open(NEWS_TIMESTAMP, 'w') as f:
         f.write(time_now.strftime("%Y-%m-%d %H:%M:%S"))
-    push_b2_file(NEWS_TABLE,"nouvelles_vatican.html")
-    push_b2_file(NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt")
+    push_b2_file('meloir',NEWS_TABLE,"nouvelles_vatican.html")
+    push_b2_file('meloir',NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt")
 
 
 

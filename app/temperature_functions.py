@@ -2,7 +2,7 @@ import logging
 from playwright.async_api import async_playwright
 import pandas as pd, numpy as np
 from datetime import date, datetime, timedelta
-from utilities import download_file_from_b2, push_b2_file
+from .utilities import download_file_from_b2, push_b2_file
 import asyncio
 
 
@@ -87,7 +87,7 @@ async def temperature_current():
 def update_temperatures():
     # Load existing history of temperatures
     logging.info("Downloading temperature file...")
-    download_file_from_b2(TEMPERATURE_CSV, TEMPERATURE_CSV)
+    download_file_from_b2('temperature',TEMPERATURE_CSV, TEMPERATURE_CSV)
     logging.info("Done")
     temps_existing = pd.read_csv(TEMPERATURE_CSV,index_col=0)
     logging.info("Converted to dataframe")
@@ -114,7 +114,7 @@ def update_temperatures():
     temps_updated.to_csv(TEMPERATURE_CSV)
     logging.info("...Done")
     logging.info("Pushing BB file...")
-    push_b2_file(TEMPERATURE_CSV,TEMPERATURE_CSV)
+    push_b2_file('temperature',TEMPERATURE_CSV,TEMPERATURE_CSV)
     logging.info("...Done")
 
 ##################################################################

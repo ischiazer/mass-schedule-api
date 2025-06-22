@@ -1,8 +1,8 @@
 import asyncio
 import logging
-from temperature_functions import temperature_current, update_temperatures
-from temperature_functions import TEMPERATURE_CSV
-from utilities import throw_static_file
+from .temperature_functions import temperature_current, update_temperatures
+from .temperature_functions import TEMPERATURE_CSV
+from .utilities import throw_static_file
 from flask import current_app
 from flask import Blueprint, request, jsonify
 

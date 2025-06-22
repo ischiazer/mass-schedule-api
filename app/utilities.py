@@ -29,7 +29,9 @@ def get_b2_bucket(bucket_name):
         b2_application_key = os.getenv("B2_MELOIR_APPLICATION_KEY")
         b2_name = 'MeloirFiles'
     elif bucket_name == 'temperature':
-        raise ValueError("Bucket 'temperature' is not supported in this context.")
+        b2_application_key_id = os.getenv("B2_MELOIR_KEY_ID")
+        b2_application_key = os.getenv("B2_MELOIR_APPLICATION_KEY")
+        b2_name = 'MeloirFiles'
     elif bucket_name == 'berger':
         b2_application_key_id = os.getenv('B2_BERGER_KEY_ID')
         b2_application_key = os.getenv('B2_BERGER_APPLICATION_KEY')

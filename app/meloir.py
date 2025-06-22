@@ -8,10 +8,10 @@ import logging
 import tempfile
 from pathlib import Path
 from datetime import date, datetime, timedelta
-from meloir_functions import fetch_and_clean_schedule, fetch_readings, get_perplexity_events, get_news
-from meloir_functions import HTML_FILE_PATH, UPLOAD_FOLDER, UPLOAD_LOG_FILE, WORD_FOLDER, HTML_FOLDER, PATH_BULLETIN, PERPLEXITY_TABLE_LAST,PERPLEXITY_TIMESTAMP,NEWS_TABLE,NEWS_TIMESTAMP,READINGS_PATH_LAST
-from utilities import push_b2_file, throw_static_file
-from utilities import log_upload, extract_cropped_images_proportional, convert_docx_to_html_with_cropped_images
+from .meloir_functions import fetch_and_clean_schedule, fetch_readings, get_perplexity_events, get_news
+from .meloir_functions import HTML_FILE_PATH, UPLOAD_FOLDER, UPLOAD_LOG_FILE, WORD_FOLDER, HTML_FOLDER, PATH_BULLETIN, PERPLEXITY_TABLE_LAST,PERPLEXITY_TIMESTAMP,NEWS_TABLE,NEWS_TIMESTAMP,READINGS_PATH_LAST
+from .utilities import push_b2_file, throw_static_file
+from .utilities import log_upload, extract_cropped_images_proportional, convert_docx_to_html_with_cropped_images
 from flask import equest, send_file, Response
 
 

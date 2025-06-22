@@ -2,7 +2,7 @@ import threading
 import logging
 from app import create_app
 from app.temperature_functions import background_loop_temperature
-from app.some_module import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity  # adjust as needed
+from app.meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity  
 
 ##################################################################
 # SET UP LOGGING
