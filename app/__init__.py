@@ -3,10 +3,10 @@ from flask_cors import CORS
 import logging
 import nest_asyncio
 from .temperature import bp_temperature
-from .meloir import bp_meloir
+from .meloir import bp_meloir, meloir_initialise
 from .temperature_functions import background_loop_temperature
 from .meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity
-from .berger import bp_berger
+from .berger import bp_berger, berger_initialise
 import threading
 
 ##################################################################
@@ -39,6 +39,7 @@ def create_app():
     nest_asyncio.apply()
     logging.info('create_app: asyncio enabled')
 
+
     # Set up logging
     logging.basicConfig(
         level=logging.INFO,
@@ -57,3 +58,8 @@ def create_app():
             thread.start()
     return app
 
+##################################################################
+# MODULE-LEVEL INITIALISATION
+def initialise_modules():
+    berger_initialise()
+    meloir_initialise()

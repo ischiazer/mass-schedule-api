@@ -15,7 +15,8 @@ print("Registering bp_berger")
 
 ##################################################################
 # INITIALISE
-download_file_from_b2_if_absent('berger',DB_NAME, DB_NAME)
+def berger_initialise():
+    download_file_from_b2_if_absent('berger',DB_NAME, DB_NAME)
 
 ##################################################################
 # QUERY - Process request for synthetic summary

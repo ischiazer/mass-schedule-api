@@ -1,6 +1,7 @@
 import threading
 import logging
 from app import create_app
+from app import initialise_modules
 from app.temperature_functions import background_loop_temperature
 from app.meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity  
 import os
@@ -32,6 +33,7 @@ def start_background_threads():
 if __name__ == "__main__":
     logging.info('Starting the app...')
     app = create_app()
+    initialise_modules()
     logging.info('... started')
     logging.info('Starting background threads...')
     start_background_threads()

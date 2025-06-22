@@ -21,6 +21,11 @@ logging.info('Blueprint Meloir done')
 print("Registering bp_meloir") 
 
 ##################################################################
+# INITIALISATION OF MODULE
+def meloir_initialise():
+    pass
+
+##################################################################
 # QUERY - FETCH MASS SCHEDULE ON THE FLY
 @bp_meloir.route('/schedule')
 def get_schedule():
