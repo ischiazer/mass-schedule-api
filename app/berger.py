@@ -11,6 +11,7 @@ import logging
 # REGISTER BLUEPRINT
 bp_berger = Blueprint("bp_berger", __name__)
 logging.info('BP Berger started')
+print("Registering bp_berger") 
 
 ##################################################################
 # INITIALISE

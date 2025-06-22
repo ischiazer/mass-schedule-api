@@ -18,7 +18,7 @@ from flask import request, send_file, Response
 # REGISTER BLUEPRINT
 bp_meloir = Blueprint("bp_meloir", __name__)
 logging.info('Blueprint Meloir done')
-
+print("Registering bp_meloir") 
 
 ##################################################################
 # QUERY - FETCH MASS SCHEDULE ON THE FLY
