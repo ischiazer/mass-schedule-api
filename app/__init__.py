@@ -19,9 +19,9 @@ def create_app():
 
     # Register the blue prints
     logging.info('create_app: registering BPs')
-    app.register_blueprint(bp_meloir)
-    app.register_blueprint(bp_temperature)
-    app.register_blueprint(bp_berger)
+    app.register_blueprint(bp_meloir, url_prefix="")
+    app.register_blueprint(bp_temperature, url_prefix="")
+    app.register_blueprint(bp_berger, url_prefix="")
     logging.info('create_app: BPs registered')
 
     # Set max file upload size to 10 MB
