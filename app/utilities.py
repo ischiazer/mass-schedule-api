@@ -3,11 +3,10 @@ import os
 import logging
 import locale
 import pytz
-from datetime import date, datetime, timedelta
+from datetime import datetime
 from bs4 import BeautifulSoup
-from flask import Flask, jsonify, request, send_file, Response
+from flask import request, send_file
 from babel.dates import format_datetime
-from email.utils import parsedate_to_datetime
 import zipfile
 from lxml import etree
 from PIL import Image

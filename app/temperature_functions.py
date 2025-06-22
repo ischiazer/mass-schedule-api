@@ -1,7 +1,7 @@
 import logging
 from playwright.async_api import async_playwright
 import pandas as pd, numpy as np
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from .utilities import download_file_from_b2, push_b2_file
 import asyncio
 
