@@ -1,14 +1,10 @@
 import sqlite3
 import pandas as pd
-import os
 import logging
 import pytz
 from datetime import datetime
 from babel.dates import format_datetime
 import random, string
-import pyperclip
-import webbrowser
-import os
 from flask import Flask, request
 import smtplib
 from email.mime.text import MIMEText
