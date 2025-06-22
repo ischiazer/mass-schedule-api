@@ -33,6 +33,7 @@ def start_background_threads():
             thread.start()
         except Exception as e:
             logging.error(f"Failed to start thread {func.__name__}: {e}")
+    print('--- end of function for background threads')
 
 ##################################################################
 # MAIN
