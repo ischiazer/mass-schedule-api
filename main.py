@@ -50,6 +50,8 @@ if __name__ == "__main__":
         logging.info("Flask server started")
     else:
         print('* is local *')
+        print('type of environment variable: '+str(type(os.getenv("LOCAL_LAPTOP"))))
+        print('value of environment variable: <'+str(os.getenv("LOCAL_LAPTOP")) + '>')
         logging.info("Starting Flask server locally on port 5050")
         app.run(debug=True, port=5050)
         logging.info("Flask server started")
