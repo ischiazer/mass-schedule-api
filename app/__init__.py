@@ -50,7 +50,10 @@ def create_app():
         ]
     )
 
-
+    with app.app_context():
+        print("\n\nRegistered routes basd on app.app_context():")
+        for rule in app.url_map.iter_rules():
+            print(rule)
     # Set up background looping tasks
     if False:
         for f in [periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity,background_loop_temperature]:
