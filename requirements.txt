@@ -14,3 +14,5 @@ feedparser
 babel
 numpy
 pandas
+requests
+
