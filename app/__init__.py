@@ -23,6 +23,10 @@ def create_app():
     app.register_blueprint(bp_temperature, url_prefix="")
     app.register_blueprint(bp_berger, url_prefix="")
     logging.info('create_app: BPs registered')
+    print('\n\nRoutes registered:')
+    for rule in app.url_map.iter_rules():
+        print(f"Registered route: {rule}")
+    print('\n\n\n\n')
 
     # Set max file upload size to 10 MB
     app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
