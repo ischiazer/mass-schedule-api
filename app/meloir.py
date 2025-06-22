@@ -8,7 +8,7 @@ import logging
 import tempfile
 from datetime import datetime
 from .meloir_functions import fetch_and_clean_schedule, fetch_readings, get_perplexity_events, get_news
-from .meloir_functions import HTML_FILE_PATH, UPLOAD_FOLDER, UPLOAD_LOG_FILE, WORD_FOLDER, HTML_FOLDER, PATH_BULLETIN, PERPLEXITY_TABLE_LAST,PERPLEXITY_TIMESTAMP,NEWS_TABLE,NEWS_TIMESTAMP,READINGS_PATH_LAST
+from .meloir_functions import BASE_FOLDER,HTML_FILE_PATH, UPLOAD_FOLDER, UPLOAD_LOG_FILE, WORD_FOLDER, HTML_FOLDER, PATH_BULLETIN, PERPLEXITY_TABLE_LAST,PERPLEXITY_TIMESTAMP,NEWS_TABLE,NEWS_TIMESTAMP,READINGS_PATH_LAST
 from .utilities import push_b2_file, throw_static_file
 from .utilities import log_upload, extract_cropped_images_proportional, convert_docx_to_html_with_cropped_images
 from flask import request, send_file, Response
@@ -16,7 +16,7 @@ from flask import request, send_file, Response
 
 ##################################################################
 # REGISTER BLUEPRINT
-bp_meloir = Blueprint("meloir_bp", __name__)
+bp_meloir = Blueprint("bp_meloir", __name__)
 logging.info('Blueprint Meloir done')
 
 
@@ -32,26 +32,26 @@ def get_schedule():
 def refresh_schedule():
     data = asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
 
-    os.makedirs("static", exist_ok=True)
+    os.makedirs(BASE_FOLDER+"static", exist_ok=True)
 
     # Save cleaned JSON
-    with open("static/schedule.json", "w", encoding="utf-8") as f:
+    with open(BASE_FOLDER+"static/schedule.json", "w", encoding="utf-8") as f:
         json.dump(data.get_json(), f, ensure_ascii=False, indent=2)
 
     # Upload JSON to BlackBlaze
-    push_b2_file("static/schedule.json","horaires_messes.json")
+    push_b2_file('meloir',BASE_FOLDER+"static/schedule.json","horaires_messes.json")
 
     # Save last updated timestamp in French format
     now = datetime.now()
     formatted = now.strftime("%A %d %B %Y à %H:%M")
-    with open("static/last_updated.txt", "w", encoding="utf-8") as f:
+    with open(BASE_FOLDER+"static/last_updated.txt", "w", encoding="utf-8") as f:
         f.write(formatted)
-    push_b2_file("static/last_updated.txt","horaires_messes_MAJ.txt")
+    push_b2_file('meloir',BASE_FOLDER+"static/last_updated.txt","horaires_messes_MAJ.txt")
 
     # Save heartbeat timestamp (ISO format)
-    with open("static/heartbeat.txt", "w") as hb:
+    with open(BASE_FOLDER+"static/heartbeat.txt", "w") as hb:
         hb.write(now.isoformat())
-    push_b2_file("static/heartbeat.txt","heartbeat.txt")
+    push_b2_file('meloir',BASE_FOLDER+"static/heartbeat.txt","heartbeat.txt")
 
     return "Schedule updated and saved to static/schedule.json"
 

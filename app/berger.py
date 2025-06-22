@@ -9,7 +9,7 @@ import logging
 
 ##################################################################
 # REGISTER BLUEPRINT
-bp_berger = Blueprint("berger_bp", __name__)
+bp_berger = Blueprint("bp_berger", __name__)
 logging.info('BP Berger started')
 
 ##################################################################
