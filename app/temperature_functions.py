@@ -7,8 +7,9 @@ import asyncio
 
 
 ##################################################################
-# INITIALISATION
-TEMPERATURE_CSV = 'temperatures.csv'
+# GLOBAL VARIABLES
+BASE_FOLDER = 'app_files/meloir_files/'
+TEMPERATURE_CSV = BASE_FOLDER+'temperatures.csv'
 
 
 ##################################################################

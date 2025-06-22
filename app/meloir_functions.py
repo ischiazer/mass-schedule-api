@@ -13,20 +13,22 @@ from email.utils import parsedate_to_datetime
 
 
 ##################################################################
-# INITIALISATION
-HTML_FILE_PATH = "latest.html"
-UPLOAD_FOLDER = "uploaded_files"
-WORD_FOLDER = "uploaded_word"
-HTML_FOLDER = "created_HTML"
-UPLOAD_LOG_FILE = "upload_log.txt"
-PATH_BULLETIN = 'bulletin_paroissial.html'
-READINGS_PATH_LAST = 'readings_current.html'
-READINGS_PATH_STORE = 'readings_%s.html'
-PERPLEXITY_TABLE_LAST = "evenements.html"
-PERPLEXITY_TIMESTAMP = "evenements_MAJ.txt"
-PERPLEXITY_TABLE_STORE = "evenements_%s.html"
-NEWS_TABLE = "nouvelles_vatican.html"
-NEWS_TIMESTAMP = "nouvelles_MAJ.txt"
+# GLOBAL VARIABLES
+
+BASE_FOLDER = 'app_files/meloir_files/'
+HTML_FILE_PATH = BASE_FOLDER+"latest.html"
+UPLOAD_FOLDER = BASE_FOLDER+"uploaded_files"
+WORD_FOLDER = BASE_FOLDER+"uploaded_word"
+HTML_FOLDER = BASE_FOLDER+"created_HTML"
+UPLOAD_LOG_FILE = BASE_FOLDER+"upload_log.txt"
+PATH_BULLETIN = BASE_FOLDER+'bulletin_paroissial.html'
+READINGS_PATH_LAST = BASE_FOLDER+'readings_current.html'
+READINGS_PATH_STORE = BASE_FOLDER+'readings_%s.html'
+PERPLEXITY_TABLE_LAST = BASE_FOLDER+"evenements.html"
+PERPLEXITY_TIMESTAMP = BASE_FOLDER+"evenements_MAJ.txt"
+PERPLEXITY_TABLE_STORE = BASE_FOLDER+"evenements_%s.html"
+NEWS_TABLE = BASE_FOLDER+"nouvelles_vatican.html"
+NEWS_TIMESTAMP = BASE_FOLDER+"nouvelles_MAJ.txt"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(WORD_FOLDER, exist_ok=True)
 os.makedirs(HTML_FOLDER, exist_ok=True)

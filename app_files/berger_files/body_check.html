@@ -1,0 +1,60 @@
+<BR>
+<BR>
+<H2>Récapitulatif d'une réservation</H2>
+<SPAN ID="error_status" style="font-size: 15px; color: #dd6666; padding: 6px 10px;  display: inline-block;"><I></I></SPAN><BR>
+Code de réservation:
+    <DIV class="form">
+        <DIV class="name-form">
+            <input type="text" placeholder="Code", class="input-name" required id="booking_code">
+        </DIV>
+    </DIV>
+</DIV>
+
+<BR>
+<BR>   
+<input name="click_check" class="button" type="button" value="Inspecter" onClick="doCheckBooking();" >
+<BR>
+
+<SCRIPT>
+    // Show error message
+    function show_error(s) {
+      document.getElementById("error_status").innerHTML = s;
+    }
+
+    // Function called when the user clicks 'Cancel'
+    function doCheckBooking() {
+      // Check validity of booking code
+      var booking_code = document.getElementById('booking_code').value;
+      if(booking_code.length != 4) {
+        show_error("Code de réservation incorrect: quatre caractères sont nécessaires. Veuillez le corriger et soumettre de nouveau");
+        return;
+      }
+      if(!/^[A-Za-z]+$/.test(booking_code)) {
+        show_error("Code de réservation incorrect: les quatre caractères doivent être des lettres. Veuillez le corriger et soumettre de nouveau");
+        return;
+      }
+    
+    
+      // Submit to server
+      var booking_descr = ["check", booking_code];
+      show_error('');
+    fetch("http://localhost:5050/berger_web_process_check_booking", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ x: booking_descr })
+    })
+    .then(response => response.text())  
+    .then(html => {
+        console.log("Response from Python:", html);
+        document.open();            
+        document.write(html);
+        document.close();         
+    })
+    .catch(error => {
+        console.error("Error calling Python:", error);
+    });
+   }
+</SCRIPT>
+    

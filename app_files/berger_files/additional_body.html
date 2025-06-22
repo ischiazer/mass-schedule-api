@@ -1,0 +1,37 @@
+<span class="small-text"><A HREF="xxx">Vérifier une réservation existante</A>&nbsp&nbsp&nbsp<A HREF="xxx">Annuler une réservation</A>&nbsp&nbsp&nbsp<A HREF="xxx">Admin</A></SPAN>
+<BR>
+<BR>
+<H2>Nouvelle réservation</H2>
+Votre sélection:
+<BR>
+<SPAN ID="error_status" style="font-size: 15px; color: #dd6666; padding: 6px 10px;  display: inline-block;"><I></I></SPAN><BR>
+<SPAN ID="DescriptionSelection" style="font-size: 15px;  border: 2px solid white;  padding: 6px 10px;  display: inline-block;"><I>(Aucune)</I></SPAN><BR>
+<DIV class="clearfix">
+    <DIV class="form">
+        <DIV class="name-form">
+            <input type="text" placeholder="Votre nom" class="input-name" required id="user_name">
+        </DIV>
+    
+         <DIV class="email-form">
+            <input type="email" placeholder="email@address.com" class="input-email" required id="user_email">
+         </DIV>
+    </DIV>
+</DIV>
+
+<BR>
+Nombre de personnes:
+<div id="buttonGridNoSpace">
+    <button onclick='select_number_people(1)'>1</button>
+    <button onclick='select_number_people(2)'>2</button>
+    <button onclick='select_number_people(3)'>3</button>
+    <button onclick='select_number_people(4)'>4</button>
+    <button onclick='select_number_people(5)'>5</button>
+    <button onclick='select_number_people(6)'>6</button>
+    <button onclick='select_number_people(7)'>7</button>
+    <button onclick='select_number_people(8)'>8</button>
+    <button onclick='select_number_people(9)'>9</button>
+</div>
+<BR>   
+<input name="click_book" class="button" type="button" value="Réserver" onClick="doMakeBooking();" >
+<BR>
+

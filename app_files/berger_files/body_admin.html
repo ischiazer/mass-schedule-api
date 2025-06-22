@@ -1,0 +1,37 @@
+<BR>
+<BR>
+<H2>Administration du site</H2>
+<BR>
+Cette page requiert l'utilisation d'un mot de passe
+<BR>
+
+<SCRIPT>
+    async function hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    async function requestAdminPage() {
+      const password = prompt("Mot de passe requis :");
+      if (!password) return;
+    
+      const hashed = await hashPassword(password);
+    
+      fetch("http://localhost:5050/berger_process_admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hashed_password: hashed })
+      })
+      .then(response => response.text())
+      .then(html => {
+        document.open();
+        document.write(html);
+        document.close();
+      });
+    }
+    
+    requestAdminPage();
+</SCRIPT>
+    
