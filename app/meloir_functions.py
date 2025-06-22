@@ -8,7 +8,8 @@ import asyncio
 import time
 import feedparser
 from openai import OpenAI
-from .utilities import get_time_stamp_HTML, french_date, fix_encoding, push_b2_file,parsedate_to_datetime, format_datetime
+from .utilities import get_time_stamp_HTML, french_date, fix_encoding, push_b2_file, format_datetime
+from email.utils import parsedate_to_datetime
 
 
 ##################################################################

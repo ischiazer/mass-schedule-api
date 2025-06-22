@@ -16,7 +16,7 @@ from flask import request, send_file, Response
 
 ##################################################################
 # REGISTER BLUEPRINT
-bp_meloir = Blueprint("meloir", __name__)
+bp_meloir = Blueprint("meloir_bp", __name__)
 
 
 ##################################################################
@@ -89,11 +89,11 @@ def upload_attachment():
         uploaded_file.save(filepath)
 
         log_upload("SUCCESS", filename)
-        return f"✅ File '{filename}' saved", 200
+        return f"File '{filename}' saved", 200
 
     except Exception as e:
         log_upload("FAIL", filename, str(e))
-        return f"❌ Error saving file: {str(e)}", 500
+        return f"Error saving file: {str(e)}", 500
 
 ##################################################################
 # QUERY - RETURN THE UPLOAD LOG
@@ -111,7 +111,7 @@ def show_log():
 # QUERY - ERROR HANDLER
 @bp_meloir.errorhandler(413)
 def request_entity_too_large(error):
-    return "❌ File too large. Limit is 10MB.", 413
+    return "File too large. Limit is 10MB.", 413
 
 ##################################################################
 # QUERY - RETURN (DOWNLOAD) ALL CONTENT
@@ -209,11 +209,11 @@ def deliver_word():
             push_b2_file(latest_path, 'bulletin_paroissial.html')
 
             log_upload("SUCCESS", filename)
-            return f"✅ Processed and saved: {html_filename}", 200
+            return f"Processed and saved: {html_filename}", 200
 
     except Exception as e:
         log_upload("FAIL", filename, str(e))
-        return f"❌ Error processing file: {str(e)}", 500
+        return f"Error processing file: {str(e)}", 500
 
 ##################################################################
 # QUERY - RETURN LATEST HTML

@@ -7,7 +7,7 @@ from flask import Blueprint
 
 ##################################################################
 # REGISTER BLUEPRINT
-bp_temperature = Blueprint("temperature", __name__)
+bp_temperature = Blueprint("temperature_bp", __name__)
 
 ##################################################################
 # QUERY - FETCH CURRENT TEMPERATURE

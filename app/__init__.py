@@ -4,7 +4,8 @@ import logging
 import nest_asyncio
 from .temperature import bp_temperature
 from .meloir import bp_meloir
-from temperature_functions import background_loop_temperature, periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity
+from .temperature_functions import background_loop_temperature
+from .meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity
 import threading
 
 ##################################################################
@@ -36,8 +37,6 @@ def create_app():
         ]
     )
 
-    # Register route blueprints
-    app.register_blueprint(bp_temperature)
 
     # Set up background looping tasks
     for f in [periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity,background_loop_temperature]:
