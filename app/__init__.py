@@ -13,21 +13,27 @@ import threading
 # APP INITIALISATION
 def create_app():
     # Start the app
+    logging.info('create_app: starting')
     app = Flask(__name__)
+    logging.info('create_app: Flask done')
 
     # Register the blue prints
+    logging.info('create_app: registering BPs')
     app.register_blueprint(bp_meloir)
     app.register_blueprint(bp_temperature)
     app.register_blueprint(bp_berger)
+    logging.info('create_app: BPs registered')
 
     # Set max file upload size to 10 MB
     app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
 
     # Enable CORS for all routes
     CORS(app, resources={r"/*": {"origins": "*"}})
+    logging.info('create_app: CORS enabled')
 
     # Enable async handling
     nest_asyncio.apply()
+    logging.info('create_app: asyncio enabled')
 
     # Set up logging
     logging.basicConfig(

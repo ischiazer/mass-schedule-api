@@ -26,18 +26,24 @@ def start_background_threads():
                 logging.error(f"Failed to start thread {func.__name__}: {e}")
     else:
         print('No background\n\n\n')
-        
+
 ##################################################################
 # MAIN
 if __name__ == "__main__":
+    logging.info('Starting the app...')
     app = create_app()
+    logging.info('... started')
+    logging.info('Starting background threads...')
     start_background_threads()
+    logging.info('...done')
     if os.getenv("LOCAL_LAPTOP")=='':
-        logging.info("Starting Flask server locally on http://0.0.0.0:10000")
-        app.run(host="0.0.0.0", port=10000)
+        logging.info("Starting Flask server on remote location")
+        port = int(os.environ.get("PORT", 10000))
+        logging.info('Port = ' + str(port))
+        app.run(host="0.0.0.0", port=port)
         logging.info("Flask server started")
     else:
-        logging.info("Starting Flask server on port 5050")
+        logging.info("Starting Flask server locally on port 5050")
         app.run(debug=True, port=5050)
         logging.info("Flask server started")
     

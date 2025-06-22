@@ -17,6 +17,7 @@ from flask import request, send_file, Response
 ##################################################################
 # REGISTER BLUEPRINT
 bp_meloir = Blueprint("meloir_bp", __name__)
+logging.info('Blueprint Meloir done')
 
 
 ##################################################################
@@ -262,28 +263,28 @@ def force_fetch_vatican_news():
 @bp_meloir.route('/static_news_nearby')
 def query_static_perplexity():
     logging.info('(Web access) static_news_nearby')
-    return throw_static_file(PERPLEXITY_TABLE_LAST,"evenements.html", "/query_static_perplexity called")
+    return throw_static_file('meloir',PERPLEXITY_TABLE_LAST,"evenements.html", "/query_static_perplexity called")
 
 ##################################################################
 # QUERY - STATIC PERFPLEXITY NEWS
 @bp_meloir.route('/static_news_nearby_timestamp')
 def query_static_perplexity_timestamp():
     logging.info('(Web access) static_news_nearby_timestamp')
-    return throw_static_file(PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt", "/static_news_nearby_timestamp called")
+    return throw_static_file('meloir', PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt", "/static_news_nearby_timestamp called")
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS
 @bp_meloir.route('/static_news_vatican')
 def query_static_vatican():
     logging.info('(Web access) static_news_vatican')
-    return throw_static_file(NEWS_TABLE,"nouvelles_vatican.html", "/static_news_vatican called")
+    return throw_static_file('meloir',NEWS_TABLE,"nouvelles_vatican.html", "/static_news_vatican called")
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS TIMESTAMP
 @bp_meloir.route('/static_news_vatican_timestamp')
 def static_news_vatican_timestamp():
     logging.info('(Web access) static_news_vatican_timestamp')
-    return throw_static_file(NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt", "/static_news_vatican_timestamp called")
+    return throw_static_file('meloir',NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt", "/static_news_vatican_timestamp called")
 
 
 ##################################################################
@@ -291,7 +292,7 @@ def static_news_vatican_timestamp():
 @bp_meloir.route('/static_readings')
 def query_static_readings():
     logging.info('(Web access) static_readings')
-    return throw_static_file(READINGS_PATH_LAST,"lectures.html", "/query_static_readings called")
+    return throw_static_file('meloir',READINGS_PATH_LAST,"lectures.html", "/query_static_readings called")
 
 
 ##################################################################
@@ -299,5 +300,5 @@ def query_static_readings():
 @bp_meloir.route('/static_bulletin')
 def query_static_bulletin():
     logging.info('(Web access) query_static_bulletin')
-    return throw_static_file(PATH_BULLETIN,"bulletin_paroissial.html", "/query_static_bulletin called")
+    return throw_static_file('meloir',PATH_BULLETIN,"bulletin_paroissial.html", "/query_static_bulletin called")
 

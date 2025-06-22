@@ -28,7 +28,7 @@ def query_current_temperature():
 def query_historical_temperature():
     logging.info("fetch_temperature_history")
     try:
-        return throw_static_file(TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
+        return throw_static_file('temperature', TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
     except Exception as e:
         logging.error(f"History fetch failed: {str(e)}")
         return "Error fetching history", 500
@@ -42,7 +42,7 @@ def query_update_temperature():
         update_temperatures()
         logging.info("update done")
         logging.info("Getting file...")
-        x = throw_static_file(TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
+        x = throw_static_file('temperature', TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
         logging.info("...done")
         return x
     except Exception as e:
