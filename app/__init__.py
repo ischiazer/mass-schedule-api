@@ -8,9 +8,6 @@ from .meloir_functions import periodic_query_readings, periodic_query_vatican_ne
 from .berger import berger_initialise
 import threading
 
-print('* Check after import *')
-print("Routes in bp_berger:", len(bp_berger.deferred_functions))
-print('* Done *')
 
 ##################################################################
 # BLUEPRINT REGISTRATIONS
@@ -24,6 +21,10 @@ def register_blueprints(app):
     app.register_blueprint(bp_meloir, url_prefix="")
     app.register_blueprint(bp_temperature, url_prefix="")
     print('/ end of register_bluperint function/')
+
+    print('* Check after import *')
+    print("Routes in bp_berger:", len(bp_berger.deferred_functions))
+    print('* Done *')
 
 ##################################################################
 # APP INITIALISATION
@@ -47,6 +48,7 @@ def create_app():
     logging.info('create_app: Flask done')
 
     # Register the blue prints
+
     register_blueprints(app)
 
 
