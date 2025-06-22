@@ -9,6 +9,12 @@ import logging
 
 
 ##################################################################
+# REGISTER BLUEPRINT
+bp_berger = Blueprint("bp_berger", __name__)
+logging.info('BP Berger started')
+print("Registering bp_berger") 
+
+##################################################################
 # INITIALISATION OF MODULE
 def berger_initialise():
     print('Checking if Berger DB is present...')
@@ -185,9 +191,3 @@ def check_page():
     html += '</BODY></HTML>'
     logging.info('...done')
     return html
-
-##################################################################
-# REGISTER BLUEPRINT
-bp_berger = Blueprint("bp_berger", __name__)
-logging.info('BP Berger started')
-print("Registering bp_berger") 

@@ -28,6 +28,17 @@ def register_blueprints(app):
 ##################################################################
 # APP INITIALISATION
 def create_app():
+    # Set up logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler("log.txt")
+        ]
+    )
+    print('create_app: baseic config  done')
+
     # Start the app
     logging.info('create_app: starting')
     print('create_app: starting')
@@ -38,7 +49,7 @@ def create_app():
     # Register the blue prints
     register_blueprints(app)
 
-    
+
     logging.info('create_app: BPs registered')
     print('\n\nRoutes registered:')
     for rule in app.url_map.iter_rules():
@@ -59,17 +70,6 @@ def create_app():
     print('create_app: best_async done')
     logging.info('create_app: asyncio enabled')
 
-
-    # Set up logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        handlers=[
-            logging.StreamHandler(),
-            logging.FileHandler("log.txt")
-        ]
-    )
-    print('create_app: baseic config  done')
 
     with app.app_context():
         print("\n\nRegistered routes basd on app.app_context():")
