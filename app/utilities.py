@@ -62,7 +62,7 @@ def push_b2_file(bucket_name, file_local, file_server):
 ##################################################################
 # DOWNLOAD FILE FROM BLACKBLAZE
 def download_file_from_b2(bucket_name, file_name, local_path):
-    log_msg'Getting bucket...')
+    log_msg('Getting bucket...')
     bucket = get_b2_bucket(bucket_name)
     log_msg('Done')
     log_msg('Downloading file '+ str(file_name))

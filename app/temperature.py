@@ -13,6 +13,7 @@ bp_temperature = Blueprint("temperature_bp", __name__)
 # QUERY - FETCH CURRENT TEMPERATURE
 @bp_temperature.route('/fetch_current_temperature')
 def query_current_temperature():
+    log_msg("fetch_current_temperature")
     try:
         log_msg("fetch_current_temperature start")
         result = asyncio.run(temperature_current())
