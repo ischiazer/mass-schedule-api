@@ -15,7 +15,7 @@ from email.utils import parsedate_to_datetime
 ##################################################################
 # GLOBAL VARIABLES
 
-BASE_FOLDER = 'app_files/meloir_files/'
+BASE_FOLDER = '../app_files/meloir_files/'
 HTML_FILE_PATH = BASE_FOLDER+"latest.html"
 UPLOAD_FOLDER = BASE_FOLDER+"uploaded_files"
 WORD_FOLDER = BASE_FOLDER+"uploaded_word"

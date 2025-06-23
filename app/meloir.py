@@ -59,7 +59,8 @@ def refresh_schedule():
         hb.write(now.isoformat())
     push_b2_file('meloir',BASE_FOLDER+"static/heartbeat.txt","heartbeat.txt")
 
-    return "Schedule updated and saved to static/schedule.json"
+    return f"Schedule updated static/schedule.json locally to <{BASE_FOLDER+"static/last_updated.txt"} and BB horaires_messes_MAJ.txt
+
 
 
 ##################################################################
@@ -277,28 +278,53 @@ def force_fetch_vatican_news():
 @bp_meloir.route('/static_news_nearby')
 def query_static_perplexity():
     log_msg('(Web access) static_news_nearby')
-    return throw_static_file('meloir',PERPLEXITY_TABLE_LAST,"evenements.html", "/query_static_perplexity called")
+    try:
+        f= throw_static_file('meloir',PERPLEXITY_TABLE_LAST,"evenements.html", "/query_static_perplexity called")
+        log_msg('static_news_nearby successful')
+        return f
+    except Exception as e:
+        log_msg(f"Error in query_static_perplexity: {str(e)}")
+        return f"Error fetching perplexity news: {str(e)}", 500
 
 ##################################################################
 # QUERY - STATIC PERFPLEXITY NEWS
 @bp_meloir.route('/static_news_nearby_timestamp')
 def query_static_perplexity_timestamp():
     log_msg('(Web access) static_news_nearby_timestamp')
-    return throw_static_file('meloir', PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt", "/static_news_nearby_timestamp called")
+    try:
+        f = throw_static_file('meloir', PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt", "/static_news_nearby_timestamp called")
+        log_msg('query_static_perplexity_timestamp successful')
+        return f
+    except Exception as e:
+        log_msg(f"Error static_news_nearby_timestamp: {str(e)}")
+        return f"Error static_news_nearby_timestamp: {str(e)}", 500
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS
 @bp_meloir.route('/static_news_vatican')
 def query_static_vatican():
     log_msg('(Web access) static_news_vatican')
-    return throw_static_file('meloir',NEWS_TABLE,"nouvelles_vatican.html", "/static_news_vatican called")
+    try:
+        f = throw_static_file('meloir',NEWS_TABLE,"nouvelles_vatican.html", "/static_news_vatican called")
+        log_msg('static_news_vatican successful')
+        return f
+    except Exception as e:
+        log_msg(f"Error in query_static_vatican: {str(e)}")
+        return f"Error fetching Vatican news: {str(e)}", 500
+    
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS TIMESTAMP
 @bp_meloir.route('/static_news_vatican_timestamp')
 def static_news_vatican_timestamp():
     log_msg('(Web access) static_news_vatican_timestamp')
-    return throw_static_file('meloir',NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt", "/static_news_vatican_timestamp called")
+    try:
+        f = throw_static_file('meloir',NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt", "/static_news_vatican_timestamp called")
+        log_msg('static_news_vatican_timestamp successful')
+        return f
+    except Exception as e:
+        log_msg(f"Error static_news_vatican_timestamp: {str(e)}")
+        return f"Error static_news_vatican_timestamp: {str(e)}", 500
 
 
 ##################################################################
@@ -306,7 +332,13 @@ def static_news_vatican_timestamp():
 @bp_meloir.route('/static_readings')
 def query_static_readings():
     log_msg('(Web access) static_readings')
-    return throw_static_file('meloir',READINGS_PATH_LAST,"lectures.html", "/query_static_readings called")
+    try:
+        f = throw_static_file('meloir',READINGS_PATH_LAST,"lectures.html", "/query_static_readings called")
+        log_msg('static_readings successful')
+        return f
+    except Exception as e:
+        log_msg(f"Error in query_static_readings: {str(e)}")
+        return f"Error fetching readings: {str(e)}", 500
 
 
 ##################################################################
@@ -314,4 +346,11 @@ def query_static_readings():
 @bp_meloir.route('/static_bulletin')
 def query_static_bulletin():
     log_msg('(Web access) query_static_bulletin')
-    return throw_static_file('meloir',PATH_BULLETIN,"bulletin_paroissial.html", "/query_static_bulletin called")
+    try:
+        f = throw_static_file('meloir',PATH_BULLETIN,"bulletin_paroissial.html", "/query_static_bulletin called")
+        log_msg('query_static_bulletin successful')
+        return f
+    except Exception as e:
+        log_msg(f"Error in query_static_bulletin: {str(e)}")
+        return f"Error fetching bulletin: {str(e)}", 500
+    

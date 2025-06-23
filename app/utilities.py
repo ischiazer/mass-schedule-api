@@ -25,7 +25,7 @@ def log_msg(msg):
     d_str = format_datetime(d, "d-MM-y HH:mm:ss", locale='fr_FR')
     if not isinstance(msg, str):
         msg = str(msg)
-    print(d_str + ' ' + msg)
+    print(d_str + ' ' + msg,flush=True)
 
 
 ##################################################################
@@ -76,6 +76,7 @@ def download_file_from_b2(bucket_name, file_name, local_path):
 ##################################################################
 # DOWNLOAD FILE FROM BLACKBLAZE ONLY IF ABSENT LOCALLY
 def download_file_from_b2_if_absent(bucket_name, file_name, local_path):
+    log_msg('Checking local file: ' + str(local_path))
     if os.path.exists(local_path):
         log_msg('File already present: '+str(local_path))
     else:
@@ -87,6 +88,7 @@ def download_file_from_b2_if_absent(bucket_name, file_name, local_path):
 # UTILITY FUNCTION - POST FILE (USING LOCAL IF AVAILABLE)
 def throw_static_file(bucket_name, local_file, BB_file, message):
     log_msg(message)
+    log_msg('Getting b2 file if absent - local file = ' + str(local_file))
     download_file_from_b2_if_absent(bucket_name, BB_file, local_file)
     log_msg('Returning content for ' + str(local_file))
     log_msg('      File size =  ' + str(os.path.getsize(local_file)))
