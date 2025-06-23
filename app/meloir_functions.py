@@ -32,6 +32,9 @@ NEWS_TIMESTAMP = BASE_FOLDER+"nouvelles_MAJ.txt"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(WORD_FOLDER, exist_ok=True)
 os.makedirs(HTML_FOLDER, exist_ok=True)
+os.makedirs(BASE_FOLDER+"static", exist_ok=True)
+
+# Create the base folder if it does not exist
 if not os.path.exists(UPLOAD_LOG_FILE):
     with open(UPLOAD_LOG_FILE, "w", encoding="utf-8") as log:
         log.write("[INIT] Created log file\n")

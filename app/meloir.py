@@ -39,7 +39,6 @@ def refresh_schedule():
     log_msg('(Web access) refresh_schedule')
     data = asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
 
-    os.makedirs(BASE_FOLDER+"static", exist_ok=True)
 
     # Save cleaned JSON
     with open(BASE_FOLDER+"static/schedule.json", "w", encoding="utf-8") as f:
