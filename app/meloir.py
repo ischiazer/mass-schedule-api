@@ -268,6 +268,7 @@ def force_fetch_vatican_news():
     log_msg("/fetch_vatican_news called")
     try:
         get_news()
+        return 'Updated now', 200
     except Exception as e:
         log_msg(f"Vatican news step failed {str(e)}")
 

@@ -8,7 +8,7 @@ import asyncio
 
 ##################################################################
 # GLOBAL VARIABLES
-BASE_FOLDER = 'app_files/meloir_files/'
+BASE_FOLDER = 'app_files/temperature_files/'
 TEMPERATURE_CSV = BASE_FOLDER+'temperatures.csv'
 
 

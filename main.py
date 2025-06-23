@@ -6,9 +6,13 @@ from app.temperature_functions import background_loop_temperature
 from app.meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity  
 import os
 from app.utilities import log_msg
+import sys
+
 
 ##################################################################
 # SET UP LOGGING
+sys.stdout.reconfigure(line_buffering=True)
+log_msg('Stdout redirected')
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s"
