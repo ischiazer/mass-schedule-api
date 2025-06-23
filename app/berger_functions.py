@@ -15,7 +15,7 @@ import os
 ##################################################################
 # GLOBAL VARIABLES
 HASHED_PASSWORD = 'e172b76465d5da5b220d7dcead985461dc3baeb3a353a2ee7254fd699c8de10c'
-BASE_FOLDER = 'app_files/berger_files/'
+BASE_FOLDER = '../app_files/berger_files/'
 DB_NAME_LOCAL = os.path.abspath(BASE_FOLDER+'bookings.db')
 DB_NAME_BB = 'bookings.db'
 log_msg('Berger local DB file = ' + DB_NAME_LOCAL)
