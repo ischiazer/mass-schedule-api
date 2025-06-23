@@ -19,6 +19,8 @@ BASE_FOLDER = 'app_files/berger_files/'
 DB_NAME_LOCAL = os.path.abspath(BASE_FOLDER+'bookings.db')
 DB_NAME_BB = 'bookings.db'
 log_msg('Berger local DB file = ' + DB_NAME_LOCAL)
+os.makedirs(BASE_FOLDER, exist_ok=True)
+log_msg('Folder created for Berger')
 
 ##################################################################
 # Connect to database (creates the file if it doesn't exist)

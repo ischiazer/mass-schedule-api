@@ -13,6 +13,8 @@ BASE_FOLDER = '../app_files/temperature_files/'
 TEMPERATURE_CSV_LOCAL = os.path.abspath(BASE_FOLDER+'temperatures.csv')
 TEMPERATURE_CSV_BB = 'temperatures.csv'
 log_msg('Temperature local file = ' + TEMPERATURE_CSV_LOCAL)
+os.makedirs(BASE_FOLDER, exist_ok=True)
+log_msg('Folder created for temperature')
 
 ##################################################################
 # SUB-FUNCTION - RETURN LIST OF CITIES FOR WHICH TEMPERATURE IS NEEDED
