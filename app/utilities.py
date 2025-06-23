@@ -20,6 +20,7 @@ UPLOAD_LOG_FILE = "upload_log.txt"
 ##################################################################
 # LOG MESSAGES ON CONSOLE AND FILE
 def log_msg(msg):
+    logging.info(msg)
     d = datetime.now(pytz.timezone('Europe/Paris'))
     d_str = format_datetime(d, "d-MM-y HH:mm:ss", locale='fr_FR')
     if not isinstance(msg, str):

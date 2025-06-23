@@ -5,6 +5,7 @@ from app import initialise_modules
 from app.temperature_functions import background_loop_temperature
 from app.meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity  
 import os
+from app.utilities import log_msg
 
 ##################################################################
 # SET UP LOGGING
@@ -15,10 +16,10 @@ logging.basicConfig(
 
 ##################################################################
 # CREATE APP
-logging.info('Starting the app...')
-print('*starting the app*')
+log_msg('Starting the app...')
+log_msg('*starting the app*')
 app = create_app()
-print('*app created*')
+log_msg('*app created*')
 
 ##################################################################
 # SCHEDULE TASKS
@@ -38,11 +39,11 @@ def start_background_threads():
 ##################################################################
 # MAIN
     initialise_modules()
-    print('*modules initialised*')
-    logging.info('... started')
-    logging.info('Starting background threads...')
+    log_msg('*modules initialised*')
+    log_msg('... started')
+    log_msg('Starting background threads...')
     start_background_threads()
-    logging.info('...done')
+    log_msg('...done')
     is_local = False
     env_var = os.getenv("LOCAL_LAPTOP")
     if not (env_var is None):
@@ -50,17 +51,17 @@ def start_background_threads():
             is_local = True
             print('//-- local details: --->.  <' + str(env_var) + '>')
     if is_local:
-        print('* is local *')
-        print('type of environment variable: '+str(type(env_var)))
-        print('value of environment variable: <'+str(env_var) + '>')
-        logging.info("Starting Flask server locally on port 5050")
+        log_msg('* is local *')
+        log_msg('type of environment variable: '+str(type(env_var)))
+        log_msg('value of environment variable: <'+str(env_var) + '>')
+        log_msg("Starting Flask server locally on port 5050")
         app.run(debug=True, port=5050)
-        logging.info("Flask server started")
+        log_msg("Flask server started")
     else:
-        print('* on server *')
-        logging.info("Starting Flask server on remote location")
+        log_msg('* on server *')
+        log_msg("Starting Flask server on remote location")
         port = int(os.environ.get("PORT", 10000))
-        logging.info('Port = ' + str(port))
+        log_msg('Port = ' + str(port))
         app.run(host="0.0.0.0", port=port)
-        logging.info("Flask server started")
+        log_msg("Flask server started")
     
