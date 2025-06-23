@@ -27,8 +27,8 @@ READINGS_PATH_STORE_LOCAL = os.path.abspath(BASE_FOLDER+'readings_%s.html')
 PERPLEXITY_TABLE_LAST_LOCAL = os.path.abspath(BASE_FOLDER+"evenements.html")
 PERPLEXITY_TIMESTAMP_LOCAL = os.path.abspath(BASE_FOLDER+"evenements_MAJ.txt")
 PERPLEXITY_TABLE_STORE_LOCAL = os.path.abspath(BASE_FOLDER+"evenements_%s.html")
-NEWS_TABLE = os.path.abspath(BASE_FOLDER+"nouvelles_vatican.html")
-NEWS_TIMESTAMP = os.path.abspath(BASE_FOLDER+"nouvelles_MAJ.txt")
+NEWS_TABLE_LOCAL = os.path.abspath(BASE_FOLDER+"nouvelles_vatican.html")
+NEWS_TIMESTAMP_LOCAL = os.path.abspath(BASE_FOLDER+"nouvelles_MAJ.txt")
 
 
 os.makedirs(UPLOAD_FOLDER_LOCAL, exist_ok=True)
@@ -53,8 +53,8 @@ log_msg(f'local file READINGS_PATH_STORE_LOCAL = {READINGS_PATH_STORE_LOCAL}')
 log_msg(f'local file PERPLEXITY_TABLE_LAST_LOCAL   = {PERPLEXITY_TABLE_LAST_LOCAL}')
 log_msg(f'local file PERPLEXITY_TIMESTAMP_LOCAL = {PERPLEXITY_TIMESTAMP_LOCAL}')
 log_msg(f'local file PERPLEXITY_TABLE_STORE_LOCAL = {PERPLEXITY_TABLE_STORE_LOCAL}')
-log_msg(f'local file NEWS_TABLE = {NEWS_TABLE}')
-log_msg(f'local file NEWS_TIMESTAMP = {NEWS_TIMESTAMP}')
+log_msg(f'local file NEWS_TABLE_LOCAL = {NEWS_TABLE_LOCAL}')
+log_msg(f'local file NEWS_TIMESTAMP_LOCAL = {NEWS_TIMESTAMP_LOCAL}')
 
 
 ##################################################################
