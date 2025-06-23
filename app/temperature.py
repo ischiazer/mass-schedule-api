@@ -28,6 +28,7 @@ def query_current_temperature():
 @bp_temperature.route('/fetch_temperature_history')
 def query_historical_temperature():
     log_msg("fetch_temperature_history")
+    log_msg(f"File name: <{TEMPERATURE_CSV}>")
     try:
         return throw_static_file('temperature', TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
     except Exception as e:
@@ -43,6 +44,7 @@ def query_update_temperature():
         update_temperatures()
         log_msg("update done")
         log_msg("Getting file...")
+        log_msg(f"File name: <{TEMPERATURE_CSV}>")
         x = throw_static_file('temperature', TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
         log_msg("...done")
         return x
