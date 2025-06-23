@@ -59,7 +59,7 @@ def refresh_schedule():
         hb.write(now.isoformat())
     push_b2_file('meloir',BASE_FOLDER+"static/heartbeat.txt","heartbeat.txt")
 
-    return f"Schedule updated static/schedule.json locally to <{BASE_FOLDER+"static/last_updated.txt"} and BB horaires_messes_MAJ.txt
+    return f'Schedule updated static/schedule.json locally to <{BASE_FOLDER+"static/last_updated.txt"} and BB horaires_messes_MAJ.txt'
 
 
 
@@ -268,7 +268,7 @@ def force_fetch_vatican_news():
     log_msg("/fetch_vatican_news called")
     try:
         get_news()
-        return 'Updated now', 200
+        return 'Vatican news Updated now', 200
     except Exception as e:
         log_msg(f"Vatican news step failed {str(e)}")
 
