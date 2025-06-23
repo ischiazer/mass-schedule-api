@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from .temperature_functions import temperature_current, update_temperatures
-from .temperature_functions import TEMPERATURE_CSV
+from .temperature_functions import TEMPERATURE_CSV_BB, TEMPERATURE_CSV_LOCAL
 from .utilities import throw_static_file, log_msg
 from flask import Blueprint
 
@@ -28,9 +28,9 @@ def query_current_temperature():
 @bp_temperature.route('/fetch_temperature_history')
 def query_historical_temperature():
     log_msg("fetch_temperature_history")
-    log_msg(f"File name: <{TEMPERATURE_CSV}>")
+    log_msg(f"File name: BB=<{TEMPERATURE_CSV_BB}> local=<{TEMPERATURE_CSV_LOCAL}>")
     try:
-        return throw_static_file('temperature', TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
+        return throw_static_file('temperature', TEMPERATURE_CSV_LOCAL, TEMPERATURE_CSV_BB, "Fetched historical temperatures")
     except Exception as e:
         logging.error(f"History fetch failed: {str(e)}")
         return f"Error fetching history: {e}", 500
@@ -44,8 +44,8 @@ def query_update_temperature():
         update_temperatures()
         log_msg("update done")
         log_msg("Getting file...")
-        log_msg(f"File name: <{TEMPERATURE_CSV}>")
-        x = throw_static_file('temperature', TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
+        log_msg(f"File name: local=<{TEMPERATURE_CSV_LOCAL}> BB=<{TEMPERATURE_CSV_BB}>")
+        x = throw_static_file('temperature', TEMPERATURE_CSV_LOCAL, TEMPERATURE_CSV_BB, "Fetched historical temperatures")
         log_msg("...done")
         return x
     except Exception as e:

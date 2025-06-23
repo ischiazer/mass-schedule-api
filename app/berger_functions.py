@@ -1,6 +1,5 @@
 import sqlite3
 import pandas as pd
-import logging
 import pytz
 from datetime import datetime
 from babel.dates import format_datetime
@@ -11,17 +10,20 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import hashlib
 from .utilities import push_b2_file,log_msg
+import os
 
 ##################################################################
 # GLOBAL VARIABLES
-DB_NAME = 'bookings.db'
 HASHED_PASSWORD = 'e172b76465d5da5b220d7dcead985461dc3baeb3a353a2ee7254fd699c8de10c'
 BASE_FOLDER = 'app_files/berger_files/'
+DB_NAME_LOCAL = os.path.abspath(BASE_FOLDER+'bookings.db')
+DB_NAME_BB = 'bookings.db'
+log_msg('Berger local DB file = ' + DB_NAME_LOCAL)
 
 ##################################################################
 # Connect to database (creates the file if it doesn't exist)
 def get_DB_connection():
-    DB_connection = sqlite3.connect(DB_NAME)
+    DB_connection = sqlite3.connect(DB_NAME_LOCAL)
     DB_cursor = DB_connection.cursor()
     return DB_connection, DB_cursor
 
@@ -29,7 +31,7 @@ def get_DB_connection():
 # UPLOAD DATABASE TO BLACKBLAZE
 def update_b2_DB():
     log_msg('Pushing Berger DB to B2...')
-    push_b2_file('berger',DB_NAME, DB_NAME)
+    push_b2_file('berger',DB_NAME_LOCAL, DB_NAME_BB)
     log_msg('...Done')
     
 ##################################################################

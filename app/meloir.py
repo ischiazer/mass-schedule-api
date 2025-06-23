@@ -8,7 +8,7 @@ import logging
 import tempfile
 from datetime import datetime
 from .meloir_functions import fetch_and_clean_schedule, fetch_readings, get_perplexity_events, get_news
-from .meloir_functions import BASE_FOLDER,HTML_FILE_PATH, UPLOAD_FOLDER, UPLOAD_LOG_FILE, WORD_FOLDER, HTML_FOLDER, PATH_BULLETIN, PERPLEXITY_TABLE_LAST,PERPLEXITY_TIMESTAMP,NEWS_TABLE,NEWS_TIMESTAMP,READINGS_PATH_LAST
+from .meloir_functions import BASE_FOLDER,HTML_FILE_PATH_LOCAL, UPLOAD_FOLDER_LOCAL, UPLOAD_LOG_FILE_LOCAL, WORD_FOLDER_LOCAL, HTML_FOLDER_LOCAL, PATH_BULLETIN_LOCAL, PERPLEXITY_TABLE_LAST_LOCAL,PERPLEXITY_TIMESTAMP_LOCAL,NEWS_TABLE_LOCAL,NEWS_TIMESTAMP_LOCAL,READINGS_PATH_LAST_LOCAL
 from .utilities import push_b2_file, throw_static_file, log_msg
 from .utilities import log_upload, extract_cropped_images_proportional, convert_docx_to_html_with_cropped_images
 from flask import request, send_file, Response
@@ -69,7 +69,7 @@ def refresh_schedule():
 def upload_html():
     log_msg('(Web access) upload_html')
     html_content = request.get_data(as_text=True)
-    with open(HTML_FILE_PATH, "w", encoding="utf-8") as f:
+    with open(HTML_FILE_PATH_LOCAL, "w", encoding="utf-8") as f:
         f.write(html_content)
     return "HTML saved", 200
 
@@ -77,9 +77,9 @@ def upload_html():
 # QUERY - GET LATEST HTML
 @bp_meloir.route("/latest")
 def latest():
-    log_msg('(Web access) latest HTML ' + HTML_FILE_PATH)
-    if os.path.exists(HTML_FILE_PATH):
-        return send_file(HTML_FILE_PATH, mimetype="text/html")
+    log_msg('(Web access) latest HTML ' + HTML_FILE_PATH_LOCAL)
+    if os.path.exists(HTML_FILE_PATH_LOCAL):
+        return send_file(HTML_FILE_PATH_LOCAL, mimetype="text/html")
     else:
         return "No HTML uploaded yet.", 404
 
@@ -96,7 +96,7 @@ def upload_attachment():
         return "Missing file or filename", 400
 
     try:
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        filepath = os.path.join(UPLOAD_FOLDER_LOCAL, filename)
         uploaded_file.save(filepath)
 
         log_upload("SUCCESS", filename)
@@ -111,10 +111,10 @@ def upload_attachment():
 @bp_meloir.route("/upload_log")
 def show_log():
     log_msg('(Web access) show_log')
-    if not os.path.exists(UPLOAD_LOG_FILE):
+    if not os.path.exists(UPLOAD_LOG_FILE_LOCAL):
         return "No log available yet.", 404
 
-    with open(UPLOAD_LOG_FILE, "r", encoding="utf-8") as f:
+    with open(UPLOAD_LOG_FILE_LOCAL, "r", encoding="utf-8") as f:
         log_content = f.read()
 
     return Response(f"<pre>{log_content}</pre>", mimetype="text/html")
@@ -133,11 +133,11 @@ def download_content():
     zip_buffer = io.BytesIO()
 
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
-        for root, _, files in os.walk(UPLOAD_FOLDER):
+        for root, _, files in os.walk(UPLOAD_FOLDER_LOCAL):
             for filename in files:
                 filepath = os.path.join(root, filename)
                 # Add file to zip with relative path
-                arcname = os.path.relpath(filepath, start=UPLOAD_FOLDER)
+                arcname = os.path.relpath(filepath, start=UPLOAD_FOLDER_LOCAL)
                 zipf.write(filepath, arcname=arcname)
 
     zip_buffer.seek(0)
@@ -193,7 +193,7 @@ def deliver_word():
     # Step a: Save uploaded .docx file with timestamp
     timestamp = datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S")
     filename = f"{timestamp}.docx"
-    docx_path = os.path.join(WORD_FOLDER, filename)
+    docx_path = os.path.join(WORD_FOLDER_LOCAL, filename)
     uploaded_file.save(docx_path)
 
     try:
@@ -201,8 +201,8 @@ def deliver_word():
         with tempfile.TemporaryDirectory() as output_dir:
             # Step c: Generate HTML output paths
             html_filename = f"{timestamp}.html"
-            html_path = os.path.join(HTML_FOLDER, html_filename)
-            latest_path = os.path.join(HTML_FOLDER, "latest_html.html")
+            html_path = os.path.join(HTML_FOLDER_LOCAL, html_filename)
+            latest_path = os.path.join(HTML_FOLDER_LOCAL, "latest_html.html")
 
             logo_details = (392860, "logo_paroisse2.gif")  # Placeholder — replace if dynamic
 
@@ -216,7 +216,7 @@ def deliver_word():
                 f.write(html)
 
             # Also write to bulletin_paroissial.html
-            with open(PATH_BULLETIN, "w", encoding="utf-8") as f:
+            with open(PATH_BULLETIN_LOCAL, "w", encoding="utf-8") as f:
                 f.write(html)
 
             # Push the HTML file to the BlackBlaze server
@@ -234,7 +234,7 @@ def deliver_word():
 @bp_meloir.route("/latest_word_html")
 def latest_word_html():
     log_msg('(Web access) latest_word_html')
-    latest_path = os.path.join(HTML_FOLDER, "latest_html.html")
+    latest_path = os.path.join(HTML_FOLDER_LOCAL, "latest_html.html")
 
     if not os.path.exists(latest_path):
         return "No HTML has been generated yet.", 404
@@ -279,7 +279,7 @@ def force_fetch_vatican_news():
 def query_static_perplexity():
     log_msg('(Web access) static_news_nearby')
     try:
-        f= throw_static_file('meloir',PERPLEXITY_TABLE_LAST,"evenements.html", "/query_static_perplexity called")
+        f= throw_static_file('meloir',PERPLEXITY_TABLE_LAST_LOCAL,"evenements.html", "/query_static_perplexity called")
         log_msg('static_news_nearby successful')
         return f
     except Exception as e:
@@ -292,7 +292,7 @@ def query_static_perplexity():
 def query_static_perplexity_timestamp():
     log_msg('(Web access) static_news_nearby_timestamp')
     try:
-        f = throw_static_file('meloir', PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt", "/static_news_nearby_timestamp called")
+        f = throw_static_file('meloir', PERPLEXITY_TIMESTAMP_LOCAL,"evenements_MAJ.txt", "/static_news_nearby_timestamp called")
         log_msg('query_static_perplexity_timestamp successful')
         return f
     except Exception as e:
@@ -305,7 +305,7 @@ def query_static_perplexity_timestamp():
 def query_static_vatican():
     log_msg('(Web access) static_news_vatican')
     try:
-        f = throw_static_file('meloir',NEWS_TABLE,"nouvelles_vatican.html", "/static_news_vatican called")
+        f = throw_static_file('meloir',NEWS_TABLE_LOCAL,"nouvelles_vatican.html", "/static_news_vatican called")
         log_msg('static_news_vatican successful')
         return f
     except Exception as e:
@@ -319,7 +319,7 @@ def query_static_vatican():
 def static_news_vatican_timestamp():
     log_msg('(Web access) static_news_vatican_timestamp')
     try:
-        f = throw_static_file('meloir',NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt", "/static_news_vatican_timestamp called")
+        f = throw_static_file('meloir',NEWS_TIMESTAMP_LOCAL,"nouvelles_vatican_MAJ.txt", "/static_news_vatican_timestamp called")
         log_msg('static_news_vatican_timestamp successful')
         return f
     except Exception as e:
@@ -333,7 +333,7 @@ def static_news_vatican_timestamp():
 def query_static_readings():
     log_msg('(Web access) static_readings')
     try:
-        f = throw_static_file('meloir',READINGS_PATH_LAST,"lectures.html", "/query_static_readings called")
+        f = throw_static_file('meloir',READINGS_PATH_LAST_LOCAL,"lectures.html", "/query_static_readings called")
         log_msg('static_readings successful')
         return f
     except Exception as e:
@@ -347,7 +347,7 @@ def query_static_readings():
 def query_static_bulletin():
     log_msg('(Web access) query_static_bulletin')
     try:
-        f = throw_static_file('meloir',PATH_BULLETIN,"bulletin_paroissial.html", "/query_static_bulletin called")
+        f = throw_static_file('meloir',PATH_BULLETIN_LOCAL,"bulletin_paroissial.html", "/query_static_bulletin called")
         log_msg('query_static_bulletin successful')
         return f
     except Exception as e:

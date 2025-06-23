@@ -3,42 +3,58 @@ from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 from flask import jsonify
 from datetime import date, datetime, timedelta
-import logging
 import asyncio
 import time
 import feedparser
 from openai import OpenAI
 from .utilities import get_time_stamp_HTML, french_date, fix_encoding, push_b2_file, format_datetime, log_msg
 from email.utils import parsedate_to_datetime
-
+import os
 
 ##################################################################
 # GLOBAL VARIABLES
 
 BASE_FOLDER = '../app_files/meloir_files/'
-HTML_FILE_PATH = BASE_FOLDER+"latest.html"
-UPLOAD_FOLDER = BASE_FOLDER+"uploaded_files"
-WORD_FOLDER = BASE_FOLDER+"uploaded_word"
-HTML_FOLDER = BASE_FOLDER+"created_HTML"
-UPLOAD_LOG_FILE = BASE_FOLDER+"upload_log.txt"
-PATH_BULLETIN = BASE_FOLDER+'bulletin_paroissial.html'
-READINGS_PATH_LAST = BASE_FOLDER+'readings_current.html'
-READINGS_PATH_STORE = BASE_FOLDER+'readings_%s.html'
-PERPLEXITY_TABLE_LAST = BASE_FOLDER+"evenements.html"
-PERPLEXITY_TIMESTAMP = BASE_FOLDER+"evenements_MAJ.txt"
-PERPLEXITY_TABLE_STORE = BASE_FOLDER+"evenements_%s.html"
-NEWS_TABLE = BASE_FOLDER+"nouvelles_vatican.html"
-NEWS_TIMESTAMP = BASE_FOLDER+"nouvelles_MAJ.txt"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(WORD_FOLDER, exist_ok=True)
-os.makedirs(HTML_FOLDER, exist_ok=True)
+
+HTML_FILE_PATH_LOCAL = os.path.abspath(BASE_FOLDER+"latest.html")
+UPLOAD_FOLDER_LOCAL = os.path.abspath(BASE_FOLDER+"uploaded_files")
+WORD_FOLDER_LOCAL = os.path.abspath(BASE_FOLDER+"uploaded_word")
+HTML_FOLDER_LOCAL = os.path.abspath(BASE_FOLDER+"created_HTML")
+UPLOAD_LOG_FILE_LOCAL = os.path.abspath(BASE_FOLDER+"upload_log.txt")
+PATH_BULLETIN_LOCAL = os.path.abspath(BASE_FOLDER+'bulletin_paroissial.html')
+READINGS_PATH_LAST_LOCAL = os.path.abspath(BASE_FOLDER+'readings_current.html')
+READINGS_PATH_STORE_LOCAL = os.path.abspath(BASE_FOLDER+'readings_%s.html')
+PERPLEXITY_TABLE_LAST_LOCAL = os.path.abspath(BASE_FOLDER+"evenements.html")
+PERPLEXITY_TIMESTAMP_LOCAL = os.path.abspath(BASE_FOLDER+"evenements_MAJ.txt")
+PERPLEXITY_TABLE_STORE_LOCAL = os.path.abspath(BASE_FOLDER+"evenements_%s.html")
+NEWS_TABLE = os.path.abspath(BASE_FOLDER+"nouvelles_vatican.html")
+NEWS_TIMESTAMP = os.path.abspath(BASE_FOLDER+"nouvelles_MAJ.txt")
+
+
+os.makedirs(UPLOAD_FOLDER_LOCAL, exist_ok=True)
+os.makedirs(WORD_FOLDER_LOCAL, exist_ok=True)
+os.makedirs(HTML_FOLDER_LOCAL, exist_ok=True)
 os.makedirs(BASE_FOLDER+"static", exist_ok=True)
 
 # Create the base folder if it does not exist
-if not os.path.exists(UPLOAD_LOG_FILE):
-    with open(UPLOAD_LOG_FILE, "w", encoding="utf-8") as log:
+if not os.path.exists(UPLOAD_LOG_FILE_LOCAL):
+    with open(UPLOAD_LOG_FILE_LOCAL, "w", encoding="utf-8") as log:
         log.write("[INIT] Created log file\n")
 
+# Show the paths
+log_msg(f'Local file HTML_FILE_PATH_LOCAL = {HTML_FILE_PATH_LOCAL}')
+log_msg(f'Local file UPLOAD_FOLDER_LOCAL = {UPLOAD_FOLDER_LOCAL}')
+log_msg(f'local file WORD_FOLDER_LOCAL = {WORD_FOLDER_LOCAL}')
+log_msg(f'local file HTML_FOLDER_LOCAL = {HTML_FOLDER_LOCAL}')
+log_msg(f'local file UPLOAD_LOG_FILE_LOCAL = {UPLOAD_LOG_FILE_LOCAL}')
+log_msg(f'local file PATH_BULLETIN_LOCAL = {PATH_BULLETIN_LOCAL}')
+log_msg(f'local file READINGS_PATH_LAST_LOCAL = {READINGS_PATH_LAST_LOCAL}')
+log_msg(f'local file READINGS_PATH_STORE_LOCAL = {READINGS_PATH_STORE_LOCAL}')
+log_msg(f'local file PERPLEXITY_TABLE_LAST_LOCAL   = {PERPLEXITY_TABLE_LAST_LOCAL}')
+log_msg(f'local file PERPLEXITY_TIMESTAMP_LOCAL = {PERPLEXITY_TIMESTAMP_LOCAL}')
+log_msg(f'local file PERPLEXITY_TABLE_STORE_LOCAL = {PERPLEXITY_TABLE_STORE_LOCAL}')
+log_msg(f'local file NEWS_TABLE = {NEWS_TABLE}')
+log_msg(f'local file NEWS_TIMESTAMP = {NEWS_TIMESTAMP}')
 
 
 ##################################################################
@@ -230,16 +246,16 @@ def fetch_readings():
     except Exception as e:
         log_msg("/fetch_readings error %s" % str(e))
         full_text = ''
-    with open(READINGS_PATH_LAST, "w", encoding="utf-8") as f:
+    with open(READINGS_PATH_LAST_LOCAL, "w", encoding="utf-8") as f:
         f.write(full_text)
     log_msg(f"/fetch_readings local file written ({len(full_text)} length)")
-    push_b2_file('meloir',READINGS_PATH_LAST, 'lectures.html')
-    log_msg(f"/fetch_readings local file size {os.path.getsize(READINGS_PATH_LAST)} bytes")
+    push_b2_file('meloir',READINGS_PATH_LAST_LOCAL, 'lectures.html')
+    log_msg(f"/fetch_readings local file size {os.path.getsize(READINGS_PATH_LAST_LOCAL)} bytes")
     log_msg("/fetch_readings local file written uploaded to BB")
 
-    with open(READINGS_PATH_STORE % get_next_sunday(), "w", encoding="utf-8") as f:
+    with open(READINGS_PATH_STORE_LOCAL % get_next_sunday(), "w", encoding="utf-8") as f:
         f.write(full_text)
-    push_b2_file('meloir',READINGS_PATH_STORE % get_next_sunday(), 'historique_lectures_%s.html' % get_next_sunday())
+    push_b2_file('meloir',READINGS_PATH_STORE_LOCAL % get_next_sunday(), 'historique_lectures_%s.html' % get_next_sunday())
     return full_text
 
 
@@ -318,25 +334,25 @@ def get_perplexity_events():
 
     # 6 - Check that the HTML code is correct
     log_msg("Perplexity query step 6")
-    with open(PERPLEXITY_TABLE_LAST, "w") as f:
+    with open(PERPLEXITY_TABLE_LAST_LOCAL, "w") as f:
         f.write(html_content)
     log_msg("Perplexity query step 6b")
     dt = datetime.now().strftime("%Y-%m-%d")
     log_msg("Perplexity query step 6c")
-    with open(PERPLEXITY_TABLE_STORE % dt, "w") as f:
+    with open(PERPLEXITY_TABLE_STORE_LOCAL % dt, "w") as f:
         f.write(html_content)
     log_msg("Perplexity query step 6d")
     log_msg("Perplexity query step 6e")
     time_now = datetime.now()
     log_msg("Perplexity query step 6f")
-    with open(PERPLEXITY_TIMESTAMP, 'w') as f:
+    with open(PERPLEXITY_TIMESTAMP_LOCAL, 'w') as f:
         f.write(time_now.strftime("%Y-%m-%d %H:%M:%S"))
     log_msg("Perplexity query step 6g")
-    push_b2_file('meloir',PERPLEXITY_TABLE_LAST,"evenements.html")
+    push_b2_file('meloir',PERPLEXITY_TABLE_LAST_LOCAL,"evenements.html")
     log_msg("Perplexity query step 6h")
-    push_b2_file('meloir',PERPLEXITY_TABLE_STORE % dt,"historique_evenements_%s.html" % dt)
+    push_b2_file('meloir',PERPLEXITY_TABLE_STORE_LOCAL % dt,"historique_evenements_%s.html" % dt)
     log_msg("Perplexity query step 6i")
-    push_b2_file('meloir',PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt")
+    push_b2_file('meloir',PERPLEXITY_TIMESTAMP_LOCAL,"evenements_MAJ.txt")
     log_msg("Perplexity query step 6j")
     log_msg("Perplexity query done")
     return html_content

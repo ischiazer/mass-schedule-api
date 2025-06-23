@@ -53,35 +53,35 @@ def get_b2_bucket(bucket_name):
 
 ##################################################################
 # UPLOAD FILE TO BLACKBLAZE
-def push_b2_file(bucket_name, file_local, file_server):
+def push_b2_file(bucket_name, file_local, file_BB):
     bucket = get_b2_bucket(bucket_name)
     bucket.upload_local_file(
         local_file=file_local,
-        file_name=file_server
+        file_name=file_BB
     )
 
 ##################################################################
 # DOWNLOAD FILE FROM BLACKBLAZE
-def download_file_from_b2(bucket_name, file_name, local_path):
+def download_file_from_b2(bucket_name, file_name_BB, local_path):
     log_msg('Getting bucket...')
     bucket = get_b2_bucket(bucket_name)
     log_msg('Done')
-    log_msg('Downloading file '+ str(file_name))
-    x = bucket.download_file_by_name(file_name)
+    log_msg('Downloading file from BB:'+ str(file_name_BB))
+    x = bucket.download_file_by_name(file_name_BB)
     log_msg('Save file '+ str(local_path))
     x.save_to(local_path)
     log_msg('Done')
-    log_msg(f"Downloaded '{file_name}' to '{local_path}'")
+    log_msg(f"Downloaded '{file_name_BB}' to '{local_path}'")
 
 ##################################################################
 # DOWNLOAD FILE FROM BLACKBLAZE ONLY IF ABSENT LOCALLY
-def download_file_from_b2_if_absent(bucket_name, file_name, local_path):
+def download_file_from_b2_if_absent(bucket_name, file_name_BB, local_path):
     log_msg('Checking local file: ' + str(local_path))
     if os.path.exists(local_path):
         log_msg('File already present: '+str(local_path))
     else:
-        log_msg('Downloading from BB: ' + str(local_path) + ' | ' + str(file_name))
-        download_file_from_b2(bucket_name, file_name, local_path)
+        log_msg('Downloading from BB: ' + str(local_path) + ' | ' + str(file_name_BB))
+        download_file_from_b2(bucket_name, file_name_BB, local_path)
         log_msg('\t\tDone')
 
 ##################################################################

@@ -4,13 +4,15 @@ import pandas as pd, numpy as np
 from datetime import date, datetime
 from .utilities import download_file_from_b2, push_b2_file,log_msg
 import asyncio
+import os
 
 
 ##################################################################
 # GLOBAL VARIABLES
 BASE_FOLDER = '../app_files/temperature_files/'
-TEMPERATURE_CSV = BASE_FOLDER+'temperatures.csv'
-
+TEMPERATURE_CSV_LOCAL = os.path.abspath(BASE_FOLDER+'temperatures.csv')
+TEMPERATURE_CSV_BB = 'temperatures.csv'
+log_msg('Temperature local file = ' + TEMPERATURE_CSV_LOCAL)
 
 ##################################################################
 # SUB-FUNCTION - RETURN LIST OF CITIES FOR WHICH TEMPERATURE IS NEEDED
@@ -88,9 +90,9 @@ async def temperature_current():
 def update_temperatures():
     # Load existing history of temperatures
     log_msg("Downloading temperature file...")
-    download_file_from_b2('temperature',TEMPERATURE_CSV, TEMPERATURE_CSV)
+    download_file_from_b2('temperature',TEMPERATURE_CSV_BB, TEMPERATURE_CSV_LOCAL)
     log_msg("Done")
-    temps_existing = pd.read_csv(TEMPERATURE_CSV,index_col=0)
+    temps_existing = pd.read_csv(TEMPERATURE_CSV_LOCAL,index_col=0)
     log_msg("Converted to dataframe")
 
     # Get current temperatures
@@ -112,10 +114,10 @@ def update_temperatures():
 
     # Save and upload
     log_msg("Saving CSV...")
-    temps_updated.to_csv(TEMPERATURE_CSV)
+    temps_updated.to_csv(TEMPERATURE_CSV_LOCAL)
     log_msg("...Done")
     log_msg("Pushing BB file...")
-    push_b2_file('temperature',TEMPERATURE_CSV,TEMPERATURE_CSV)
+    push_b2_file('temperature',TEMPERATURE_CSV_LOCAL,TEMPERATURE_CSV_BB)
     log_msg("...Done")
 
 ##################################################################
