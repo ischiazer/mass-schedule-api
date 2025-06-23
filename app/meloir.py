@@ -9,7 +9,7 @@ import tempfile
 from datetime import datetime
 from .meloir_functions import fetch_and_clean_schedule, fetch_readings, get_perplexity_events, get_news
 from .meloir_functions import BASE_FOLDER,HTML_FILE_PATH, UPLOAD_FOLDER, UPLOAD_LOG_FILE, WORD_FOLDER, HTML_FOLDER, PATH_BULLETIN, PERPLEXITY_TABLE_LAST,PERPLEXITY_TIMESTAMP,NEWS_TABLE,NEWS_TIMESTAMP,READINGS_PATH_LAST
-from .utilities import push_b2_file, throw_static_file
+from .utilities import push_b2_file, throw_static_file, log_msg
 from .utilities import log_upload, extract_cropped_images_proportional, convert_docx_to_html_with_cropped_images
 from flask import request, send_file, Response
 
@@ -18,7 +18,7 @@ from flask import request, send_file, Response
 ##################################################################
 # REGISTER BLUEPRINT
 bp_meloir = Blueprint("bp_meloir", __name__)
-logging.info('Blueprint Meloir done')
+log_msg('Blueprint Meloir done')
 print("Registering bp_meloir") 
 
 ##################################################################
@@ -146,7 +146,7 @@ def download_content():
 # QUERY - FETCH DIR (LISTING OF FILES)
 @bp_meloir.route("/show_dir")
 def show_dir():
-    logging.info('(Web access) show_dir')
+    log_msg('(Web access) show_dir')
     base_path = "."  # Start from current working directory
     file_list = []
 
@@ -238,7 +238,7 @@ def latest_word_html():
 # QUERY - FETCH READINGS
 @bp_meloir.route('/fetch_readings')
 def force_fetch_readings():
-    logging.info("/fetch_readings called")
+    log_msg("/fetch_readings called")
     return fetch_readings()
 
 
@@ -246,50 +246,50 @@ def force_fetch_readings():
 # QUERY - FETCH PERPLEXITY
 @bp_meloir.route('/fetch_perplexity')
 def force_fetch_perplexity():
-    logging.info("/fetch_perplexity called")
+    log_msg("/fetch_perplexity called")
     try:
         get_perplexity_events()
     except Exception as e:
-        logging.info('Error running get_perplexity_events')
+        log_msg('Error running get_perplexity_events')
 
 
 ##################################################################
 # QUERY - FETCH VATICAN NEWS
 @bp_meloir.route('/fetch_vatican_news')
 def force_fetch_vatican_news():
-    logging.info("/fetch_vatican_news called")
+    log_msg("/fetch_vatican_news called")
     try:
         get_news()
     except Exception as e:
-        logging.info(f"Vatican news step failed {str(e)}")
+        log_msg(f"Vatican news step failed {str(e)}")
 
 
 ##################################################################
 # QUERY - STATIC PERPLEXITY NEWS
 @bp_meloir.route('/static_news_nearby')
 def query_static_perplexity():
-    logging.info('(Web access) static_news_nearby')
+    log_msg('(Web access) static_news_nearby')
     return throw_static_file('meloir',PERPLEXITY_TABLE_LAST,"evenements.html", "/query_static_perplexity called")
 
 ##################################################################
 # QUERY - STATIC PERFPLEXITY NEWS
 @bp_meloir.route('/static_news_nearby_timestamp')
 def query_static_perplexity_timestamp():
-    logging.info('(Web access) static_news_nearby_timestamp')
+    log_msg('(Web access) static_news_nearby_timestamp')
     return throw_static_file('meloir', PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt", "/static_news_nearby_timestamp called")
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS
 @bp_meloir.route('/static_news_vatican')
 def query_static_vatican():
-    logging.info('(Web access) static_news_vatican')
+    log_msg('(Web access) static_news_vatican')
     return throw_static_file('meloir',NEWS_TABLE,"nouvelles_vatican.html", "/static_news_vatican called")
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS TIMESTAMP
 @bp_meloir.route('/static_news_vatican_timestamp')
 def static_news_vatican_timestamp():
-    logging.info('(Web access) static_news_vatican_timestamp')
+    log_msg('(Web access) static_news_vatican_timestamp')
     return throw_static_file('meloir',NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt", "/static_news_vatican_timestamp called")
 
 
@@ -297,7 +297,7 @@ def static_news_vatican_timestamp():
 # QUERY - STATIC READINGS
 @bp_meloir.route('/static_readings')
 def query_static_readings():
-    logging.info('(Web access) static_readings')
+    log_msg('(Web access) static_readings')
     return throw_static_file('meloir',READINGS_PATH_LAST,"lectures.html", "/query_static_readings called")
 
 
@@ -305,5 +305,5 @@ def query_static_readings():
 # QUERY - STATIC PARISH PAPER
 @bp_meloir.route('/static_bulletin')
 def query_static_bulletin():
-    logging.info('(Web access) query_static_bulletin')
+    log_msg('(Web access) query_static_bulletin')
     return throw_static_file('meloir',PATH_BULLETIN,"bulletin_paroissial.html", "/query_static_bulletin called")

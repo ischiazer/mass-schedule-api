@@ -2,7 +2,7 @@ import asyncio
 import logging
 from .temperature_functions import temperature_current, update_temperatures
 from .temperature_functions import TEMPERATURE_CSV
-from .utilities import throw_static_file
+from .utilities import throw_static_file, log_msg
 from flask import Blueprint
 
 ##################################################################
@@ -14,9 +14,9 @@ bp_temperature = Blueprint("temperature_bp", __name__)
 @bp_temperature.route('/fetch_current_temperature')
 def query_current_temperature():
     try:
-        logging.info("fetch_current_temperature start")
+        log_msg("fetch_current_temperature start")
         result = asyncio.run(temperature_current())
-        logging.info("fetch_current_temperature end")
+        log_msg("fetch_current_temperature end")
         return result.to_csv()
     except Exception as e:
         logging.error(f"Current temperature failed: {e}")
@@ -26,7 +26,7 @@ def query_current_temperature():
 # QUERY - FETCH TEMPERATURE HISTORY
 @bp_temperature.route('/fetch_temperature_history')
 def query_historical_temperature():
-    logging.info("fetch_temperature_history")
+    log_msg("fetch_temperature_history")
     try:
         return throw_static_file('temperature', TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
     except Exception as e:
@@ -37,13 +37,13 @@ def query_historical_temperature():
 # QUERY - FORCE UPDATE TEMPERATURE
 @bp_temperature.route('/update_temperature')
 def query_update_temperature():
-    logging.info("force update_temperature")
+    log_msg("force update_temperature")
     try:
         update_temperatures()
-        logging.info("update done")
-        logging.info("Getting file...")
+        log_msg("update done")
+        log_msg("Getting file...")
         x = throw_static_file('temperature', TEMPERATURE_CSV, TEMPERATURE_CSV, "Fetched historical temperatures")
-        logging.info("...done")
+        log_msg("...done")
         return x
     except Exception as e:
         logging.error(f"Force update failed: {str(e)}")

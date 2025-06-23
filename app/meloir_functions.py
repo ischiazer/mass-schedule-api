@@ -8,7 +8,7 @@ import asyncio
 import time
 import feedparser
 from openai import OpenAI
-from .utilities import get_time_stamp_HTML, french_date, fix_encoding, push_b2_file, format_datetime
+from .utilities import get_time_stamp_HTML, french_date, fix_encoding, push_b2_file, format_datetime, log_msg
 from email.utils import parsedate_to_datetime
 
 
@@ -147,23 +147,23 @@ def get_current_readings_URL():
 ##################################################################
 # SUB-FUNCTION TO FETCH READINGS VIA CHROMIUM
 async def readings_extract_all_sections(url):
-    logging.info("/fetch_readings async started")
+    log_msg("/fetch_readings async started")
     try:
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
             page = await browser.new_page()
-            logging.info("/fetch_readings async opening URL")
+            log_msg("/fetch_readings async opening URL")
             await page.goto(url)
-            logging.info("/fetch_readings async opened URL")
+            log_msg("/fetch_readings async opened URL")
             await page.wait_for_selector("h2")
-            logging.info("/fetch_readings async selector")
+            log_msg("/fetch_readings async selector")
 
             # Get all h2s (titles of sections like Première lecture, Cantique, etc.)
             titles = await page.query_selector_all("h2")
             result = []
 
             for title_el in titles:
-                logging.info("/fetch_readings async title " + str(title_el))
+                log_msg("/fetch_readings async title " + str(title_el))
                 title_text = await title_el.inner_text()
 
                 # Get the next sibling: h3 for reference
@@ -201,22 +201,22 @@ async def readings_extract_all_sections(url):
 def fetch_readings():
     global z
     url = get_current_readings_URL()
-    logging.info("/fetch_readings URL defined")
+    log_msg("/fetch_readings URL defined")
     try:
         readings = asyncio.get_event_loop().run_until_complete(readings_extract_all_sections(url))
-        logging.info("/fetch_readings URL requested")
+        log_msg("/fetch_readings URL requested")
         if readings is None:
             full_text = ''
-            logging.info("/fetch_readings content empty")
+            log_msg("/fetch_readings content empty")
         else:
-            logging.info("/fetch_readings content obtained")
+            log_msg("/fetch_readings content obtained")
             z = readings
             full_text = '<P>' + french_date(get_next_sunday()) + '</P?<BR>'
-            logging.info("/fetch_readings starting sections")
+            log_msg("/fetch_readings starting sections")
             list_sections = ['1e lecture', 'Psaume', '2e lecture','Evangile']
 
             for i, r in enumerate(readings[:4]):
-                logging.info("/fetch_readings processing section #%d" % i)
+                log_msg("/fetch_readings processing section #%d" % i)
                 full_text += '<div class="sqs-block-content">'
                 full_text += f"<H3 class='sqs-block-title' style='color: rgb(55, 125, 197); margin-top: 2em; margin-bottom: 0.3em;'>{fix_encoding(list_sections[i])}</H3>\n"
                 full_text += f"<I>{fix_encoding(r['title'])}</I><BR>\n"
@@ -225,14 +225,14 @@ def fetch_readings():
         full_text += get_time_stamp_HTML()
 
     except Exception as e:
-        logging.info("/fetch_readings error %s" % str(e))
+        log_msg("/fetch_readings error %s" % str(e))
         full_text = ''
     with open(READINGS_PATH_LAST, "w", encoding="utf-8") as f:
         f.write(full_text)
-    logging.info(f"/fetch_readings local file written ({len(full_text)} length)")
+    log_msg(f"/fetch_readings local file written ({len(full_text)} length)")
     push_b2_file('meloir',READINGS_PATH_LAST, 'lectures.html')
-    logging.info(f"/fetch_readings local file size {os.path.getsize(READINGS_PATH_LAST)} bytes")
-    logging.info("/fetch_readings local file written uploaded to BB")
+    log_msg(f"/fetch_readings local file size {os.path.getsize(READINGS_PATH_LAST)} bytes")
+    log_msg("/fetch_readings local file written uploaded to BB")
 
     with open(READINGS_PATH_STORE % get_next_sunday(), "w", encoding="utf-8") as f:
         f.write(full_text)
@@ -249,7 +249,7 @@ def get_perplexity_events():
     client = OpenAI(api_key=api_key, base_url="https://api.perplexity.ai")
 
     # 1 -- Base query
-    logging.info("Perplexity query step 1")
+    log_msg("Perplexity query step 1")
     query = "Pouvez-vous me donner la liste des événements religieux catholiques tels que pélerinages, processions, ou retraites organisés autour de Saint Malo ou du Mont Saint Michel, Saint Méloir des Ondes, l'abbaye de Beaufort (Plerguer) dans le mois à venir. Je souhaiterais au moins trois événements"
     response = client.chat.completions.create(
         model="llama-3.1-sonar-large-128k-online",  # Or another available Perplexity model
@@ -263,7 +263,7 @@ def get_perplexity_events():
     ]
 
     # 2 -- Add locations we like
-    logging.info("Perplexity query step 2")
+    log_msg("Perplexity query step 2")
     query_additions = ("Si il y a des événements religieux catholiques pertinents dans le mois à venir dans les abbayes suivantes, pouvez-vous les ajouter à ce que vous venez de me donner? \n"
         "- Monastère de Beaufort (https://www.monastere-beaufort.com/accueil.php)\n"
         "- Abbaye de Saint Jacut (https://www.abbaye-st-jacut.com/)\n"
@@ -276,7 +276,7 @@ def get_perplexity_events():
     history.append({"role": "assistant", "content": response2.choices[0].message.content})
 
     # 3 -- Filter the results
-    logging.info("Perplexity query step 3")
+    log_msg("Perplexity query step 3")
     results = response.choices[0].message.content+'\n\n'+response2.choices[0].message.content
     post_process_instruction = (
         "Voici les événements catholiques que vous avez trouvé:\n\n"
@@ -291,7 +291,7 @@ def get_perplexity_events():
     history.append({"role": "assistant", "content": post_process_response.choices[0].message.content})
 
     # 4 -- Formatting
-    logging.info("Perplexity query step 4")
+    log_msg("Perplexity query step 4")
     results_filtered = post_process_response.choices[0]
     formatting_instruction = (
         "Voici ce que vous avez trouvé:"
@@ -306,43 +306,40 @@ def get_perplexity_events():
     html_content = formatted_response.choices[0].message.content
 
     # 5 - Only keep the HTML content
-    logging.info("Perplexity query step 5")
+    log_msg("Perplexity query step 5")
     html_content = html_content[html_content.upper().find('<TABLE'):html_content.upper().find('</TABLE')+8]
 
     # 5B - Reformat the HTML table
-    logging.info("Perplexity query step 5b")
+    log_msg("Perplexity query step 5b")
     html_content = reformat_html_table(html_content)
 
     # 6 - Check that the HTML code is correct
-    logging.info("Perplexity query step 6")
-    #try:
-    #    soup = BeautifulSoup(html_content, "html5lib")
-    #    print("HTML parsed successfully — no fatal errors.")
+    log_msg("Perplexity query step 6")
     with open(PERPLEXITY_TABLE_LAST, "w") as f:
         f.write(html_content)
-    logging.info("Perplexity query step 6b")
+    log_msg("Perplexity query step 6b")
     dt = datetime.now().strftime("%Y-%m-%d")
-    logging.info("Perplexity query step 6c")
+    log_msg("Perplexity query step 6c")
     with open(PERPLEXITY_TABLE_STORE % dt, "w") as f:
         f.write(html_content)
-    logging.info("Perplexity query step 6d")
-    logging.info("Perplexity query step 6e")
+    log_msg("Perplexity query step 6d")
+    log_msg("Perplexity query step 6e")
     time_now = datetime.now()
-    logging.info("Perplexity query step 6f")
+    log_msg("Perplexity query step 6f")
     with open(PERPLEXITY_TIMESTAMP, 'w') as f:
         f.write(time_now.strftime("%Y-%m-%d %H:%M:%S"))
-    logging.info("Perplexity query step 6g")
+    log_msg("Perplexity query step 6g")
     push_b2_file('meloir',PERPLEXITY_TABLE_LAST,"evenements.html")
-    logging.info("Perplexity query step 6h")
+    log_msg("Perplexity query step 6h")
     push_b2_file('meloir',PERPLEXITY_TABLE_STORE % dt,"historique_evenements_%s.html" % dt)
-    logging.info("Perplexity query step 6i")
+    log_msg("Perplexity query step 6i")
     push_b2_file('meloir',PERPLEXITY_TIMESTAMP,"evenements_MAJ.txt")
-    logging.info("Perplexity query step 6j")
-    logging.info("Perplexity query done")
+    log_msg("Perplexity query step 6j")
+    log_msg("Perplexity query done")
     return html_content
 
     #except Exception as e:
-    #    logging.info(f"Perplexity HTML incorrect {str(e)}")
+    #    log_msg(f"Perplexity HTML incorrect {str(e)}")
 
 
 ##################################################################

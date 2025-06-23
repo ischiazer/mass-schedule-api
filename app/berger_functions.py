@@ -10,7 +10,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import hashlib
-from .utilities import push_b2_file,download_file_from_b2_if_absent
+from .utilities import push_b2_file,log_msg
 
 ##################################################################
 # GLOBAL VARIABLES
@@ -28,9 +28,9 @@ def get_DB_connection():
 ##################################################################
 # UPLOAD DATABASE TO BLACKBLAZE
 def update_b2_DB():
-    print('Pushing to B2...')
+    log_msg('Pushing Berger DB to B2...')
     push_b2_file('berger',DB_NAME, DB_NAME)
-    print('...Done')
+    log_msg('...Done')
     
 ##################################################################
 # SUB-FUNCTION: DUMP BOOKING DATABASE INTO HTML TABLE
@@ -486,13 +486,11 @@ def berger_create_new_booking(booker_name, booker_email, number_people, list_dat
     DB_cursor.execute(sql)
     
     # Create entries for the dates booked
-    print('Trying')
+    log_msg('Trying to insert new data in booking DB...')
     for dt in list_dates_to_book:
-        print('Date = <' + str(dt) + '>')
-        print('Converted date = <' + berger_convert_date(dt) + '>')
-        print('Booking code = <' + booking_code + '>')
         sql = f"INSERT INTO TableBookingDates (Date, BookingCode) VALUES ('{berger_convert_date(dt)}','{booking_code}')"
         DB_cursor.execute(sql)
+    log_msg('...done')
 
     # Commmit the changes to the database
     DB_connection.commit()

@@ -2,7 +2,7 @@ import logging
 from playwright.async_api import async_playwright
 import pandas as pd, numpy as np
 from datetime import date, datetime
-from .utilities import download_file_from_b2, push_b2_file
+from .utilities import download_file_from_b2, push_b2_file,log_msg
 import asyncio
 
 
@@ -53,20 +53,20 @@ def get_city_mapping():
 ##################################################################
 # SUB-FUNCTION - GET FROM WEB HTML FILE WITH TEMPERATURE FOR ONE CITY
 async def temperature_fetch_full_text(city):
-    logging.info("[City] " + str(city) + ' start')
+    log_msg("[City] " + str(city) + ' start')
     url = get_city_mapping()[city]
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         await page.goto(url)
         await page.wait_for_selector("body")  # Wait for the main body to load
-        logging.info("[City] " + str(city) + ' end')
+        log_msg("[City] " + str(city) + ' end')
         return await page.inner_text("body")
 
 ##################################################################
 # SUB-FUNCTION - GET FROM WEB CURRENT TEMPERATURE
 async def temperature_current():
-    logging.info("[Current temp] Start]")
+    log_msg("[Current temp] Start]")
     dt_str = datetime.today().strftime('%Y-%m-%d')
     temps = pd.DataFrame(index=[k for k in get_city_mapping()], columns=[dt_str])
     for city in temps.index:
@@ -80,48 +80,48 @@ async def temperature_current():
             logging.warning(f"Failed to fetch temperature for {city}: {e}")
             t = np.nan
         temps.loc[city, dt_str] = t
-    logging.info("[Current temp] End]")
+    log_msg("[Current temp] End]")
     return temps
 
 ##################################################################
 # FUNCTION - UPDATE SEA TEMPERATURE FILE
 def update_temperatures():
     # Load existing history of temperatures
-    logging.info("Downloading temperature file...")
+    log_msg("Downloading temperature file...")
     download_file_from_b2('temperature',TEMPERATURE_CSV, TEMPERATURE_CSV)
-    logging.info("Done")
+    log_msg("Done")
     temps_existing = pd.read_csv(TEMPERATURE_CSV,index_col=0)
-    logging.info("Converted to dataframe")
+    log_msg("Converted to dataframe")
 
     # Get current temperatures
-    logging.info("Getting current...")
+    log_msg("Getting current...")
     temps_new = asyncio.run(temperature_current())
-    logging.info("...done")
+    log_msg("...done")
 
     # Add current temperatures to existing
-    logging.info("Joining...")
+    log_msg("Joining...")
     if temps_new.columns[0] in temps_existing.columns:
-        logging.info('Date %s already present' % str(temps_new.columns[0]))
+        log_msg('Date %s already present' % str(temps_new.columns[0]))
         temps_updated = temps_existing.copy()
-        logging.info('copied')
+        log_msg('copied')
     else:
-        logging.info('Starting join...')
+        log_msg('Starting join...')
         temps_updated = temps_new.join(temps_existing, how='outer')
-        logging.info('...done joining')
-    logging.info("...Done")
+        log_msg('...done joining')
+    log_msg("...Done")
 
     # Save and upload
-    logging.info("Saving CSV...")
+    log_msg("Saving CSV...")
     temps_updated.to_csv(TEMPERATURE_CSV)
-    logging.info("...Done")
-    logging.info("Pushing BB file...")
+    log_msg("...Done")
+    log_msg("Pushing BB file...")
     push_b2_file('temperature',TEMPERATURE_CSV,TEMPERATURE_CSV)
-    logging.info("...Done")
+    log_msg("...Done")
 
 ##################################################################
 # FUNCTION: CALL THE SEA TEMPERATURE UPDATE
 def force_fetch_temperature():
-    logging.info("force_fetch_temperature")
+    log_msg("force_fetch_temperature")
     update_temperatures()
 
 ##################################################################
@@ -138,10 +138,10 @@ async def periodic_query_temperature():
 ##################################################################
 # FUNCTION CALLED BY THE THREADING LOOP
 def background_loop_temperature():
-    logging.info("/start_background_loop_temperature 1")
+    log_msg("/start_background_loop_temperature 1")
     loop = asyncio.new_event_loop()
-    logging.info("/start_background_loop_temperature 2")
+    log_msg("/start_background_loop_temperature 2")
     asyncio.set_event_loop(loop)
-    logging.info("/start_background_loop_temperature 3")
+    log_msg("/start_background_loop_temperature 3")
     loop.run_until_complete(periodic_query_temperature())
-    logging.info("/start_background_loop_temperature 4")
+    log_msg("/start_background_loop_temperature 4")

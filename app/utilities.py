@@ -17,6 +17,15 @@ import mammoth
 
 UPLOAD_LOG_FILE = "upload_log.txt"
 
+##################################################################
+# LOG MESSAGES ON CONSOLE AND FILE
+def log_msg(msg):
+    d = datetime.now(pytz.timezone('Europe/Paris'))
+    d_str = format_datetime(d, "d-MM-y HH:mm:ss", locale='fr_FR')
+    if not isinstance(msg, str):
+        msg = str(msg)
+    print(d_str + ' ' + msg)
+
 
 ##################################################################
 # CONNECT TO BLACKBLAZE
@@ -53,33 +62,33 @@ def push_b2_file(bucket_name, file_local, file_server):
 ##################################################################
 # DOWNLOAD FILE FROM BLACKBLAZE
 def download_file_from_b2(bucket_name, file_name, local_path):
-    logging.info('Getting bucket...')
+    log_msg'Getting bucket...')
     bucket = get_b2_bucket(bucket_name)
-    logging.info('Done')
-    logging.info('Downloading file '+ str(file_name))
+    log_msg('Done')
+    log_msg('Downloading file '+ str(file_name))
     x = bucket.download_file_by_name(file_name)
-    logging.info('Save file '+ str(local_path))
+    log_msg('Save file '+ str(local_path))
     x.save_to(local_path)
-    logging.info('Done')
-    logging.info(f"Downloaded '{file_name}' to '{local_path}'")
+    log_msg('Done')
+    log_msg(f"Downloaded '{file_name}' to '{local_path}'")
 
 ##################################################################
 # DOWNLOAD FILE FROM BLACKBLAZE ONLY IF ABSENT LOCALLY
 def download_file_from_b2_if_absent(bucket_name, file_name, local_path):
     if os.path.exists(local_path):
-        logging.info('File already present: '+str(local_path))
+        log_msg('File already present: '+str(local_path))
     else:
-        logging.info('Downloading from BB: ' + str(local_path) + ' | ' + str(file_name))
+        log_msg('Downloading from BB: ' + str(local_path) + ' | ' + str(file_name))
         download_file_from_b2(bucket_name, file_name, local_path)
-        logging.info('\t\tDone')
+        log_msg('\t\tDone')
 
 ##################################################################
 # UTILITY FUNCTION - POST FILE (USING LOCAL IF AVAILABLE)
 def throw_static_file(bucket_name, local_file, BB_file, message):
-    logging.info(message)
+    log_msg(message)
     download_file_from_b2_if_absent(bucket_name, BB_file, local_file)
-    logging.info('Returning content for ' + str(local_file))
-    logging.info('      File size =  ' + str(os.path.getsize(local_file)))
+    log_msg('Returning content for ' + str(local_file))
+    log_msg('      File size =  ' + str(os.path.getsize(local_file)))
     return send_file(local_file, mimetype="text/html")
 
 ##################################################################
@@ -212,7 +221,7 @@ def extract_cropped_images_proportional(docx_path, output_dir, logo_details):
                 try:
                     img = Image.open(io.BytesIO(media_files[image_path])).convert("RGB")
                 except:
-                    logging.info('Image %s skipped' % image_name)
+                    log_msg('Image %s skipped' % image_name)
                     results.append((image_name, Path(output_dir)/Path(image_path)))
                 else:
                     width_px, height_px = img.size
@@ -236,7 +245,7 @@ def extract_cropped_images_proportional(docx_path, output_dir, logo_details):
                         cropped.save(out_path)
                         results.append((image_name, out_path))
                     except Exception as e:
-                        logging.info(f"Failed cropping {image_name}: {e}")
+                        log_msg(f"Failed cropping {image_name}: {e}")
                         continue
 
         return results
@@ -259,10 +268,10 @@ def convert_docx_to_html_with_cropped_images(docx_path, output_html_path, pic_fi
                 b64 = base64.b64encode(f.read()).decode("utf-8")
             return {"src": f"data:image/{ext};base64,{b64}"}
         except StopIteration:
-            logging.info("⚠️ More images in DOCX than available cropped images. Falling back.")
+            log_msg("⚠️ More images in DOCX than available cropped images. Falling back.")
             return {}
         except Exception as e:
-            logging.info(f"⚠️ Error processing image: {str(e)}")
+            log_msg(f"⚠️ Error processing image: {str(e)}")
             return {}
 
     result = mammoth.convert_to_html(docx_path, convert_image=mammoth.images.inline(convert_image))

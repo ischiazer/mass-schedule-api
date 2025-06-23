@@ -6,13 +6,14 @@ from .meloir import meloir_initialise
 from .temperature_functions import background_loop_temperature
 from .meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity
 from .berger import berger_initialise
+from .utilities import log_msg
 import threading
 
 
 ##################################################################
 # BLUEPRINT REGISTRATIONS
 def register_blueprints(app):
-    print('/ register_bluperint function/')
+    log_msg('/ register_bluperint function/')
     from .berger import bp_berger
     from .meloir import bp_meloir
     from .temperature import bp_temperature
@@ -20,11 +21,7 @@ def register_blueprints(app):
     app.register_blueprint(bp_berger, url_prefix="")
     app.register_blueprint(bp_meloir, url_prefix="")
     app.register_blueprint(bp_temperature, url_prefix="")
-    print('/ end of register_bluperint function/')
-
-    print('* Check after import *')
-    print("Routes in bp_berger:", len(bp_berger.deferred_functions))
-    print('* Done *')
+    log_msg('/ end of register_bluperint function/')
 
 ##################################################################
 # APP INITIALISATION
@@ -38,51 +35,35 @@ def create_app():
             logging.FileHandler("log.txt")
         ]
     )
-    print('create_app: baseic config  done')
+    log_msg('create_app: baseic config  done')
 
     # Start the app
-    logging.info('create_app: starting')
-    print('create_app: starting')
+    log_msg('create_app: starting')
     app = Flask(__name__)
-    print('create_app: Flask started')
-    logging.info('create_app: Flask done')
+    log_msg('create_app: Flask started')
 
     # Register the blue prints
-
     register_blueprints(app)
-
-
-    logging.info('create_app: BPs registered')
-    print('\n\nRoutes registered:')
-    for rule in app.url_map.iter_rules():
-        print(f"Registered route: {rule}")
-    print('\n\n\n\n')
+    log_msg('Executed register_blueprints')
 
     # Set max file upload size to 10 MB
     app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
-    print('create_app: config done')
+    log_msg('create_app: config done')
 
     # Enable CORS for all routes
     CORS(app, resources={r"/*": {"origins": "*"}})
-    print('create_app: CORS done')
-    logging.info('create_app: CORS enabled')
+    log_msg('create_app: CORS done')
 
     # Enable async handling
     nest_asyncio.apply()
-    print('create_app: best_async done')
-    logging.info('create_app: asyncio enabled')
+    log_msg('create_app: best_async done')
 
-
-    with app.app_context():
-        print("\n\nRegistered routes basd on app.app_context():")
-        for rule in app.url_map.iter_rules():
-            print(rule)
     # Set up background looping tasks
     if False:
         for f in [periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity,background_loop_temperature]:
             thread = threading.Thread(target=f, daemon=True)
             thread.start()
-    print('create_app: returning app')
+    log_msg('create_app: returning app')
     return app
 
 ##################################################################
