@@ -36,6 +36,10 @@ log_msg(f'Berger ADDITIONAL_STYLE = {ADDITIONAL_STYLE}')
 
 os.makedirs(BASE_FOLDER, exist_ok=True)
 log_msg('Folder created for Berger')
+download_file_from_b2_if_absent('berger', 'base_style.html', BASE_STYLE)
+download_file_from_b2_if_absent('berger', 'additional_body.html', ADDITIONAL_BODY)
+download_file_from_b2_if_absent('berger', 'embedded_js.js', EMBEDDED_JS)
+download_file_from_b2_if_absent('berger', 'additional_style.html', ADDITIONAL_STYLE)
 
 ##################################################################
 # Connect to database (creates the file if it doesn't exist)
