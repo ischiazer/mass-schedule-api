@@ -4,7 +4,7 @@ from .temperature_functions import temperature_current, update_temperatures
 from .temperature_functions import TEMPERATURE_CSV_BB, TEMPERATURE_CSV_LOCAL
 from .utilities import throw_static_file, log_msg
 from flask import Blueprint
-
+import os
 ##################################################################
 # REGISTER BLUEPRINT
 bp_temperature = Blueprint("temperature_bp", __name__)
