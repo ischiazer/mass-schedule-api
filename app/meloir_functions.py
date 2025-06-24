@@ -449,16 +449,16 @@ def call_mass_schedule_and_store():
         f.write(formatted)
     push_b2_file('meloir',BASE_FOLDER+"static/last_updated.txt","horaires_messes_MAJ.txt")
 
-    # Save heartbeat timestamp (ISO format)
+    # Save heartbeat timestamp
     with open(BASE_FOLDER+"static/heartbeat.txt", "w") as hb:
-        hb.write(now.isoformat())
+        hb.write(get_now_french())
     push_b2_file('meloir',BASE_FOLDER+"static/heartbeat.txt","heartbeat.txt")
 
     return f'Schedule updated static/schedule.json locally to <{BASE_FOLDER+"static/last_updated.txt"} and BB horaires_messes_MAJ.txt'
 
 ##################################################################
 # WEB SITE HEARTBEAT
-def heartbeat():
+def site_heartbeat():
     log_msg(f'Function heartbeat pid= {os.getpid()}')
     msg_heartbeat = get_now_french()
     with open(SITE_HEARTBEAT_LOCAL, "wt") as hb:
