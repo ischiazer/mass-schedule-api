@@ -22,4 +22,4 @@ RUN playwright install chromium
 
 ENV PORT=10000
 
-CMD ["gunicorn", "-w", "8", "-b", "0.0.0.0:10000", "--timeout", "360", "--graceful-timeout", "360","--log-level", "debug", "--access-logfile", "-", "--error-logfile", "-", "main:app"]
+CMD ["gunicorn", "-w", "8", "-b", "0.0.0.0:10000", "--timeout", "360", "--graceful-timeout", "360", "--access-logfile", "-", "--error-logfile", "-", "main:app"]
