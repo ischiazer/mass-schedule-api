@@ -76,7 +76,8 @@ else:
 
 ##################################################################
 # ADDITIONAL RUN IF REQUIRED
-if __name__ == "__main__":
-    if "run_app" in sys.argv:
-        run_app()
+# if __name__ == "__main__":
+#     if 
+#     if "run_app" in sys.argv:
+#         run_app()
     
