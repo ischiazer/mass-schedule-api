@@ -235,9 +235,11 @@ def force_fetch_perplexity():
     log_msg("/fetch_perplexity called")
     log_msg(f'(Web access) force_fetch_perplexity  pid= {os.getpid()}')
     try:
-        get_perplexity_events()
+        h = get_perplexity_events()
     except Exception as e:
         log_msg('Error running get_perplexity_events')
+        h = 'Error running get_perplexity_events'
+    return h
 
 
 ##################################################################

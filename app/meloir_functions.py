@@ -363,7 +363,9 @@ def get_perplexity_events():
     log_msg("Perplexity query step 6i")
     push_b2_file('meloir',PERPLEXITY_TIMESTAMP_LOCAL,"evenements_MAJ.txt")
     log_msg("Perplexity query step 6j")
-    log_msg(f"Perplexity query done. HTML length {len(str(html_content))} characters, type {str(type(html_content))}")
+    log_msg("Perplexity content length = %d" % len(str(html_content)))
+    log_msg("Preplexity content type = %s" % str(type(html_content)))
+    log_msg("Perplexity query step 6k")
     return html_content
 
     #except Exception as e:

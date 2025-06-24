@@ -40,9 +40,13 @@ log_msg('Folder created for Berger')
 ##################################################################
 # Connect to database (creates the file if it doesn't exist)
 def get_DB_connection():
-    DB_connection = sqlite3.connect(DB_NAME_LOCAL)
-    DB_cursor = DB_connection.cursor()
-    return DB_connection, DB_cursor
+    if os.path.exists(DB_NAME_LOCAL):
+        DB_connection = sqlite3.connect(DB_NAME_LOCAL)
+        DB_cursor = DB_connection.cursor()
+        return DB_connection, DB_cursor
+    else:
+        log_msg(f'\n\n**** LOCAL DB {DB_NAME_LOCAL} NOT FOUND! ****\n\n')
+        return None, None
 
 ##################################################################
 # UPLOAD DATABASE TO BLACKBLAZE
