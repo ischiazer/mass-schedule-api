@@ -20,6 +20,8 @@ log_msg('Folder created for temperature')
 # SUB-FUNCTION - RETURN LIST OF CITIES FOR WHICH TEMPERATURE IS NEEDED
 
 def get_city_mapping():
+    log_msg(f"Function get_city_mapping.  pid= {os.getpid()}")
+
     mapping_city_url = {'Den Haag': "https://www.seatemperature.org/europe/netherlands/scheveningen.htm",
                         "Egmond":"https://www.seatemperature.org/europe/netherlands/egmond-aan-zee.htm",
                         "Vlieland":"https://www.seatemperature.org/europe/netherlands/oost-vlieland.htm",
@@ -57,7 +59,7 @@ def get_city_mapping():
 ##################################################################
 # SUB-FUNCTION - GET FROM WEB HTML FILE WITH TEMPERATURE FOR ONE CITY
 async def temperature_fetch_full_text(city):
-    log_msg("[City] " + str(city) + ' start')
+    log_msg(f"Function gtemperature_fetch_full_text city=[{city}] pid= {os.getpid()}")
     url = get_city_mapping()[city]
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -70,7 +72,7 @@ async def temperature_fetch_full_text(city):
 ##################################################################
 # SUB-FUNCTION - GET FROM WEB CURRENT TEMPERATURE
 async def temperature_current():
-    log_msg("[Current temp] Start]")
+    log_msg(f"[Current temp] Start] pid= {os.getpid()}")
     dt_str = datetime.today().strftime('%Y-%m-%d')
     temps = pd.DataFrame(index=[k for k in get_city_mapping()], columns=[dt_str])
     for city in temps.index:
@@ -91,7 +93,7 @@ async def temperature_current():
 # FUNCTION - UPDATE SEA TEMPERATURE FILE
 def update_temperatures():
     # Load existing history of temperatures
-    log_msg("Downloading temperature file...")
+    log_msg("Downloading temperature file... pid= %s" % os.getpid())
     download_file_from_b2('temperature',TEMPERATURE_CSV_BB, TEMPERATURE_CSV_LOCAL)
     log_msg("Done")
     temps_existing = pd.read_csv(TEMPERATURE_CSV_LOCAL,index_col=0)
@@ -125,12 +127,13 @@ def update_temperatures():
 ##################################################################
 # FUNCTION: CALL THE SEA TEMPERATURE UPDATE
 def force_fetch_temperature():
-    log_msg("force_fetch_temperature")
+    log_msg(f"force_fetch_temperature pid= {os.getpid()}")
     update_temperatures()
 
 ##################################################################
 # REGULAR CALL TO THE SEA TEMPERATURE
 async def periodic_query_temperature():
+    log_msg(f"periodic_query_temperature pid= {os.getpid()}")
     await asyncio.sleep(60 * 60 * 3)   
     while True:
         try:
@@ -142,6 +145,7 @@ async def periodic_query_temperature():
 ##################################################################
 # FUNCTION CALLED BY THE THREADING LOOP
 def background_loop_temperature():
+    log_msg(f"background_loop_temperature 0 pid= {os.getpid()}")
     log_msg("/start_background_loop_temperature 1")
     loop = asyncio.new_event_loop()
     log_msg("/start_background_loop_temperature 2")

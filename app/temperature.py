@@ -13,7 +13,7 @@ bp_temperature = Blueprint("temperature_bp", __name__)
 # QUERY - FETCH CURRENT TEMPERATURE
 @bp_temperature.route('/fetch_current_temperature')
 def query_current_temperature():
-    log_msg("fetch_current_temperature")
+    log_msg(f"fetch_current_temperature  pid= {os.getpid()}")
     try:
         log_msg("fetch_current_temperature start")
         result = asyncio.run(temperature_current())
@@ -27,7 +27,7 @@ def query_current_temperature():
 # QUERY - FETCH TEMPERATURE HISTORY
 @bp_temperature.route('/fetch_temperature_history')
 def query_historical_temperature():
-    log_msg("fetch_temperature_history")
+    log_msg(f"fetch_temperature_history  pid= {os.getpid()}")
     log_msg(f"File name: BB=<{TEMPERATURE_CSV_BB}> local=<{TEMPERATURE_CSV_LOCAL}>")
     try:
         return throw_static_file('temperature', TEMPERATURE_CSV_LOCAL, TEMPERATURE_CSV_BB, "Fetched historical temperatures")
@@ -37,7 +37,7 @@ def query_historical_temperature():
 
 ##################################################################
 # QUERY - FORCE UPDATE TEMPERATURE
-@bp_temperature.route('/update_temperature')
+@bp_temperature.route(f'/update_temperature  pid= {os.getpid()}')
 def query_update_temperature():
     log_msg("force update_temperature")
     try:

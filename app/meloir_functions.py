@@ -62,6 +62,7 @@ log_msg(f'local file NEWS_TIMESTAMP_LOCAL = {NEWS_TIMESTAMP_LOCAL}')
 async def fetch_and_clean_schedule():
     url = "https://messes.info/horaires/paroisse%20notre%20dame%20du%20Bois%20Renou?display=TABLE"
 
+    log_msg(f"Function Fetching mass schedule pid= {os.getpid()}")
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
@@ -116,6 +117,7 @@ async def fetch_and_clean_schedule():
         except Exception:
             continue
 
+    log_msg('Mass schedule done')
     return jsonify(clean_schedule)
 
 
@@ -219,8 +221,9 @@ async def readings_extract_all_sections(url):
 # MAIN FUNCTION TO FETCH READINGS
 def fetch_readings():
     global z
+    log_msg(f"Function fetch_readings pid= {os.getpid()}")
     url = get_current_readings_URL()
-    log_msg("/fetch_readings URL defined")
+    log_msg(f"fetch_readings URL defined")
     try:
         readings = asyncio.get_event_loop().run_until_complete(readings_extract_all_sections(url))
         log_msg("/fetch_readings URL requested")
@@ -256,6 +259,7 @@ def fetch_readings():
     with open(READINGS_PATH_STORE_LOCAL % get_next_sunday(), "w", encoding="utf-8") as f:
         f.write(full_text)
     push_b2_file('meloir',READINGS_PATH_STORE_LOCAL % get_next_sunday(), 'historique_lectures_%s.html' % get_next_sunday())
+    log_msg('function fetch_readings done')
     return full_text
 
 
@@ -263,6 +267,7 @@ def fetch_readings():
 ##################################################################
 # FUNCTION CALLING PERPLEXITY TO FIND NEARBY EVENTS
 def get_perplexity_events():
+    log_msg(f'Function get_perplexity_events pid= {os.getpid()}')
     # Initialise the Perplexity connection
     api_key = os.getenv("PERPLEXITY_KEY")
     client = OpenAI(api_key=api_key, base_url="https://api.perplexity.ai")
@@ -365,6 +370,7 @@ def get_perplexity_events():
 ##################################################################
 # FUNCTION - FETCH VATICAN NEWS
 def get_news():
+    log_msg(f'Function get_news pid= {os.getpid()}')
     # URL of Vatican RSS
     rss_url = "https://www.vaticannews.va/fr.rss.xml"
     log_msg("Fetching Vatican news from " + rss_url)

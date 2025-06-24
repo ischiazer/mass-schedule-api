@@ -29,14 +29,14 @@ def meloir_initialise():
 # QUERY - FETCH MASS SCHEDULE ON THE FLY
 @bp_meloir.route('/schedule')
 def get_schedule():
-    log_msg('(Web access) get_schedule')
+    log_msg(f'(Web access) get_schedule pid= {os.getpid()}')
     return asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
 
 ##################################################################
 # QUERY - REFRESH MASS SCHEDULE AND STORE
 @bp_meloir.route('/refresh')
 def refresh_schedule():
-    log_msg('(Web access) refresh_schedule')
+    log_msg(f'(Web access) refresh_schedule  pid= {os.getpid()}')
     data = asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
 
 
@@ -67,7 +67,7 @@ def refresh_schedule():
 # QUERY - UPLOAD HTML FILE
 @bp_meloir.route("/upload_html", methods=["POST"])
 def upload_html():
-    log_msg('(Web access) upload_html')
+    log_msg(f'(Web access) upload_html  pid= {os.getpid()}')
     html_content = request.get_data(as_text=True)
     with open(HTML_FILE_PATH_LOCAL, "w", encoding="utf-8") as f:
         f.write(html_content)
@@ -77,7 +77,7 @@ def upload_html():
 # QUERY - GET LATEST HTML
 @bp_meloir.route("/latest")
 def latest():
-    log_msg('(Web access) latest HTML ' + HTML_FILE_PATH_LOCAL)
+    log_msg(f'(Web access) latest HTML ' + HTML_FILE_PATH_LOCAL + 'pid= {os.getpid()}')
     if os.path.exists(HTML_FILE_PATH_LOCAL):
         return send_file(HTML_FILE_PATH_LOCAL, mimetype="text/html")
     else:
@@ -87,7 +87,7 @@ def latest():
 # QUERY - UPLOAD STANDARD ATTACHMENT
 @bp_meloir.route("/upload_attachment", methods=["POST"])
 def upload_attachment():
-    log_msg('(Web access) upload_attachment')
+    log_msg(f'(Web access) upload_attachment.   pid= {os.getpid()}')
     uploaded_file = request.files.get("file")
     filename = request.form.get("filename")
 
@@ -110,7 +110,7 @@ def upload_attachment():
 # QUERY - RETURN THE UPLOAD LOG
 @bp_meloir.route("/upload_log")
 def show_log():
-    log_msg('(Web access) show_log')
+    log_msg(f'(Web access) show_log  pid= {os.getpid()}')
     if not os.path.exists(UPLOAD_LOG_FILE_LOCAL):
         return "No log available yet.", 404
 
@@ -129,7 +129,7 @@ def request_entity_too_large(error):
 # QUERY - RETURN (DOWNLOAD) ALL CONTENT
 @bp_meloir.route("/download_content")
 def download_content():
-    log_msg('(Web access) download_content ZIP')
+    log_msg(f'(Web access) download_content ZIP  pid= {os.getpid()}')
     zip_buffer = io.BytesIO()
 
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
@@ -150,7 +150,7 @@ def download_content():
 
 ##################################################################
 # QUERY - FETCH DIR (LISTING OF FILES)
-@bp_meloir.route("/show_dir")
+@bp_meloir.route(f"/show_dir  pid= {os.getpid()}")
 def show_dir():
     log_msg('(Web access) show_dir')
     base_path = "."  # Start from current working directory
@@ -184,7 +184,7 @@ def show_dir():
 # QUERY - RECEIVE WORD FILE AND PROCESS INTO HTML
 @bp_meloir.route("/deliver_word", methods=["POST"])
 def deliver_word():
-    log_msg('(Web access) deliver_word')
+    log_msg(f'(Web access) deliver_word.  pid= {os.getpid()}')
     uploaded_file = request.files.get("file")
     if not uploaded_file:
         log_upload("FAIL", "unknown", "No file uploaded")
@@ -233,7 +233,7 @@ def deliver_word():
 # QUERY - RETURN LATEST HTML
 @bp_meloir.route("/latest_word_html")
 def latest_word_html():
-    log_msg('(Web access) latest_word_html')
+    log_msg(f'(Web access) latest_word_html  pid= {os.getpid()}')
     latest_path = os.path.join(HTML_FOLDER_LOCAL, "latest_html.html")
 
     if not os.path.exists(latest_path):
@@ -244,7 +244,7 @@ def latest_word_html():
 
 ##################################################################
 # QUERY - FETCH READINGS
-@bp_meloir.route('/fetch_readings')
+@bp_meloir.route(f'/fetch_readings  pid= {os.getpid()}')
 def force_fetch_readings():
     log_msg("/fetch_readings called")
     return fetch_readings()
@@ -252,7 +252,7 @@ def force_fetch_readings():
 
 ##################################################################
 # QUERY - FETCH PERPLEXITY
-@bp_meloir.route('/fetch_perplexity')
+@bp_meloir.route(f'/fetch_perplexity  pid= {os.getpid()}')
 def force_fetch_perplexity():
     log_msg("/fetch_perplexity called")
     try:
@@ -263,7 +263,7 @@ def force_fetch_perplexity():
 
 ##################################################################
 # QUERY - FETCH VATICAN NEWS
-@bp_meloir.route('/fetch_vatican_news')
+@bp_meloir.route('f/fetch_vatican_news  pid= {os.getpid()}')
 def force_fetch_vatican_news():
     log_msg("/fetch_vatican_news called")
     try:
@@ -275,7 +275,7 @@ def force_fetch_vatican_news():
 
 ##################################################################
 # QUERY - STATIC PERPLEXITY NEWS
-@bp_meloir.route('/static_news_nearby')
+@bp_meloir.route(f'/static_news_nearby  pid= {os.getpid()}')
 def query_static_perplexity():
     log_msg('(Web access) static_news_nearby')
     try:
@@ -288,7 +288,7 @@ def query_static_perplexity():
 
 ##################################################################
 # QUERY - STATIC PERFPLEXITY NEWS
-@bp_meloir.route('/static_news_nearby_timestamp')
+@bp_meloir.route(f'/static_news_nearby_timestamp  pid= {os.getpid()}')
 def query_static_perplexity_timestamp():
     log_msg('(Web access) static_news_nearby_timestamp')
     try:
@@ -301,7 +301,7 @@ def query_static_perplexity_timestamp():
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS
-@bp_meloir.route('/static_news_vatican')
+@bp_meloir.route(f'/static_news_vatican  pid= {os.getpid()}')
 def query_static_vatican():
     log_msg('(Web access) static_news_vatican')
     try:
@@ -315,7 +315,7 @@ def query_static_vatican():
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS TIMESTAMP
-@bp_meloir.route('/static_news_vatican_timestamp')
+@bp_meloir.route(f'/static_news_vatican_timestamp  pid= {os.getpid()}')
 def static_news_vatican_timestamp():
     log_msg('(Web access) static_news_vatican_timestamp')
     try:
@@ -329,7 +329,7 @@ def static_news_vatican_timestamp():
 
 ##################################################################
 # QUERY - STATIC READINGS
-@bp_meloir.route('/static_readings')
+@bp_meloir.route(f'/static_readings pid= {os.getpid()}')
 def query_static_readings():
     log_msg('(Web access) static_readings')
     try:
@@ -343,7 +343,7 @@ def query_static_readings():
 
 ##################################################################
 # QUERY - STATIC PARISH PAPER
-@bp_meloir.route('/static_bulletin')
+@bp_meloir.route(f'/static_bulletin  pid= {os.getpid()}')
 def query_static_bulletin():
     log_msg('(Web access) query_static_bulletin')
     try:
