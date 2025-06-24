@@ -9,7 +9,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import hashlib
-from .utilities import push_b2_file,log_msg
+from .utilities import push_b2_file,log_msg, download_file_from_b2_if_absent
 import os
 #ok
 ##################################################################
@@ -45,8 +45,15 @@ def get_DB_connection():
         DB_cursor = DB_connection.cursor()
         return DB_connection, DB_cursor
     else:
-        log_msg(f'\n\n**** LOCAL DB {DB_NAME_LOCAL} NOT FOUND! ****\n\n')
-        return None, None
+        log_msg(f'\n\n**** Berger local DB not available {DB_NAME_LOCAL}. trying to download ****\n\n')
+        download_file_from_b2_if_absent('berger',DB_NAME_LOCAL, DB_NAME_BB)
+        if os.path.exists(DB_NAME_LOCAL):
+            DB_connection = sqlite3.connect(DB_NAME_LOCAL)
+            DB_cursor = DB_connection.cursor()
+            return DB_connection, DB_cursor
+        else:
+            log_msg(f'\n\n**** LOCAL DB {DB_NAME_LOCAL} NOT FOUND AND CANNOT BE DOWNLOADED****\n\n')
+            return None, None
 
 ##################################################################
 # UPLOAD DATABASE TO BLACKBLAZE
