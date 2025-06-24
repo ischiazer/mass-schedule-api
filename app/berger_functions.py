@@ -15,10 +15,25 @@ import os
 ##################################################################
 # GLOBAL VARIABLES
 HASHED_PASSWORD = 'e172b76465d5da5b220d7dcead985461dc3baeb3a353a2ee7254fd699c8de10c'
-BASE_FOLDER = '../app_files/berger_files/'
+if os.path.abspath('.').endswith(('/app/', '/app')):
+    BASE_FOLDER = '../app_files/berger_files/'
+else:
+    BASE_FOLDER = 'app_files/berger_files/'
 DB_NAME_LOCAL = os.path.abspath(BASE_FOLDER+'bookings.db')
 DB_NAME_BB = 'bookings.db'
+
+BASE_STYLE = os.path.abspath(BASE_FOLDER+'base_style.html')
+ADDITIONAL_BODY = os.path.abspath(BASE_FOLDER + 'additional_body.html')
+EMBEDDED_JS = os.path.abspath(BASE_FOLDER + 'embedded_js.js')
+ADDITIONAL_STYLE = os.path.abspath(BASE_FOLDER + 'additional_style.html')
+
+log_msg('Berger python file dir  = ' + os.path.abspath('.'))
 log_msg('Berger local DB file = ' + DB_NAME_LOCAL)
+log_msg(f'Berger BASE_STYLE = {BASE_STYLE}')
+log_msg(f'Berger ADDITIONAL_BODY = {ADDITIONAL_BODY}')
+log_msg(f'Berger EMBEDDED_JS = {EMBEDDED_JS}')
+log_msg(f'Berger ADDITIONAL_STYLE = {ADDITIONAL_STYLE}')
+
 os.makedirs(BASE_FOLDER, exist_ok=True)
 log_msg('Folder created for Berger')
 
@@ -56,7 +71,7 @@ def dump_bookings_HTML(include_header_footer=True):
 ##################################################################
 # SUB-FUNCTION: STYLE SHEET
 def get_berger_HTML_style():
-    with open(BASE_FOLDER+'base_style.html', 'rt') as f:
+    with open(BASE_STYLE, 'rt') as f:
         html = f.read()
     return html
 
@@ -403,7 +418,7 @@ def get_new_booking_selection_HTML():
     html_main = '<HTML>\n' + get_berger_HTML_style() + '\n\n<BODY>\n'
 
     # Add body
-    with open(BASE_FOLDER+'additional_body.html','rt') as f:
+    with open(ADDITIONAL_BODY,'rt') as f:
         html_main += f.read()
 
     # Concatenate HTML tables for each month
@@ -414,11 +429,10 @@ def get_new_booking_selection_HTML():
         html_calendar += '</div>\n'
     html_calendar += '</div>\n\n'
     html_main += html_calendar
-
     # Embed Javascript
-    with open(BASE_FOLDER+'embedded_js.js', 'rt') as f:
+    with open(EMBEDDED_JS, 'rt') as f:
         js_code = f.read()
-    with open(BASE_FOLDER+'additional_style.html', 'rt') as f:    
+    with open(ADDITIONAL_STYLE, 'rt') as f:    
         additional_style = f.read()
     html_main += "<STYLE>\n" + additional_style + '</STYLE>\n'
     html_main += '<SCRIPT>'

@@ -6,13 +6,13 @@ from .berger_functions import DB_NAME_LOCAL, DB_NAME_BB, HASHED_PASSWORD, BASE_F
 from .utilities import download_file_from_b2_if_absent, log_msg
 from flask import request, jsonify, send_file, Response
 import logging
-
+import os
 
 ##################################################################
 # REGISTER BLUEPRINT
 bp_berger = Blueprint("bp_berger", __name__)
 log_msg('BP Berger started')
-
+log_msg(f"Berger current directory {os.path.dirname(os.path.abspath(__file__))}")
 ##################################################################
 # INITIALISATION OF MODULE
 def berger_initialise():

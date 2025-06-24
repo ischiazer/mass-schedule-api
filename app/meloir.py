@@ -150,9 +150,9 @@ def download_content():
 
 ##################################################################
 # QUERY - FETCH DIR (LISTING OF FILES)
-@bp_meloir.route(f"/show_dir  pid= {os.getpid()}")
+@bp_meloir.route('/show_dir')
 def show_dir():
-    log_msg('(Web access) show_dir')
+    log_msg(f'(Web access) /show_dir  pid= {os.getpid()}')
     base_path = "."  # Start from current working directory
     file_list = []
 
@@ -244,17 +244,18 @@ def latest_word_html():
 
 ##################################################################
 # QUERY - FETCH READINGS
-@bp_meloir.route(f'/fetch_readings  pid= {os.getpid()}')
+@bp_meloir.route('/fetch_readings')
 def force_fetch_readings():
-    log_msg("/fetch_readings called")
+    log_msg(f'/fetch_readings  pid= {os.getpid()}')
     return fetch_readings()
 
 
 ##################################################################
 # QUERY - FETCH PERPLEXITY
-@bp_meloir.route(f'/fetch_perplexity  pid= {os.getpid()}')
+@bp_meloir.route('/fetch_perplexity')
 def force_fetch_perplexity():
     log_msg("/fetch_perplexity called")
+    log_msg(f'(Web access) force_fetch_perplexity  pid= {os.getpid()}')
     try:
         get_perplexity_events()
     except Exception as e:
@@ -263,9 +264,9 @@ def force_fetch_perplexity():
 
 ##################################################################
 # QUERY - FETCH VATICAN NEWS
-@bp_meloir.route('f/fetch_vatican_news  pid= {os.getpid()}')
+@bp_meloir.route('/fetch_vatican_news')
 def force_fetch_vatican_news():
-    log_msg("/fetch_vatican_news called")
+    log_msg('f/fetch_vatican_news  pid= {os.getpid()}')
     try:
         get_news()
         return 'Vatican news Updated now', 200
@@ -275,9 +276,9 @@ def force_fetch_vatican_news():
 
 ##################################################################
 # QUERY - STATIC PERPLEXITY NEWS
-@bp_meloir.route(f'/static_news_nearby  pid= {os.getpid()}')
+@bp_meloir.route('/static_news_nearby')
 def query_static_perplexity():
-    log_msg('(Web access) static_news_nearby')
+    log_msg(f'/static_news_nearby  pid= {os.getpid()}')
     try:
         f= throw_static_file('meloir',PERPLEXITY_TABLE_LAST_LOCAL,"evenements.html", "/query_static_perplexity called")
         log_msg('static_news_nearby successful')
@@ -288,9 +289,9 @@ def query_static_perplexity():
 
 ##################################################################
 # QUERY - STATIC PERFPLEXITY NEWS
-@bp_meloir.route(f'/static_news_nearby_timestamp  pid= {os.getpid()}')
+@bp_meloir.route('/static_news_nearby_timestamp')
 def query_static_perplexity_timestamp():
-    log_msg('(Web access) static_news_nearby_timestamp')
+    log_msg(f'/static_news_nearby_timestamp  pid= {os.getpid()}')
     try:
         f = throw_static_file('meloir', PERPLEXITY_TIMESTAMP_LOCAL,"evenements_MAJ.txt", "/static_news_nearby_timestamp called")
         log_msg('query_static_perplexity_timestamp successful')
@@ -301,9 +302,9 @@ def query_static_perplexity_timestamp():
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS
-@bp_meloir.route(f'/static_news_vatican  pid= {os.getpid()}')
+@bp_meloir.route('/static_news_vatican')
 def query_static_vatican():
-    log_msg('(Web access) static_news_vatican')
+    log_msg(f'/static_news_vatican  pid= {os.getpid()}')
     try:
         f = throw_static_file('meloir',NEWS_TABLE_LOCAL,"nouvelles_vatican.html", "/static_news_vatican called")
         log_msg('static_news_vatican successful')
@@ -315,9 +316,9 @@ def query_static_vatican():
 
 ##################################################################
 # QUERY - STATIC VATICAN NEWS TIMESTAMP
-@bp_meloir.route(f'/static_news_vatican_timestamp  pid= {os.getpid()}')
+@bp_meloir.route('/static_news_vatican_timestamp')
 def static_news_vatican_timestamp():
-    log_msg('(Web access) static_news_vatican_timestamp')
+    log_msg(f'/static_news_vatican_timestamp  pid= {os.getpid()}')
     try:
         f = throw_static_file('meloir',NEWS_TIMESTAMP_LOCAL,"nouvelles_vatican_MAJ.txt", "/static_news_vatican_timestamp called")
         log_msg('static_news_vatican_timestamp successful')
@@ -329,9 +330,9 @@ def static_news_vatican_timestamp():
 
 ##################################################################
 # QUERY - STATIC READINGS
-@bp_meloir.route(f'/static_readings pid= {os.getpid()}')
+@bp_meloir.route('/static_readings')
 def query_static_readings():
-    log_msg('(Web access) static_readings')
+    log_msg(f'/static_readings pid= {os.getpid()}')
     try:
         f = throw_static_file('meloir',READINGS_PATH_LAST_LOCAL,"lectures.html", "/query_static_readings called")
         log_msg('static_readings successful')
@@ -343,9 +344,9 @@ def query_static_readings():
 
 ##################################################################
 # QUERY - STATIC PARISH PAPER
-@bp_meloir.route(f'/static_bulletin  pid= {os.getpid()}')
+@bp_meloir.route('/static_bulletin')
 def query_static_bulletin():
-    log_msg('(Web access) query_static_bulletin')
+    log_msg(f'/static_bulletin  pid= {os.getpid()}')
     try:
         f = throw_static_file('meloir',PATH_BULLETIN_LOCAL,"bulletin_paroissial.html", "/query_static_bulletin called")
         log_msg('query_static_bulletin successful')

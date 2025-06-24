@@ -37,9 +37,9 @@ def query_historical_temperature():
 
 ##################################################################
 # QUERY - FORCE UPDATE TEMPERATURE
-@bp_temperature.route(f'/update_temperature  pid= {os.getpid()}')
+@bp_temperature.route('/update_temperature')
 def query_update_temperature():
-    log_msg("force update_temperature")
+    log_msg(f'/update_temperature  pid= {os.getpid()}')
     try:
         update_temperatures()
         log_msg("update done")

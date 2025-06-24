@@ -8,7 +8,6 @@ import os
 from app.utilities import log_msg
 import sys
 
-#ok
 ##################################################################
 # SET UP LOGGING
 sys.stdout.reconfigure(line_buffering=True)
@@ -41,31 +40,43 @@ def start_background_threads():
     print('--- end of function for background threads')
 
 ##################################################################
-# MAIN
-    initialise_modules()
-    log_msg('*modules initialised*')
-    log_msg('... started')
-    log_msg('Starting background threads...')
-    start_background_threads()
-    log_msg('...done')
-    is_local = False
-    env_var = os.getenv("LOCAL_LAPTOP")
-    if not (env_var is None):
-        if env_var != '':
-            is_local = True
-            print('//-- local details: --->.  <' + str(env_var) + '>')
-    if is_local:
-        log_msg('* is local *')
-        log_msg('type of environment variable: '+str(type(env_var)))
-        log_msg('value of environment variable: <'+str(env_var) + '>')
-        log_msg("Starting Flask server locally on port 5050")
-        app.run(debug=True, port=5050)
-        log_msg("Flask server started")
-    else:
-        log_msg('* on server *')
-        log_msg("Starting Flask server on remote location")
-        port = int(os.environ.get("PORT", 10000))
-        log_msg('Port = ' + str(port))
-        app.run(host="0.0.0.0", port=port)
-        log_msg("Flask server started")
+# RUN THE APP
+def run_app():
+    log_msg('Running the app...')
+    app.run(debug=True, port=5050)  
+
+##################################################################
+# MAIN BODY
+initialise_modules()
+log_msg('*modules initialised*')
+log_msg('... started')
+log_msg('Starting background threads...')
+start_background_threads()
+log_msg('...done')
+is_local = False
+env_var = os.getenv("LOCAL_LAPTOP")
+if not (env_var is None):
+    if env_var != '':
+        is_local = True
+        print('//-- local details: --->.  <' + str(env_var) + '>')
+if is_local:
+    log_msg('* is local *')
+    log_msg('type of environment variable: '+str(type(env_var)))
+    log_msg('value of environment variable: <'+str(env_var) + '>')
+    log_msg("Starting Flask server locally on port 5050")
+    app.run(debug=True, port=5050)
+    log_msg("Flask server started")
+else:
+    log_msg('* on server *')
+    log_msg("Starting Flask server on remote location")
+    port = int(os.environ.get("PORT", 10000))
+    log_msg('Port = ' + str(port))
+    app.run(host="0.0.0.0", port=port)
+    log_msg("Flask server started")
+
+##################################################################
+# ADDITIONAL RUN IF REQUIRED
+if __name__ == "__main__":
+    if "run_app" in sys.argv:
+        run_app()
     

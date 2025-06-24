@@ -14,8 +14,10 @@ import os
 ##################################################################
 # GLOBAL VARIABLES
 
-BASE_FOLDER = '../app_files/meloir_files/'
-
+if os.path.abspath('.').endswith(('/app/', '/app')):
+    BASE_FOLDER = '../app_files/meloir_files/'
+else:
+    BASE_FOLDER = 'app_files/meloir_files/'
 HTML_FILE_PATH_LOCAL = os.path.abspath(BASE_FOLDER+"latest.html")
 UPLOAD_FOLDER_LOCAL = os.path.abspath(BASE_FOLDER+"uploaded_files")
 WORD_FOLDER_LOCAL = os.path.abspath(BASE_FOLDER+"uploaded_word")

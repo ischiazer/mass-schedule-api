@@ -9,7 +9,10 @@ import os
 
 ##################################################################
 # GLOBAL VARIABLES
-BASE_FOLDER = '../app_files/temperature_files/'
+if os.path.abspath('.').endswith(('/app/', '/app')):
+    BASE_FOLDER = '../app_files/temperature_files/'
+else:
+    BASE_FOLDER = 'app_files/temperature_files/'
 TEMPERATURE_CSV_LOCAL = os.path.abspath(BASE_FOLDER+'temperatures.csv')
 TEMPERATURE_CSV_BB = 'temperatures.csv'
 log_msg('Temperature local file = ' + TEMPERATURE_CSV_LOCAL)
