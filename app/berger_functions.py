@@ -11,35 +11,45 @@ from email.mime.multipart import MIMEMultipart
 import hashlib
 from .utilities import push_b2_file,log_msg, download_file_from_b2_if_absent
 import os
-#ok
+
 ##################################################################
 # GLOBAL VARIABLES
 HASHED_PASSWORD = 'e172b76465d5da5b220d7dcead985461dc3baeb3a353a2ee7254fd699c8de10c'
+
+
+##################################################################
+# FILES
 if os.path.abspath('.').endswith(('/app/', '/app')):
     BASE_FOLDER = '../app_files/berger_files/'
 else:
     BASE_FOLDER = 'app_files/berger_files/'
 DB_NAME_LOCAL = os.path.abspath(BASE_FOLDER+'bookings.db')
 DB_NAME_BB = 'bookings.db'
-
+os.makedirs(BASE_FOLDER, exist_ok=True)
 BASE_STYLE = os.path.abspath(BASE_FOLDER+'base_style.html')
 ADDITIONAL_BODY = os.path.abspath(BASE_FOLDER + 'additional_body.html')
 EMBEDDED_JS = os.path.abspath(BASE_FOLDER + 'embedded_js.js')
 ADDITIONAL_STYLE = os.path.abspath(BASE_FOLDER + 'additional_style.html')
-
+HTML_BODY_CANCEL=os.path.abspath(BASE_FOLDER+'body_cancellation.html')
+HTML_BODY_CHECK=os.path.abspath(BASE_FOLDER+'body_check.html')
+HTML_BODY_ADMIN=os.path.abspath(BASE_FOLDER+'body_admin.html')
 log_msg('Berger python file dir  = ' + os.path.abspath('.'))
 log_msg('Berger local DB file = ' + DB_NAME_LOCAL)
 log_msg(f'Berger BASE_STYLE = {BASE_STYLE}')
 log_msg(f'Berger ADDITIONAL_BODY = {ADDITIONAL_BODY}')
 log_msg(f'Berger EMBEDDED_JS = {EMBEDDED_JS}')
 log_msg(f'Berger ADDITIONAL_STYLE = {ADDITIONAL_STYLE}')
-
-os.makedirs(BASE_FOLDER, exist_ok=True)
+log_msg(f'Berger HTML_BODY_CANCEL = {HTML_BODY_CANCEL}')
+log_msg(f'Berger HTML_BODY_CHECK = {HTML_BODY_CHECK}')
+log_msg(f'Berger HTML_BODY_ADMIN = {HTML_BODY_ADMIN}')
 log_msg('Folder created for Berger')
 download_file_from_b2_if_absent('berger', 'base_style.html', BASE_STYLE)
 download_file_from_b2_if_absent('berger', 'additional_body.html', ADDITIONAL_BODY)
 download_file_from_b2_if_absent('berger', 'embedded_js.js', EMBEDDED_JS)
 download_file_from_b2_if_absent('berger', 'additional_style.html', ADDITIONAL_STYLE)
+download_file_from_b2_if_absent('berger', 'body_cancellation.html', HTML_BODY_CANCEL)
+download_file_from_b2_if_absent('berger', 'body_check.html', HTML_BODY_CHECK)
+download_file_from_b2_if_absent('berger', 'body_admin.html', HTML_BODY_ADMIN)
 
 ##################################################################
 # Connect to database (creates the file if it doesn't exist)

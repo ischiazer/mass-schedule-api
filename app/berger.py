@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from .berger_functions import get_berger_HTML_style
 from .berger_functions import get_historical_bookings_HTML,dump_bookings_HTML,get_single_booking_confirmation_HTML,berger_create_new_booking,berger_booking_not_found,get_email_from_booking_code, berger_delete_booking,get_new_booking_selection_HTML
 from .berger_functions import send_html_email
-from .berger_functions import DB_NAME_LOCAL, DB_NAME_BB, HASHED_PASSWORD, BASE_FOLDER
+from .berger_functions import DB_NAME_LOCAL, DB_NAME_BB, HASHED_PASSWORD, BASE_FOLDER, HTML_BODY_CANCEL,HTML_BODY_CHECK,HTML_BODY_ADMIN
 from .utilities import download_file_from_b2_if_absent, log_msg
 from flask import request, jsonify, send_file, Response
 import logging
@@ -150,7 +150,7 @@ def berger_process_admin():
 def berger_admin_page():
     log_msg("Berger - throwing admin page...")
     html = '<HTML>\n' + get_berger_HTML_style() + '\n\n<BODY>\n'
-    with open(BASE_FOLDER+'body_admin.html','rt') as f:
+    with open(HTML_BODY_ADMIN,'rt') as f:
         html += f.read()
     html += '</BODY></HTML>'
     log_msg('...done')
@@ -171,7 +171,7 @@ def new_booking_page():
 def cancel_page():
     log_msg("Berger - throwing cancel page...")
     html = '<HTML>\n' + get_berger_HTML_style() + '\n\n<BODY>\n'
-    with open(BASE_FOLDER+'body_cancellation.html','rt') as f:
+    with open(HTML_BODY_CANCEL,'rt') as f:
         html += f.read()
     html += '</BODY></HTML>'
     log_msg('...done')
@@ -184,7 +184,7 @@ def cancel_page():
 def check_page():
     log_msg("Berger - throwing check page...")
     html = '<HTML>\n' + get_berger_HTML_style() + '\n\n<BODY>\n'
-    with open(BASE_FOLDER+'body_check.html','rt') as f:
+    with open(HTML_BODY_CHECK','rt') as f:
         html += f.read()
     html += '</BODY></HTML>'
     log_msg('...done')
