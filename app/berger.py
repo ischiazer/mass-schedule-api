@@ -60,7 +60,7 @@ def berger_web_process_new_booking():
     log_msg('** receive')
     data = request.get_json()
     x = data.get("x", [])
-    log_msg("Received list:", x)
+    log_msg("Received list:" + str(x))
     booker_name = x[1]
     booker_email = x[2]
     number_people = x[3]
