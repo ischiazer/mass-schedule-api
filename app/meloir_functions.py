@@ -7,7 +7,8 @@ import asyncio
 import time
 import feedparser
 from openai import OpenAI
-from .utilities import get_time_stamp_HTML, french_date, fix_encoding, push_b2_file, format_datetime, log_msg
+import json
+from .utilities import get_time_stamp_HTML, french_date, fix_encoding, push_b2_file, format_datetime, log_msg, get_now_french
 from email.utils import parsedate_to_datetime
 import os
 
@@ -31,6 +32,7 @@ PERPLEXITY_TIMESTAMP_LOCAL = os.path.abspath(BASE_FOLDER+"evenements_MAJ.txt")
 PERPLEXITY_TABLE_STORE_LOCAL = os.path.abspath(BASE_FOLDER+"evenements_%s.html")
 NEWS_TABLE_LOCAL = os.path.abspath(BASE_FOLDER+"nouvelles_vatican.html")
 NEWS_TIMESTAMP_LOCAL = os.path.abspath(BASE_FOLDER+"nouvelles_MAJ.txt")
+SITE_HEARTBEAT_LOCAL = os.path.abspath(BASE_FOLDER+"site_heartbeat.txt")
 
 
 os.makedirs(UPLOAD_FOLDER_LOCAL, exist_ok=True)
@@ -351,10 +353,9 @@ def get_perplexity_events():
         f.write(html_content)
     log_msg("Perplexity query step 6d")
     log_msg("Perplexity query step 6e")
-    time_now = datetime.now()
     log_msg("Perplexity query step 6f")
     with open(PERPLEXITY_TIMESTAMP_LOCAL, 'w') as f:
-        f.write(time_now.strftime("%Y-%m-%d %H:%M:%S"))
+        f.write(get_now_french())
     log_msg("Perplexity query step 6g")
     push_b2_file('meloir',PERPLEXITY_TABLE_LAST_LOCAL,"evenements.html")
     log_msg("Perplexity query step 6h")
@@ -420,16 +421,51 @@ def get_news():
     with open(NEWS_TABLE_LOCAL, "w") as f:
         f.write(html)
     log_msg("... done writing news to local file")
-    time_now = datetime.now()
     with open(NEWS_TIMESTAMP_LOCAL, 'w') as f:
-        f.write(time_now.strftime("%Y-%m-%d %H:%M:%S"))
+        f.write(get_now_french())
     log_msg("Pushing news file to B2...")
     push_b2_file('meloir',NEWS_TABLE_LOCAL,"nouvelles_vatican.html")
     log_msg("Pushing news timestamp to B2...")
     push_b2_file('meloir',NEWS_TIMESTAMP_LOCAL,"nouvelles_vatican_MAJ.txt")
     log_msg("Done with get_news()")
 
+##################################################################
+# CALL MASS SCHEDULE FUNCTION AND STORE
+def call_mass_schedule_and_store():
+    log_msg(f'Function call_mass_schedule_and_store pid= {os.getpid()}')
+    data = asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
 
+    # Save cleaned JSON
+    with open(BASE_FOLDER+"static/schedule.json", "w", encoding="utf-8") as f:
+        json.dump(data.get_json(), f, ensure_ascii=False, indent=2)
+
+    # Upload JSON to BlackBlaze
+    push_b2_file('meloir',BASE_FOLDER+"static/schedule.json","horaires_messes.json")
+
+    # Save last updated timestamp in French format
+    formatted = get_now_french()
+    log_msg(f'Last updated timestamp: {formatted}')
+    with open(BASE_FOLDER+"static/last_updated.txt", "w", encoding="utf-8") as f:
+        f.write(formatted)
+    push_b2_file('meloir',BASE_FOLDER+"static/last_updated.txt","horaires_messes_MAJ.txt")
+
+    # Save heartbeat timestamp (ISO format)
+    with open(BASE_FOLDER+"static/heartbeat.txt", "w") as hb:
+        hb.write(now.isoformat())
+    push_b2_file('meloir',BASE_FOLDER+"static/heartbeat.txt","heartbeat.txt")
+
+    return f'Schedule updated static/schedule.json locally to <{BASE_FOLDER+"static/last_updated.txt"} and BB horaires_messes_MAJ.txt'
+
+##################################################################
+# WEB SITE HEARTBEAT
+def heartbeat():
+    log_msg(f'Function heartbeat pid= {os.getpid()}')
+    msg_heartbeat = get_now_french()
+    with open(SITE_HEARTBEAT_LOCAL, "wt") as hb:
+        hb.write(msg_heartbeat)
+    push_b2_file('meloir',SITE_HEARTBEAT_LOCAL,"site_heartbeat.txt")
+    log_msg(f'Heartbeat updated to {msg_heartbeat}')
+    return f'Heartbeat updated to {msg_heartbeat}'
 
 ##################################################################
 # REGULAR CALL TO THE VATICAN NEWS QUERY
@@ -454,3 +490,12 @@ def periodic_query_readings():
     while True:
         fetch_readings()
         time.sleep(1 * 60 * 60)  # Sleep 1 hours
+
+##################################################################
+# REGULAR CALL TO THE MASS SCHEDULE
+def periodic_query_mass_schedule():
+    time.sleep(.7 * 60 * 60) 
+    while True:
+        call_mass_schedule_and_store()
+        time.sleep(.5 * 60 * 60)  # Sleep 30 min
+

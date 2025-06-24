@@ -7,7 +7,7 @@ import zipfile
 import logging
 import tempfile
 from datetime import datetime
-from .meloir_functions import fetch_and_clean_schedule, fetch_readings, get_perplexity_events, get_news
+from .meloir_functions import fetch_and_clean_schedule, fetch_readings, get_perplexity_events, get_news, call_mass_schedule_and_store
 from .meloir_functions import BASE_FOLDER,HTML_FILE_PATH_LOCAL, UPLOAD_FOLDER_LOCAL, UPLOAD_LOG_FILE_LOCAL, WORD_FOLDER_LOCAL, HTML_FOLDER_LOCAL, PATH_BULLETIN_LOCAL, PERPLEXITY_TABLE_LAST_LOCAL,PERPLEXITY_TIMESTAMP_LOCAL,NEWS_TABLE_LOCAL,NEWS_TIMESTAMP_LOCAL,READINGS_PATH_LAST_LOCAL
 from .utilities import push_b2_file, throw_static_file, log_msg
 from .utilities import log_upload, extract_cropped_images_proportional, convert_docx_to_html_with_cropped_images
@@ -36,30 +36,8 @@ def get_schedule():
 # QUERY - REFRESH MASS SCHEDULE AND STORE
 @bp_meloir.route('/refresh')
 def refresh_schedule():
-    log_msg(f'(Web access) refresh_schedule  pid= {os.getpid()}')
-    data = asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
-
-
-    # Save cleaned JSON
-    with open(BASE_FOLDER+"static/schedule.json", "w", encoding="utf-8") as f:
-        json.dump(data.get_json(), f, ensure_ascii=False, indent=2)
-
-    # Upload JSON to BlackBlaze
-    push_b2_file('meloir',BASE_FOLDER+"static/schedule.json","horaires_messes.json")
-
-    # Save last updated timestamp in French format
-    now = datetime.now()
-    formatted = now.strftime("%A %d %B %Y à %H:%M")
-    with open(BASE_FOLDER+"static/last_updated.txt", "w", encoding="utf-8") as f:
-        f.write(formatted)
-    push_b2_file('meloir',BASE_FOLDER+"static/last_updated.txt","horaires_messes_MAJ.txt")
-
-    # Save heartbeat timestamp (ISO format)
-    with open(BASE_FOLDER+"static/heartbeat.txt", "w") as hb:
-        hb.write(now.isoformat())
-    push_b2_file('meloir',BASE_FOLDER+"static/heartbeat.txt","heartbeat.txt")
-
-    return f'Schedule updated static/schedule.json locally to <{BASE_FOLDER+"static/last_updated.txt"} and BB horaires_messes_MAJ.txt'
+    h = call_mass_schedule_and_store()
+    return f'call_mass_schedule_and_store done'
 
 
 

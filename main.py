@@ -3,7 +3,7 @@ import logging
 from app import create_app
 from app import initialise_modules
 from app.temperature_functions import background_loop_temperature
-from app.meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity  
+from app.meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule
 import os
 from app.utilities import log_msg
 import sys
@@ -29,7 +29,7 @@ log_msg('*app created*')
 def start_background_threads():
     # Define functions to be called at regular intervals
     print('--- beginning of function for background threads')
-    for func in [background_loop_temperature, periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity]:
+    for func in [background_loop_temperature, periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule]:
         try:
             logging.info(f"Starting background thread: {func.__name__}")
             print(f"--Starting background thread: {func.__name__}")
