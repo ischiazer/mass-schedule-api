@@ -184,7 +184,7 @@ def cancel_page():
 def check_page():
     log_msg("Berger - throwing check page...")
     html = '<HTML>\n' + get_berger_HTML_style() + '\n\n<BODY>\n'
-    with open(HTML_BODY_CHECK','rt') as f:
+    with open(HTML_BODY_CHECK,'rt') as f:
         html += f.read()
     html += '</BODY></HTML>'
     log_msg('...done')
