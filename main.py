@@ -53,26 +53,27 @@ log_msg('... started')
 log_msg('Starting background threads...')
 start_background_threads()
 log_msg('...done')
-is_local = False
-env_var = os.getenv("LOCAL_LAPTOP")
-if not (env_var is None):
-    if env_var != '':
-        is_local = True
-        print('//-- local details: --->.  <' + str(env_var) + '>')
-if is_local:
-    log_msg('* is local *')
-    log_msg('type of environment variable: '+str(type(env_var)))
-    log_msg('value of environment variable: <'+str(env_var) + '>')
-    log_msg("Starting Flask server locally on port 5050")
-    app.run(debug=True, port=5050)
-    log_msg("Flask server started")
-else:
-    log_msg('* on server *')
-    log_msg("Starting Flask server on remote location")
-    port = int(os.environ.get("PORT", 10000))
-    log_msg('Port = ' + str(port))
-    app.run(host="0.0.0.0", port=port)
-    log_msg("Flask server started")
+# if __name__ == "__main__":
+    is_local = False
+    env_var = os.getenv("LOCAL_LAPTOP")
+    if not (env_var is None):
+        if env_var != '':
+            is_local = True
+            print('//-- local details: --->.  <' + str(env_var) + '>')
+    if is_local:
+        log_msg('* is local *')
+        log_msg('type of environment variable: '+str(type(env_var)))
+        log_msg('value of environment variable: <'+str(env_var) + '>')
+        log_msg("Starting Flask server locally on port 5050")
+        app.run(debug=True, port=5050)
+        log_msg("Flask server started")
+    else:
+        log_msg('* on server *')
+        log_msg("Starting Flask server on remote location")
+        port = int(os.environ.get("PORT", 10000))
+        log_msg('Port = ' + str(port))
+        app.run(host="0.0.0.0", port=port)
+        log_msg("Flask server started")
 
 ##################################################################
 # ADDITIONAL RUN IF REQUIRED
