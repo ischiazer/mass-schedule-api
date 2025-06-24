@@ -43,6 +43,7 @@ log_msg(f'Berger HTML_BODY_CANCEL = {HTML_BODY_CANCEL}')
 log_msg(f'Berger HTML_BODY_CHECK = {HTML_BODY_CHECK}')
 log_msg(f'Berger HTML_BODY_ADMIN = {HTML_BODY_ADMIN}')
 log_msg('Folder created for Berger')
+download_file_from_b2_if_absent('berger', DB_NAME_BB, DB_NAME_LOCAL)
 download_file_from_b2_if_absent('berger', 'base_style.html', BASE_STYLE)
 download_file_from_b2_if_absent('berger', 'additional_body.html', ADDITIONAL_BODY)
 download_file_from_b2_if_absent('berger', 'embedded_js.js', EMBEDDED_JS)
@@ -60,7 +61,7 @@ def get_DB_connection():
         return DB_connection, DB_cursor
     else:
         log_msg(f'\n\n**** Berger local DB not available {DB_NAME_LOCAL}. trying to download ****\n\n')
-        download_file_from_b2_if_absent('berger',DB_NAME_LOCAL, DB_NAME_BB)
+        download_file_from_b2_if_absent('berger',DB_NAME_BB,DB_NAME_LOCAL)
         if os.path.exists(DB_NAME_LOCAL):
             DB_connection = sqlite3.connect(DB_NAME_LOCAL)
             DB_cursor = DB_connection.cursor()
