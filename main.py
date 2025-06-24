@@ -51,11 +51,12 @@ initialise_modules()
 log_msg('*modules initialised*')
 log_msg('... started')
 log_msg('Starting background threads...')
-start_background_threads()
 log_msg('...done')
 if __name__ == "__main__":
     is_local = False
     env_var = os.getenv("LOCAL_LAPTOP")
+    if os.getpid() == os.getppid():
+        start_background_threads()
     if not (env_var is None):
         if env_var != '':
             is_local = True
