@@ -53,7 +53,7 @@ log_msg('... started')
 log_msg('Starting background threads...')
 start_background_threads()
 log_msg('...done')
-# if __name__ == "__main__":
+if __name__ == "__main__":
     is_local = False
     env_var = os.getenv("LOCAL_LAPTOP")
     if not (env_var is None):
