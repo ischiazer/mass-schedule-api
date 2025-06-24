@@ -334,12 +334,13 @@ def get_perplexity_events():
 
     # 6 - Check that the HTML code is correct
     log_msg("Perplexity query step 6")
-    with open(PERPLEXITY_TABLE_LAST_LOCAL, "w") as f:
+    log_msg(f"Writing Perplexity HTML to local file {PERPLEXITY_TABLE_LAST_LOCAL}")
+    with open(PERPLEXITY_TABLE_LAST_LOCAL, "wt") as f:
         f.write(html_content)
     log_msg("Perplexity query step 6b")
     dt = datetime.now().strftime("%Y-%m-%d")
     log_msg("Perplexity query step 6c")
-    with open(PERPLEXITY_TABLE_STORE_LOCAL % dt, "w") as f:
+    with open(PERPLEXITY_TABLE_STORE_LOCAL % dt, "wt") as f:
         f.write(html_content)
     log_msg("Perplexity query step 6d")
     log_msg("Perplexity query step 6e")
@@ -366,7 +367,9 @@ def get_perplexity_events():
 def get_news():
     # URL of Vatican RSS
     rss_url = "https://www.vaticannews.va/fr.rss.xml"
+    log_msg("Fetching Vatican news from " + rss_url)
     feed = feedparser.parse(rss_url)
+    log_msg("Done with fetching Vatican news")
 
     # Start HTML table with inline CSS styling
     html = '''
@@ -379,7 +382,9 @@ def get_news():
     '''
 
     # Add each news item
+    log_msg("Going through each news entry...")
     for entry in feed.entries[:10]:
+        log_msg(f"Processing news entry: {entry.title}")
         # Date of publication
         raw_date = entry.published
         pub_date = parsedate_to_datetime(raw_date)
@@ -401,14 +406,20 @@ def get_news():
         '''
 
     # End of table
+    log_msg("Finished processing news entries")
     html += '</table>'
-    with open(NEWS_TABLE, "w") as f:
+    log_msg("Writing news to local file...")
+    with open(NEWS_TABLE_LOCAL, "w") as f:
         f.write(html)
+    log_msg("... done writing news to local file")
     time_now = datetime.now()
-    with open(NEWS_TIMESTAMP, 'w') as f:
+    with open(NEWS_TIMESTAMP_LOCAL, 'w') as f:
         f.write(time_now.strftime("%Y-%m-%d %H:%M:%S"))
-    push_b2_file('meloir',NEWS_TABLE,"nouvelles_vatican.html")
-    push_b2_file('meloir',NEWS_TIMESTAMP,"nouvelles_vatican_MAJ.txt")
+    log_msg("Pushing news file to B2...")
+    push_b2_file('meloir',NEWS_TABLE_LOCAL,"nouvelles_vatican.html")
+    log_msg("Pushing news timestamp to B2...")
+    push_b2_file('meloir',NEWS_TIMESTAMP_LOCAL,"nouvelles_vatican_MAJ.txt")
+    log_msg("Done with get_news()")
 
 
 
