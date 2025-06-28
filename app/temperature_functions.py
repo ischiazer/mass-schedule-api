@@ -152,7 +152,7 @@ def background_loop_temperature():
     log_msg("/start_background_loop_temperature 1")
     loop = asyncio.new_event_loop()
     log_msg("/start_background_loop_temperature 2")
-    asyncio.set_event_loop(loop)
+    #asyncio.set_event_loop(loop)
     log_msg("/start_background_loop_temperature 3")
     loop.run_until_complete(periodic_query_temperature())
     log_msg("/start_background_loop_temperature 4")
