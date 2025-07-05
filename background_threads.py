@@ -3,7 +3,7 @@ from app.temperature_functions import background_loop_temperature
 from app.meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule
 from app.utilities import log_msg
 import os
-
+import glob
 _background_started = False
 
 
