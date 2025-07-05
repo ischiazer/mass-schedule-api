@@ -16,6 +16,7 @@ import base64
 import mammoth
 
 UPLOAD_LOG_FILE = "upload_log.txt"
+STANDARD_LOG_FILE = "log.txt"
 
 ##################################################################
 # LOG MESSAGES ON CONSOLE AND FILE
@@ -26,7 +27,15 @@ def log_msg(msg):
     if not isinstance(msg, str):
         msg = str(msg)
     print(d_str + ' ' + msg,flush=True)
+    with open(STANDARD_LOG_FILE,"at") as f:
+        f.write(d_str + ' ' + msg + '\n')
 
+##################################################################
+# GET FULL LOG
+def get_full_log_content():
+    with open(STANDARD_LOG_FILE, "rt", encoding="utf-8") as f:
+        s = f.read()
+    return s    
 
 ##################################################################
 # CONNECT TO BLACKBLAZE

@@ -10,7 +10,7 @@ from datetime import datetime
 from .meloir_functions import fetch_and_clean_schedule, fetch_readings, get_perplexity_events, get_news, call_mass_schedule_and_store, site_heartbeat
 from .meloir_functions import BASE_FOLDER,HTML_FILE_PATH_LOCAL, UPLOAD_FOLDER_LOCAL, UPLOAD_LOG_FILE_LOCAL, WORD_FOLDER_LOCAL, HTML_FOLDER_LOCAL, PATH_BULLETIN_LOCAL, PERPLEXITY_TABLE_LAST_LOCAL,PERPLEXITY_TIMESTAMP_LOCAL,NEWS_TABLE_LOCAL,NEWS_TIMESTAMP_LOCAL,READINGS_PATH_LAST_LOCAL
 from .utilities import push_b2_file, throw_static_file, log_msg
-from .utilities import log_upload, extract_cropped_images_proportional, convert_docx_to_html_with_cropped_images
+from .utilities import log_upload, get_full_log_content, extract_cropped_images_proportional, convert_docx_to_html_with_cropped_images
 from flask import request, send_file, Response
 
 
@@ -31,6 +31,12 @@ def meloir_initialise():
 def get_schedule():
     log_msg(f'(Web access) get_schedule pid= {os.getpid()}')
     return asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
+
+##################################################################
+# QUERY - FETCH MASS SCHEDULE ON THE FLY
+@bp_meloir.route('/get_log')
+def get_loc():
+    return get_full_log_content()
 
 ##################################################################
 # QUERY - REFRESH MASS SCHEDULE AND STORE
