@@ -2,8 +2,18 @@ import threading
 from app.temperature_functions import background_loop_temperature
 from app.meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule
 from app.utilities import log_msg
+import os
 
 _background_started = False
+
+
+##################################################################
+# CHECK WHETHER THE CURRENT WORKER IS THE PRIMARY ONE
+# (THE ONLY ONE ALLOWED TO START BACKGROUND THREADS)
+def is_primary_worker():
+    pids = [int(os.path.basename(p)) for p in glob.glob("/proc/[0-9]*") if os.path.isdir(p)]
+    min_pid = min(pids) if pids else None
+    return os.getpid() == min_pid
 
 ##################################################################
 # SCHEDULE TASKS
@@ -12,7 +22,11 @@ def start_background_threads():
     if _background_started:
         return
     _background_started = True    
-    log_msg('--- beginning of function for background threads')
+
+    if not is_primary_worker():
+        log_msg(f"Skipping background threads in worker PID {os.getpid()}")
+        return
+    log_msg(f"Starting background threads in primary worker PID {os.getpid()}")
     for func in [background_loop_temperature, periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule]:
         try:
             log_msg(f"Starting background thread: {func.__name__}")
