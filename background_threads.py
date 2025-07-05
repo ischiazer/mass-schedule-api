@@ -3,12 +3,16 @@ from app.temperature_functions import background_loop_temperature
 from app.meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule
 from app.utilities import log_msg
 
+_background_started = False
 
 ##################################################################
 # SCHEDULE TASKS
 def start_background_threads():
-    # Define functions to be called at regular intervals
-    print('--- beginning of function for background threads')
+    global _background_started
+    if _background_started:
+        return
+    _background_started = True    
+    log_msg('--- beginning of function for background threads')
     for func in [background_loop_temperature, periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule]:
         try:
             log_msg(f"Starting background thread: {func.__name__}")
