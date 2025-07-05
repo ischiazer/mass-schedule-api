@@ -137,12 +137,15 @@ def force_fetch_temperature():
 # REGULAR CALL TO THE SEA TEMPERATURE
 async def periodic_query_temperature():
     log_msg(f"periodic_query_temperature pid= {os.getpid()}")
-    await asyncio.sleep(60 * 60 * 3)   
+    #await asyncio.sleep(60 * 60 * 3)   
+    await asyncio.sleep(7)   
     while True:
         try:
+            log_msg("Updating temperatures...")
             update_temperatures()
+            log_msg("..done updating temperatures...")
         except Exception as e:
-            logging.warning(f"Periodic fetch of temperature failed: {e}")
+            log_msg(f"Periodic fetch of temperature failed: {e}")
         await asyncio.sleep(60 * 60 * 12)   
 
 ##################################################################
@@ -150,9 +153,13 @@ async def periodic_query_temperature():
 def background_loop_temperature():
     log_msg(f"background_loop_temperature 0 pid= {os.getpid()}")
     log_msg("/start_background_loop_temperature 1")
-    loop = asyncio.new_event_loop()
-    log_msg("/start_background_loop_temperature 2")
-    #asyncio.set_event_loop(loop)
-    log_msg("/start_background_loop_temperature 3")
-    loop.run_until_complete(periodic_query_temperature())
-    log_msg("/start_background_loop_temperature 4")
+    try:
+        log_msg("/start_background_loop_temperature 2")
+        loop = asyncio.new_event_loop()
+        log_msg("/start_background_loop_temperature 3")
+        asyncio.set_event_loop(loop) 
+        log_msg("/start_background_loop_temperature 4")
+        loop.run_until_complete(periodic_query_temperature())
+        log_msg("/start_background_loop_temperature 5")
+    except Exception as e:
+        log_msg(f"Error in background_loop_temperature: {e}")

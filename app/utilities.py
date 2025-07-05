@@ -35,7 +35,7 @@ def log_msg(msg):
 def get_full_log_content():
     with open(STANDARD_LOG_FILE, "rt", encoding="utf-8") as f:
         s = f.read()
-    return s    
+    return s.replace('\n', '<br>')    
 
 ##################################################################
 # CONNECT TO BLACKBLAZE

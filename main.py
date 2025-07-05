@@ -3,7 +3,6 @@ import logging
 from app import create_app
 from app import initialise_modules
 from app.temperature_functions import background_loop_temperature
-from app.meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule
 import os
 from app.utilities import log_msg
 import sys
@@ -25,21 +24,6 @@ app = create_app()
 log_msg('*app created*')
 
 ##################################################################
-# SCHEDULE TASKS
-def start_background_threads():
-    # Define functions to be called at regular intervals
-    print('--- beginning of function for background threads')
-    for func in [background_loop_temperature, periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule]:
-        try:
-            logging.info(f"Starting background thread: {func.__name__}")
-            print(f"--Starting background thread: {func.__name__}")
-            thread = threading.Thread(target=func, name=func.__name__, daemon=True)
-            thread.start()
-        except Exception as e:
-            logging.error(f"Failed to start thread {func.__name__}: {e}")
-    print('--- end of function for background threads')
-
-##################################################################
 # RUN THE APP
 def run_app():
     log_msg('Running the app...')
@@ -55,8 +39,6 @@ log_msg('...done')
 if __name__ == "__main__":
     is_local = False
     env_var = os.getenv("LOCAL_LAPTOP")
-    if os.getpid() == os.getppid():
-        start_background_threads()
     if not (env_var is None):
         if env_var != '':
             is_local = True
