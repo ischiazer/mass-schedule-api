@@ -21,5 +21,5 @@ ENV LC_ALL fr_FR.UTF-8
 RUN playwright install chromium
 
 ENV PORT=10000
-RUN echo "Contents of /app:" && ls -l /a
+RUN echo "Contents of /app:" && ls -l /app
 CMD ["gunicorn", "-w", "8", "-b", "0.0.0.0:10000", "--timeout", "360", "--graceful-timeout", "360", "--access-logfile", "-", "--error-logfile", "-", "--config", "gunicorn.conf.py", "main:app"]
