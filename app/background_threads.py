@@ -11,9 +11,12 @@ _background_started = False
 # CHECK WHETHER THE CURRENT WORKER IS THE PRIMARY ONE
 # (THE ONLY ONE ALLOWED TO START BACKGROUND THREADS)
 def is_primary_worker():
-    pids = [int(os.path.basename(p)) for p in glob.glob("/proc/[0-9]*") if os.path.isdir(p)]
-    min_pid = min(pids) if pids else None
-    return os.getpid() == min_pid
+    try:
+        fd = os.open("/tmp/primary_worker.lock", os.O_CREAT | os.O_EXCL | os.O_RDWR)
+        os.write(fd, str(os.getpid()).encode())
+        return True
+    except FileExistsError:
+        return False
 
 ##################################################################
 # SCHEDULE TASKS
