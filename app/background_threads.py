@@ -19,21 +19,24 @@ def is_primary_worker():
 # SCHEDULE TASKS
 def start_background_threads():
     global _background_started
-    if _background_started:
-        return
-    _background_started = True    
 
     if not is_primary_worker():
         log_msg(f"Skipping background threads in worker PID {os.getpid()}")
         return
     log_msg(f"Starting background threads in primary worker PID {os.getpid()}")
-    for func in [background_loop_temperature, periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule]:
+    if _background_started:
+        log_msg("The background threads have already been started.")
+        return
+    _background_started = True    
+    for i, func in enumerate([background_loop_temperature, periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule]):
+        log_msg(f"Starting background thread {i}")
         try:
-            log_msg(f"Starting background thread: {func.__name__}")
-            print(f"--Starting background thread: {func.__name__}")
+            log_msg(f"Trying to start  background thread #{i}: {func.__name__}")
             thread = threading.Thread(target=func, name=func.__name__, daemon=True)
+            log_msg(f"Progressing #{i}")
             thread.start()
+            log_msg(f"Done starting background thread #{i}: {func.__name__}")
         except Exception as e:
-            log_msg(f"Failed to start thread {func.__name__}: {e}")
+            log_msg(f"Failed to start thread #{i} {func.__name__}: {e}")
     log_msg('--- end of function for background threads')
 
