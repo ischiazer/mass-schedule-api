@@ -435,7 +435,12 @@ def get_news():
 # CALL MASS SCHEDULE FUNCTION AND STORE
 def call_mass_schedule_and_store():
     log_msg(f'Function call_mass_schedule_and_store pid= {os.getpid()}')
-    data = asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
+    log_msg('Trying to get mass schedule data')
+    try:
+        data = asyncio.get_event_loop().run_until_complete(fetch_and_clean_schedule())
+    except Exception as e:
+        log_msg(f'Error fetching mass schedule data: {e}')
+        return f'Error fetching mass schedule data: {e}'
     log_msg('Done querying mass schedule data')
 
     # Save cleaned JSON
