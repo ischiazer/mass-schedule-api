@@ -5,6 +5,7 @@ from app import initialise_modules
 from app.temperature_functions import background_loop_temperature
 import os
 from app.utilities import log_msg
+from app.background_threads import set_flask_app
 import sys
 
 ##################################################################
@@ -22,6 +23,8 @@ log_msg('Starting the app...')
 log_msg('*starting the app*')
 app = create_app()
 log_msg('*app created*')
+set_flask_app(app)
+log_msg('*app referenced*')
 
 ##################################################################
 # RUN THE APP

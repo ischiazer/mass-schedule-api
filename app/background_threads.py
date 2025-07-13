@@ -7,6 +7,22 @@ import glob
 _background_started = False
 
 
+_app = None
+
+##################################################################
+# APP
+def set_flask_app(app):
+    global _app
+    _app = app
+
+##################################################################
+# WRAPPER FOR FUNCTIONS TO CALL PERIODICALLY
+def run_with_app_context(func):
+    def wrapper(*args, **kwargs):
+        with _app.app_context():
+            return func(*args, **kwargs)
+    return wrapper
+
 ##################################################################
 # CHECK WHETHER THE CURRENT WORKER IS THE PRIMARY ONE
 # (THE ONLY ONE ALLOWED TO START BACKGROUND THREADS)
@@ -31,7 +47,11 @@ def start_background_threads():
         log_msg("The background threads have already been started.")
         return
     _background_started = True    
-    for i, func in enumerate([background_loop_temperature, periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule]):
+    for i, func in enumerate([run_with_app_context(background_loop_temperature),
+                              run_with_app_context(periodic_query_readings),
+                              run_with_app_context(periodic_query_vatican_news), 
+                              run_with_app_context(periodic_query_perplexity),
+                              run_with_app_context(periodic_query_mass_schedule)]):
         log_msg(f"Starting background thread {i}")
         try:
             log_msg(f"Trying to start  background thread #{i}: {func.__name__}")
