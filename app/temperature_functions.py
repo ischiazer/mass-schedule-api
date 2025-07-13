@@ -142,7 +142,8 @@ async def periodic_query_temperature():
     while True:
         try:
             log_msg("Updating temperatures...")
-            update_temperatures()
+            with app.app_context():
+                update_temperatures()
             log_msg("..done updating temperatures...")
         except Exception as e:
             log_msg(f"Periodic fetch of temperature failed: {e}")
@@ -151,7 +152,7 @@ async def periodic_query_temperature():
 ##################################################################
 # FUNCTION CALLED BY THE THREADING LOOP
 def background_loop_temperature():
-    log_msg(f"background_loop_temperature 0 pid= {os.getpid()}")
+    log_msg(f"background_loop_temperature 0")
     log_msg("/start_background_loop_temperature 1")
     try:
         log_msg("/start_background_loop_temperature 2")
