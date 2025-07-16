@@ -35,6 +35,7 @@ def start_background_threads():
     if not is_primary_worker():
         log_msg(f"Skipping background threads in worker PID {os.getpid()}")
         return
+    log_msg(f"Name of app in background_threads = {str(_app)}")
     log_msg(f"Starting background threads in primary worker PID {os.getpid()}")
     if _background_started:
         log_msg("The background threads have already been started.")

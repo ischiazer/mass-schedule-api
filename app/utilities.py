@@ -38,6 +38,12 @@ def get_full_log_content():
     return s.replace('\n', '<br>')    
 
 ##################################################################
+# GET FULL LOG
+def clear_log_content():
+    with open(STANDARD_LOG_FILE, "wt", encoding="utf-8") as f:
+        f.write('Log cleared\n\n')
+
+##################################################################
 # CONNECT TO BLACKBLAZE
 def get_b2_bucket(bucket_name):
     b2_info = InMemoryAccountInfo()
