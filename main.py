@@ -34,12 +34,11 @@ def run_app():
 
 ##################################################################
 # MAIN BODY
+log_msg('MAIN *modules initialising*')
 initialise_modules()
-log_msg('*modules initialised*')
-log_msg('... started')
-log_msg('Starting background threads...')
-log_msg('...done')
+log_msg('... initalising done')
 if __name__ == "__main__":
+    log_msg('MAIN inside __name__ == ')
     is_local = False
     env_var = os.getenv("LOCAL_LAPTOP")
     if not (env_var is None):
