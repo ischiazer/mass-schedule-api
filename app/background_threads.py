@@ -52,7 +52,7 @@ def start_background_threads():
         return wrapper
 
     thread_funcs = [
-        background_loop_temperature,
+        lambda: background_loop_temperature(_app),
         periodic_query_readings,
         periodic_query_perplexity,
         periodic_query_vatican_news,
