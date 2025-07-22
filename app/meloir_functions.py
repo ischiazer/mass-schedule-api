@@ -483,6 +483,7 @@ def periodic_query_vatican_news():
     time.sleep(27 * 60)
     log_msg('Sleep time elapsed for periodic_query_vatican_news')
     while True:
+        log_msg('Periodic news update through periodic_query_perplexity ')
         get_news()
         time.sleep(90 * 60)
 
@@ -493,6 +494,7 @@ def periodic_query_perplexity():
     time.sleep(2 * 60 * 60)
     log_msg('Sleep time elapsed for periodic_query_perplexity')
     while True:
+        log_msg('Periodic call to perplexity within periodic_query_perplexity ')
         get_perplexity_events()
         time.sleep(24 * 60 * 60)
 
@@ -503,6 +505,7 @@ def periodic_query_readings():
     time.sleep(.25 * 60 * 60) 
     log_msg('Sleep time elapsed for periodic_query_readings')
     while True:
+        log_msg('Periodic readings update through periodic_query_readings ')
         fetch_readings()
         time.sleep(1 * 60 * 60)  # Sleep 1 hours
 
@@ -513,6 +516,7 @@ def periodic_query_mass_schedule():
     time.sleep(90) 
     log_msg('Sleep time elapsed for periodic_query_mass_schedule')
     while True:
+        log_msg('Periodic mass schedule update through periodic_query_mass_schedule ')
         call_mass_schedule_and_store()
         time.sleep(.5 * 60 * 60)  # Sleep 30 min
 

@@ -141,12 +141,13 @@ async def periodic_query_temperature(ref_app):
     await asyncio.sleep(7)   
     while True:
         try:
+            log_msg('Periodic call to temperature within periodic_query_temperature ')
             log_msg("Updating temperatures...")
             with ref_app.app_context():
                 update_temperatures()
             log_msg("..done updating temperatures...")
         except Exception as e:
-            log_msg(f"Periodic fetch of temperature failed: {e}")
+            log_msg(f"Periodic fetch of temperature failed [periodic_query_temperature]: {e}")
         await asyncio.sleep(60 * 60 * 12)   
 
 ##################################################################
