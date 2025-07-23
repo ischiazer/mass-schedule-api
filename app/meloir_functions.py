@@ -33,7 +33,8 @@ PERPLEXITY_TABLE_STORE_LOCAL = os.path.abspath(BASE_FOLDER+"evenements_%s.html")
 NEWS_TABLE_LOCAL = os.path.abspath(BASE_FOLDER+"nouvelles_vatican.html")
 NEWS_TIMESTAMP_LOCAL = os.path.abspath(BASE_FOLDER+"nouvelles_MAJ.txt")
 SITE_HEARTBEAT_LOCAL = os.path.abspath(BASE_FOLDER+"site_heartbeat.txt")
-
+PERPLEXITY_MODEL = "perplexity/sonar-pro" #"llama-3.1-sonar-large-128k-online"
+ 
 
 os.makedirs(UPLOAD_FOLDER_LOCAL, exist_ok=True)
 os.makedirs(WORD_FOLDER_LOCAL, exist_ok=True)
@@ -275,13 +276,12 @@ def get_perplexity_events():
     # Initialise the Perplexity connection
     api_key = os.getenv("PERPLEXITY_KEY")
     client = OpenAI(api_key=api_key, base_url="https://api.perplexity.ai")
-
     # 1 -- Base query
     log_msg("Perplexity query step 1")
     try:
         query = "Pouvez-vous me donner la liste des événements religieux catholiques tels que pélerinages, processions, ou retraites organisés autour de Saint Malo ou du Mont Saint Michel, Saint Méloir des Ondes, l'abbaye de Beaufort (Plerguer) dans le mois à venir. Je souhaiterais au moins trois événements"
         response = client.chat.completions.create(
-                model="llama-3.1-sonar-large-128k-online",  # Or another available Perplexity model
+                model=PERPLEXITY_MODEL,  # Or another available Perplexity model
                 messages=[
                     {"role": "user", "content": query}
                 ]
