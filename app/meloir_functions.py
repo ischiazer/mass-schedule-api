@@ -33,7 +33,7 @@ PERPLEXITY_TABLE_STORE_LOCAL = os.path.abspath(BASE_FOLDER+"evenements_%s.html")
 NEWS_TABLE_LOCAL = os.path.abspath(BASE_FOLDER+"nouvelles_vatican.html")
 NEWS_TIMESTAMP_LOCAL = os.path.abspath(BASE_FOLDER+"nouvelles_MAJ.txt")
 SITE_HEARTBEAT_LOCAL = os.path.abspath(BASE_FOLDER+"site_heartbeat.txt")
-PERPLEXITY_MODEL = "perplexity/sonar-pro" #"llama-3.1-sonar-large-128k-online"
+PERPLEXITY_MODEL = "sonar-pro" #"llama-3.1-sonar-large-128k-online"
  
 
 os.makedirs(UPLOAD_FOLDER_LOCAL, exist_ok=True)
