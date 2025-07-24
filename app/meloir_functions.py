@@ -304,7 +304,7 @@ def get_perplexity_events():
             "- Abbaye du Mont Saint Michel\n")
         history.append({"role": "user", "content": query_additions})
         response2 = client.chat.completions.create(
-            model="llama-3.1-sonar-large-128k-online",
+            model=PERPLEXITY_MODEL,
             messages=history
         )
         history.append({"role": "assistant", "content": response2.choices[0].message.content})
@@ -322,7 +322,7 @@ def get_perplexity_events():
         )
         history.append({"role": "user", "content": post_process_instruction})
         post_process_response = client.chat.completions.create(
-            model="llama-3.1-sonar-large-128k-online",  # or your chosen model
+            model=PERPLEXITY_MODEL,  
             messages=history
         )
         history.append({"role": "assistant", "content": post_process_response.choices[0].message.content})
@@ -341,7 +341,7 @@ def get_perplexity_events():
         )
         history.append({"role": "user", "content": formatting_instruction})
         formatted_response = client.chat.completions.create(
-            model="llama-3.1-sonar-large-128k-online",  # or your chosen model
+            model=PERPLEXITY_MODEL,
             messages=history
         )
         html_content = formatted_response.choices[0].message.content
