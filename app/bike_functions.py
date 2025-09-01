@@ -39,6 +39,7 @@ def update_b2_DB():
 ############################################################################
 # ONE-OFF DOWNLOAD LIME BIKE DATA
 def download_bikes(url_locations, url_types):
+    print(get_now_french() + ' Bike download start')
     disc = requests.get(url_locations).json()
     feeds = {f["name"]: f["url"] for f in disc["data"]["en"]["feeds"]}
     
@@ -63,6 +64,7 @@ def download_bikes(url_locations, url_types):
     vehicles = pd.DataFrame(vehicles)
     vehicles = vehicles[[c for c in vehicles.columns if (not (c in ['vehicle_type','form_factor','propulsion_type']))]]
     vehicles = vehicles.join(table_types, how='left', on='vehicle_type_id')
+    print(get_now_french() + ' Bike # entries '+str(vehicles.shape[0]))
     
     # Store the extraction time
     vehicles['DateTime'] = now_paris
@@ -72,6 +74,7 @@ def download_bikes(url_locations, url_types):
         vehicles[f] =vehicles[f].astype('category')
         
     # Return result
+    print(get_now_french() + ' Bike download end')
     return vehicles.copy()
 
 ############################################################################
@@ -81,7 +84,10 @@ def update_bike_db():
     x = download_bikes(URL_GBFS, URL_types)
     with open(DB_NAME_LOCAL, 'rb') as f:
         db = pickle.load(f)
+    log_msg('Bike entries before = ' + str(db.shape[0]))
     db = pd.concat([db, x], ignore_index=True)
+    log_msg('Bike entries additional = ' + str(x.shape[0]))
+    log_msg('Bike entries after = ' + str(db.shape[0]))
     with open(DB_NAME_LOCAL, 'wb') as f:
         pickle.dump(db, f)
     print(get_now_french() + ' ... bike data done & saved')
