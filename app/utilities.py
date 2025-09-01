@@ -60,6 +60,10 @@ def get_b2_bucket(bucket_name):
         b2_application_key_id = os.getenv('B2_BERGER_KEY_ID')
         b2_application_key = os.getenv('B2_BERGER_APPLICATION_KEY')
         b2_name = 'bergerbookings'
+    elif bucket_name == 'bikedata':
+        b2_application_key_id = os.getenv('B2_BIKEDATA_KEY_ID')
+        b2_application_key = os.getenv('B2_BIKEDATA_APPLICATION_KEY')
+        b2_name = 'bikedata'
     else:
         raise ValueError("Unknown bucket name: " + str(bucket_name))
     b2_api.authorize_account("production", b2_application_key_id, b2_application_key)
@@ -134,9 +138,16 @@ def french_date(dt_string):
 
 ##################################################################
 # UTILITY: CURRENT DATE AND TIME IN FRENCH, USING BABEL
-def get_now_french():
+
+# Return a datetime object
+def get_now_french_noformat():
     paris_tz = pytz.timezone('Europe/Paris')
     now_paris = datetime.now(paris_tz)
+    return now_paris
+
+# Return a string
+def get_now_french():
+    now_paris = get_now_french_noformat()
     formatted = format_datetime(now_paris, "EEE d MMMM y 'à' HH:mm", locale='fr_FR')
     return formatted
 

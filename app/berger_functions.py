@@ -342,7 +342,7 @@ def get_single_booking_confirmation_HTML(booking_code, type_query):
             <BR>
             <TABLE>
             <CAPTION>Si vous changez d'avis</CAPTION>
-            <TR><TD>Connectez-vous sur <a HREF=3D'http://www.ondesmusicales.com/paris'>http://www.ondesmusicales.com/paris</A></TD></TR>
+            <TR><TD>Connectez-vous sur <a HREF=3D'http://www.lesondesmusicales.com/paris'>http://www.lesondesmusicales.com/paris</A></TD></TR>
             </TABLE>
             <BR>
             </BODY>
