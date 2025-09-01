@@ -1,6 +1,6 @@
 import pandas as pd
 from flask import Flask, request
-from .utilities import push_b2_file,log_msg, download_file_from_b2_if_absent, get_now_french_noformat, get_now_french_formatted
+from .utilities import push_b2_file,log_msg, download_file_from_b2_if_absent, get_now_french_noformat, get_now_french
 import os
 import requests
 import pickle
@@ -77,16 +77,16 @@ def download_bikes(url_locations, url_types):
 ############################################################################
 # UPDATE THE BIKE DATABASE
 def update_bike_db():
-    print(get_now_french_formatted() + ' Downloading bike data...')
+    print(get_now_french() + ' Downloading bike data...')
     x = download_bikes(URL_GBFS, URL_types)
     with open(DB_NAME_LOCAL, 'rb') as f:
         db = pickle.load(f)
     db = pd.concat([db, x], ignore_index=True)
     with open(DB_NAME_LOCAL, 'wb') as f:
         pickle.dump(db, f)
-    print(get_now_french_formatted() + ' ... bike data done & saved')
+    print(get_now_french() + ' ... bike data done & saved')
     push_b2_file('bikedata',DB_NAME_LOCAL, DB_NAME_BB)
-    print(get_now_french_formatted() + ' pushed to BlackBlaze')
+    print(get_now_french() + ' pushed to BlackBlaze')
 
 ##################################################################
 # REGULAR CALL TO THE UPDATE_BIKE_DB_FUNCTION
