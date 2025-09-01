@@ -97,4 +97,4 @@ def periodic_query_bike():
     while True:
         log_msg('Periodic bike update through update_bike_db ')
         update_bike_db()
-        time.sleep(90 * 60)
+        time.sleep(30 * 60)
