@@ -45,4 +45,7 @@ def query_update_bike_db():
 # QUERY - BIKE DATABASE STATS
 @bp_bike.route('/bike_db_stats')
 def query_bike_dt_stats():
-    return get_bike_db_stats()
+    log_msg("querying DB stats")
+    dbstats = get_bike_db_stats()
+    log_msg("...done dbstats")
+    return dbstats
