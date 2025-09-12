@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from .bike_functions import update_bike_db
+from .bike_functions import update_bike_db, get_bike_db_stats
 from .bike_functions import DB_NAME_LOCAL, DB_NAME_BB
 from .utilities import throw_static_file, log_msg
 from flask import Blueprint
@@ -40,3 +40,9 @@ def query_update_bike_db():
     except Exception as e:
         logging.error(f"Force update failed: {str(e)}")
         return f"Error Force update: {str(e)}", 500
+
+##################################################################
+# QUERY - BIKE DATABASE STATS
+@bp_bike.route('/bike_db_stats')
+def query_bike_dt_stats():
+    return get_bike_db_stats()

@@ -104,3 +104,25 @@ def periodic_query_bike():
         log_msg('Periodic bike update through update_bike_db ')
         update_bike_db()
         time.sleep(30 * 60)
+
+############################################################################
+# GET BIKE DATABASE STATS
+def get_bike_db_stats():
+    print(get_now_french() + ' Creating bike stats...')
+
+    # Get DB
+    with open(DB_NAME_LOCAL, 'rb') as f:
+        db = pickle.load(f)
+
+    # Create summary Pandas
+    x_summary = db.groupby(by='DateTime')[['bike_id']].count().sort_index()
+    x_summary.index = [format_datetime(d,'dd-MM-y HH:mm',locale='fr_FR') for d in x_summary.index]
+    
+    # Create HTML
+    s = '<TABLE><tr><TH>Time</TH><TH></TH><TH>Count</TH>\n'
+    for d in x_summary.index:
+        s += '<TR><TD>' + d + '</TD><TD> - - </TD><TD>' + str(x_summary.loc[d, 'bike_id']) + '</TD>\n'
+    s += '</TABLE>\n'
+    
+    # Return HTML
+    return s
