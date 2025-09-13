@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from .bike_functions import update_bike_db, get_bike_db_stats
-from .bike_functions import DB_NAME_LOCAL, DB_NAME_BB
 from .utilities import throw_static_file, log_msg
 from flask import Blueprint
 import os
