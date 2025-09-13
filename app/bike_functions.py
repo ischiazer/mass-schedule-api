@@ -138,7 +138,7 @@ def update_bike_db():
 def periodic_query_bike():
     log_msg('Entering background function periodic_query_bike ')
     log_msg('Bike sleep start')
-    time.sleep(1 * 60)
+    time.sleep(19 * 60)
     log_msg('Bike sleep end')
     while True:
         log_msg('Periodic bike update through update_bike_db ')

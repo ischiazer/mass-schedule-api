@@ -137,8 +137,7 @@ def force_fetch_temperature():
 # REGULAR CALL TO THE SEA TEMPERATURE
 async def periodic_query_temperature(ref_app):
     log_msg(f"periodic_query_temperature pid= {os.getpid()}")
-    #await asyncio.sleep(60 * 60 * 3)   
-    await asyncio.sleep(7)   
+    await asyncio.sleep(60 * 60 * 1.111)   
     while True:
         try:
             log_msg('Periodic call to temperature within periodic_query_temperature ')
