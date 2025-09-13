@@ -1,11 +1,8 @@
-import nest_asyncio, os, pytz, asyncio,time
+import requests, pytz, os
 import pandas as pd
-from bs4 import BeautifulSoup
-from b2sdk.v2 import InMemoryAccountInfo, B2Api
-from playwright.async_api import async_playwright
+from datetime import datetime
 from babel.dates import format_datetime
-from datetime import datetime, timedelta
-from .utilities import push_b2_file,log_msg, get_now_french
+from .utilities import push_b2_file,log_msg
 
 ##################################################################
 # BASIC SET-UP
