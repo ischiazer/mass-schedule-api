@@ -260,17 +260,17 @@ def generate_confession_schedule():
 
 ##################################################################
 # REGULAR CALL TO THE generate_confession_schedule
-def periodic_confession():
-    log_msg('Entering background function periodic_confession ')
-    log_msg('Periodic confession sleep')
+def periodic_query_confessions():
+    log_msg('Entering background function periodic_query_confessions ')
+    log_msg('periodic_query_confessions sleep')
     time.sleep(19)
-    log_msg('Confession sleep end')
+    log_msg('periodic_query_confessions sleep end')
     while True:
-        log_msg('Periodic confession loop step ')
+        log_msg('periodic_query_confessions loop step ')
         try:
             generate_confession_schedule()
         except Exception as e:
-            log_msg('Error in periodic confession update: ' + str(e))
+            log_msg('Error in periodic_query_confessions update: ' + str(e))
         else:
-            log_msg('Periodic confession update done')
+            log_msg('periodic_query_confessions update done')
         time.sleep(12 * 60 * 60)
