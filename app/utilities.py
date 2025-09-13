@@ -151,6 +151,11 @@ def get_now_french():
     formatted = format_datetime(now_paris, "EEE d MMMM y 'à' HH:mm", locale='fr_FR')
     return formatted
 
+# Return a string with seconds
+def get_now_french_seconds():
+    now_paris = get_now_french_noformat()
+    formatted = format_datetime(now_paris, "EEE d MMMM y 'à' HH:mm:ss", locale='fr_FR')
+    return formatted
 
 ##################################################################
 # FUNCTION TO UPDATE LOG OF FILES BEING UPLOADED

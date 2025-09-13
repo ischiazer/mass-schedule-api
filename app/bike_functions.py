@@ -1,16 +1,38 @@
 import pandas as pd
 from flask import Flask, request
-from .utilities import push_b2_file,log_msg, download_file_from_b2_if_absent, get_now_french_noformat, get_now_french
+from .utilities import push_b2_file,log_msg, download_file_from_b2_if_absent, get_now_french_noformat, get_now_french, get_now_french_seconds
 import os
 import requests
-import pickle
 import time
+from sqlalchemy import create_engine, types
+from babel.dates import format_datetime
 
 ##################################################################
 # GLOBAL VARIABLES
 URL_GBFS = "https://data.lime.bike/api/partners/v2/gbfs/paris/gbfs.json"
 URL_types = 'https://data.lime.bike/api/partners/v2/gbfs/paris/vehicle_types.json'
 list_fields_cat = ['bike_id','propulsion_type','form_factor','DateTime']
+SQL_URL = os.getenv('RENDER_DB_URL')
+_sql_engine = None
+
+##################################################################
+# RETURN SQL ENGINE (AND START ONE IF THERE IS NONE)
+def get_sql_engine():
+    global _sql_engine
+    if _sql_engine is None:
+        _sql_engine = create_engine(
+            SQL_URL,
+            pool_size=5,
+            max_overflow=2,
+            pool_timeout=30,
+            pool_recycle=1800,
+            future=True
+        )
+    return _sql_engine
+
+##################################################################
+# START THE SQL ENGINE
+_temp = get_sql_engine()
 
 
 ##################################################################
@@ -19,22 +41,10 @@ if os.path.abspath('.').endswith(('/app/', '/app')):
     BASE_FOLDER = '../app_files/bike_files/'
 else:
     BASE_FOLDER = 'app_files/bike_files/'
-DB_NAME_LOCAL = os.path.abspath(BASE_FOLDER+'bike.pickle')
-DB_NAME_BB = 'bike.pickle'
 os.makedirs(BASE_FOLDER, exist_ok=True)
 log_msg('Bike python file dir  = ' + os.path.abspath('.'))
-log_msg('Bike local DB file = ' + DB_NAME_LOCAL)
 log_msg('Folder created for bike')
-#download_file_from_b2_if_absent('bikedata', DB_NAME_BB, DB_NAME_LOCAL)
 
-
-##################################################################
-# UPLOAD DATABASE TO BLACKBLAZE
-def update_b2_DB():
-    log_msg('Pushing bike DB to B2...')
-    push_b2_file('bikedata',DB_NAME_LOCAL, DB_NAME_BB)
-    log_msg('...Done')
-    
 
 ############################################################################
 # ONE-OFF DOWNLOAD LIME BIKE DATA
@@ -80,19 +90,44 @@ def download_bikes(url_locations, url_types):
 ############################################################################
 # UPDATE THE BIKE DATABASE
 def update_bike_db():
-    print(get_now_french() + ' Downloading bike data...')
+    # Get the new bike data
+    print(get_now_french_seconds() + ' Downloading bike data...')
     x = download_bikes(URL_GBFS, URL_types)
-    with open(DB_NAME_LOCAL, 'rb') as f:
-        db = pickle.load(f)
-    log_msg('Bike entries before = ' + str(db.shape[0]))
-    db = pd.concat([db, x], ignore_index=True)
-    log_msg('Bike entries additional = ' + str(x.shape[0]))
-    log_msg('Bike entries after = ' + str(db.shape[0]))
-    with open(DB_NAME_LOCAL, 'wb') as f:
-        pickle.dump(db, f)
-    print(get_now_french() + ' ... bike data done & saved')
-    push_b2_file('bikedata',DB_NAME_LOCAL, DB_NAME_BB)
-    print(get_now_french() + ' pushed to BlackBlaze')
+    print(get_now_french_seconds() + ' appending data to SQL database')
+    if pd.api.types.is_datetime64_any_dtype(x["date_time"]):
+        if x["date_time"].dt.tz is None:
+            x["date_time"] = x["date_time"].dt.tz_localize("UTC")
+        else:
+            x["date_time"] = x["date_time"].dt.tz_convert("UTC")
+
+    # dtype mapping for SQL
+    pg_types = {
+        "date_time":            types.DateTime(timezone=True),
+        "bike_id":              types.Text(),
+        "lat":                  types.Float(precision=53),
+        "lon":                  types.Float(precision=53),
+        "is_reserved":          types.Boolean(),
+        "is_disabled":          types.Boolean(),
+        "current_range_meters": types.Integer(),
+        "vehicle_type_id":      types.Text(),
+        "last_reported":        types.BigInteger(),
+        "form_factor":          types.Text(),
+        "propulsion_type":      types.Text(),
+    }
+
+    # Append newly downloaded data to SQL DB
+    print(get_now_french_seconds() + ' Starting SQL append query')
+    x.to_sql(
+        "bikeactivity",
+        get_sql_engine(),
+        if_exists="append",
+        index=False,
+        dtype=pg_types,
+        method="multi", 
+        chunksize=1000
+    )
+    print(get_now_french_seconds() + ' Completed SQL append query')
+
 
 ##################################################################
 # REGULAR CALL TO THE UPDATE_BIKE_DB_FUNCTION
@@ -100,7 +135,7 @@ def periodic_query_bike():
     log_msg('Entering background function periodic_query_bike ')
     time.sleep(3 * 60)
     log_msg('Sleep time elapsed for periodic_query_bike')
-    while False:
+    while True:
         log_msg('Periodic bike update through update_bike_db ')
         update_bike_db()
         time.sleep(30 * 60)
@@ -110,18 +145,19 @@ def periodic_query_bike():
 def get_bike_db_stats():
     print(get_now_french() + ' Creating bike stats...')
 
-    # Get DB
-    with open(DB_NAME_LOCAL, 'rb') as f:
-        db = pickle.load(f)
-
+    # Run query
+    print(get_now_french_seconds() + ' Querying SQL data stats')
+    query = "SELECT date_time, COUNT(*) AS n_rows FROM bikeactivity GROUP BY date_time ORDER BY date_time;"
+    x = pd.read_sql(query, get_sql_engine()).set_index('date_time')
+    print(get_now_french_seconds() + ' Qdone qerying SQL data stats')
+    
     # Create summary Pandas
-    x_summary = db.groupby(by='DateTime')[['bike_id']].count().sort_index()
-    x_summary.index = [format_datetime(d,'dd-MM-y HH:mm',locale='fr_FR') for d in x_summary.index]
+    x.index = [format_datetime(d.tz_convert("Europe/Paris"),'dd-MM-y HH:mm',locale='fr_FR') for d in x.index]
     
     # Create HTML
     s = '<TABLE><tr><TH>Time</TH><TH></TH><TH>Count</TH>\n'
-    for d in x_summary.index:
-        s += '<TR><TD>' + d + '</TD><TD> - - </TD><TD>' + str(x_summary.loc[d, 'bike_id']) + '</TD>\n'
+    for d in x.index:
+        s += '<TR><TD>' + d + '</TD><TD> - - </TD><TD>' + str(x.loc[d, 'n_rows']) + '</TD>\n'
     s += '</TABLE>\n'
     
     # Return HTML
