@@ -34,7 +34,7 @@ def query_update_bike_db():
         log_msg("update done")
         log_msg("Getting file...")
         log_msg(f"File name: local=<{DB_NAME_LOCAL}> BB=<{DB_NAME_BB}>")
-        x = 'bike updated''
+        x = 'bike updated'
         log_msg("...done")
         return x
     except Exception as e:
