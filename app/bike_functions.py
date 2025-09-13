@@ -11,7 +11,7 @@ from babel.dates import format_datetime
 # GLOBAL VARIABLES
 URL_GBFS = "https://data.lime.bike/api/partners/v2/gbfs/paris/gbfs.json"
 URL_types = 'https://data.lime.bike/api/partners/v2/gbfs/paris/vehicle_types.json'
-list_fields_cat = ['bike_id','propulsion_type','form_factor','DateTime']
+list_fields_cat = ['bike_id','propulsion_type','form_factor','date_time']
 SQL_URL = os.getenv('RENDER_DB_URL')
 _sql_engine = None
 
@@ -77,7 +77,7 @@ def download_bikes(url_locations, url_types):
     print(get_now_french() + ' Bike # entries '+str(vehicles.shape[0]))
     
     # Store the extraction time
-    vehicles['DateTime'] = now_paris
+    vehicles['date_time'] = now_paris
     
     # Convert into categories
     for f in list_fields_cat:
