@@ -172,4 +172,4 @@ def get_bike_db_stats():
     
     # Return HTML
     return s
-log_msg('Bike code read'
+log_msg('Bike code read')
