@@ -20,6 +20,7 @@ _sql_engine = None
 def get_sql_engine():
     global _sql_engine
     if _sql_engine is None:
+        log_msg('Bike DB engine set up starting')
         _sql_engine = create_engine(
             SQL_URL,
             pool_size=5,
@@ -28,6 +29,9 @@ def get_sql_engine():
             pool_recycle=1800,
             future=True
         )
+        log_msg('Bike DB engine set up done')
+    else:
+        log_msg('Bike DB engine already in place')
     return _sql_engine
 
 ##################################################################
