@@ -4,6 +4,7 @@ from app.meloir_functions import periodic_query_readings, periodic_query_vatican
 from app.bike_functions import periodic_query_bike
 from app.berger_confessions import periodic_query_confessions
 from app.berger_mass import periodic_query_berger_mass
+from app.berger_shops import periodic_query_berger_shops
 from app.utilities import log_msg
 import os
 import glob
@@ -63,7 +64,8 @@ def start_background_threads():
         periodic_query_bike,
         wrap_async(periodic_query_confessions),
         wrap_async(periodic_query_mass_schedule),  
-        wrap_async(periodic_query_berger_mass)
+        wrap_async(periodic_query_berger_mass),
+        periodic_query_berger_shops
     ]
 
 
