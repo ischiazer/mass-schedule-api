@@ -25,7 +25,7 @@ os.makedirs(BASE_FOLDER, exist_ok=True)
 log_msg('Bike python file dir  = ' + os.path.abspath('.'))
 log_msg('Bike local DB file = ' + DB_NAME_LOCAL)
 log_msg('Folder created for bike')
-download_file_from_b2_if_absent('bikedata', DB_NAME_BB, DB_NAME_LOCAL)
+#download_file_from_b2_if_absent('bikedata', DB_NAME_BB, DB_NAME_LOCAL)
 
 
 ##################################################################
@@ -100,7 +100,7 @@ def periodic_query_bike():
     log_msg('Entering background function periodic_query_bike ')
     time.sleep(3 * 60)
     log_msg('Sleep time elapsed for periodic_query_bike')
-    while True:
+    while False:
         log_msg('Periodic bike update through update_bike_db ')
         update_bike_db()
         time.sleep(30 * 60)
