@@ -8,7 +8,7 @@ from b2sdk.v2 import InMemoryAccountInfo, B2Api
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 from flask import Flask, request
-from .utilities import push_b2_file,log_msg
+from .utilities import push_b2_file,log_msg, get_now_french
 
 ##################################################################
 # BASIC SET-UP
