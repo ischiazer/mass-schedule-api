@@ -64,6 +64,18 @@ def get_b2_bucket(bucket_name):
         b2_application_key_id = os.getenv('B2_BIKEDATA_KEY_ID')
         b2_application_key = os.getenv('B2_BIKEDATA_APPLICATION_KEY')
         b2_name = 'bikedata'
+    elif bucket_name == 'bergerconfessions':
+        b2_application_key_id = os.getenv('B2_BERGERCONFESSIONS_KEY_ID')
+        b2_application_key = os.getenv('B2_BERGERCONFESSIONS_APPLICATION_KEY')
+        b2_name = 'bergerconfessions'
+    elif bucket_name == 'bergermesses':
+        b2_application_key_id = os.getenv('B2_BERGERMESSES_KEY_ID')
+        b2_application_key = os.getenv('B2_BERGERMESSES_APPLICATION_KEY')
+        b2_name = 'bergermesses'
+    elif bucket_name == 'bergershops':
+        b2_application_key_id = os.getenv('B2_BERGERSHOPS_KEYID')
+        b2_application_key = os.getenv('B2_BERGERSHOPS_APPLICATION_KEY')
+        b2_name = 'bergershops'
     else:
         raise ValueError("Unknown bucket name: " + str(bucket_name))
     b2_api.authorize_account("production", b2_application_key_id, b2_application_key)
