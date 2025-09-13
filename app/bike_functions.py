@@ -133,11 +133,17 @@ def update_bike_db():
 # REGULAR CALL TO THE UPDATE_BIKE_DB_FUNCTION
 def periodic_query_bike():
     log_msg('Entering background function periodic_query_bike ')
-    time.sleep(3 * 60)
-    log_msg('Sleep time elapsed for periodic_query_bike')
+    log_msg('Bike sleep start')
+    time.sleep(1 * 60)
+    log_msg('Bike sleep end')
     while True:
         log_msg('Periodic bike update through update_bike_db ')
-        update_bike_db()
+        try:
+            update_bike_db()
+        except Exception as e:
+            log_msg('Error in periodic bike update: ' + str(e))
+        else:
+            log_msg('Periodic bike update done')
         time.sleep(30 * 60)
 
 ############################################################################
@@ -162,3 +168,4 @@ def get_bike_db_stats():
     
     # Return HTML
     return s
+log_msg('Bike code read'
