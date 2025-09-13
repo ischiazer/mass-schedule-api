@@ -11,11 +11,11 @@ from .utilities import push_b2_file,log_msg, get_now_french
 # BASIC SET-UP
 HTML_PARIS_MASS_LOCAL = os.path.abspath('berger_mass_schedule.html')
 HTML_PARIS_MASS_BB = 'berger_mass_schedule.html'
-list_churches = {'Saint Charles de Monceau': {'direct': "https://www.saintcharlesdemonceau.com/horaires-acces/", 'messesinfo': "https://messes.info/lieu/75/paris-17/saint-charles-de-monceau"},
-               'Saint François de Sales': {'direct':"https://saintfrancoisdesales.fr/reconciliation/", 'messesinfo': "https://messes.info/lieu/75/paris-17/saint-francois-de-sales-ancienne-eglise"},
-               'Saint Augustin': {'direct': 'https://www.saintaugustin.net/horaires-des-messes', 'messesinfo': 'https://messes.info/lieu/75/paris-08/saint-augustin'},
-               'Saint Eugène': {'direct': "https://saint-eugene.net/informations-pratiques/horaires-messes-et-offices/", 'messesinfo': "https://messes.info/lieu/75/paris-09/saint-eugene"},
-               "Saint Sulpice": {'direct':"https://www.paroissesaintsulpice.paris/", 'messesinfo':"https://messes.info/lieu/75/paris-06/saint-sulpice"}
+list_churches = {'Saint Charles de Monceau': {'direct': "https://www.saintcharlesdemonceau.com/horaires-acces/", 'messesinfo': "https://messes.info/lieu/75/paris-17/saint-charles-de-monceau", 'messesinfo_messe': 'https://messes.info/horaires/eglise%20saint%20charles%20monceau%20diocese:pa%20dim%20toutecelebration?display=TABLE'},
+               'Saint François de Sales': {'direct':"https://saintfrancoisdesales.fr/reconciliation/", 'messesinfo': "https://messes.info/lieu/75/paris-17/saint-francois-de-sales-ancienne-eglise",'messesinfo_messe':'https://messes.info/horaires/75017%20saint%20francois%20de%20sales%20toutecelebration?display=TABLE'},
+               'Saint Augustin': {'direct': 'https://www.saintaugustin.net/horaires-des-messes', 'messesinfo': 'https://messes.info/lieu/75/paris-08/saint-augustin','messesinfo_messe':'https://messes.info/horaires/saint-augustin%20paris%2075008%20toutecelebration?display=TABLE'},
+               'Saint Eugène': {'direct': "https://saint-eugene.net/informations-pratiques/horaires-messes-et-offices/", 'messesinfo': "https://messes.info/lieu/75/paris-09/saint-eugene",'messesinfo_messe': 'https://messes.info/horaires/Saint-Eug%C3%A8ne%20-%20Sainte-C%C3%A9cile%20toutecelebration?display=TABLE'},
+               "Saint Sulpice": {'direct':"https://www.paroissesaintsulpice.paris/", 'messesinfo':"https://messes.info/lieu/75/paris-06/saint-sulpice",'messesinfo_messe':'https://messes.info/horaires/saint-sulpice%2075006%20paris%20%20toutecelebration?display=TABLE'}
                }
 list_churches_descr = {'Saint Charles de Monceau':{'short':'S. Charles','address':'22b rue Legendre','maplink':'https://maps.app.goo.gl/VKzr3wSUadnX5A5HA'},
                        'Saint François de Sales': {'short':'S. F. de Sales','address': '70 rue Jouffroy / 15 rue Ampère', 'maplink':'https://maps.app.goo.gl/ME2PSxXLUTqkbtuA9'},
@@ -93,7 +93,8 @@ def make_html_paris_mass_schedule():
     loop = asyncio.get_event_loop()
     list_mass = []
     for church in list_churches:
-        h = loop.run_until_complete(paris_mass_one_church(church,list_churches[church]))
+        log_msg(f'\tmake_html_paris_mass_schedule querying {church}')
+        h = loop.run_until_complete(paris_mass_one_church(church,list_churches[church]['messesinfo_messe']))
         list_mass += h
     
     # Store into pandas and clean up
