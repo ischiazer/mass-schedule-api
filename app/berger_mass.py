@@ -167,7 +167,7 @@ def make_html_paris_mass_schedule():
         html += '</TR>\n'
     html += '</TBODY>\n'
     html += '</TABLE>'
-    html += '<BR><BR><TABLE class="table_mass_times_berger">\n\t<TR>\n\t\t<TH></TH><TH style="font-weight: bold; color:#CE6D6A">Nom</TH><TH style="font-weight: bold; color:#CE6D6A" >Adresse</TH/><TH style="font-weight: bold; color:#CE6D6A">Map</TH></TR>\n'
+    html += '<BR><BR><TABLE class="table_mass_times_berger";font-size: 0.75em;>\n\t<TR>\n\t\t<TH></TH><TH style="font-weight: bold; color:#CE6D6A">Nom</TH><TH style="font-weight: bold; color:#CE6D6A" >Adresse</TH/><TH style="font-weight: bold; color:#CE6D6A">Map</TH></TR>\n'
     for c in list_churches_descr:
         maplink = list_churches_descr[c]['maplink']
         html += f'\t<TD>{list_churches_descr[c]["short"]}</TD><TD>{c}</TD><TD>{list_churches_descr[c]["address"]}</TD><TD><A HREF="{maplink}">Map</TD></TR>\n'

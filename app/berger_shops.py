@@ -2,7 +2,7 @@ import requests, pytz, os
 import pandas as pd
 from datetime import datetime
 from babel.dates import format_datetime
-from .utilities import push_b2_file,log_msg
+from .utilities import push_b2_file,log_msg, get_now_french
 import os, requests, time, pytz
 
 ##################################################################
@@ -212,7 +212,7 @@ def get_shop_opening_hours(shop_name, place_id):
 # MAKE HTML TABLE WITH CONTACT DETAILS OF SHOPS
 def make_shop_contact_table(list_shops):
     log_msg('Making HTML table of shop contact details')
-    html = '\n\n<TABLE style="line-height: 1.4;">\n<TR><TH style="text-align: left; color: #dd6666">Type</TH><TH style="text-align: left; color: #dd6666">Nom</TH><TH style="text-align: left; color: #dd6666">Adresse</TH><TH style="text-align: center; color: #dd6666">Lien carte</TH><TH style="text-align: center; color: #dd6666">Tél.</TH>\n</TR>\n'
+    html = '\n\n<TABLE style="line-height: 1.4;font-size: 0.75em;">\n<TR><TH style="text-align: left; color: #dd6666">Type</TH><TH style="text-align: left; color: #dd6666">Nom</TH><TH style="text-align: left; color: #dd6666">Adresse</TH><TH style="text-align: center; color: #dd6666">Lien carte</TH><TH style="text-align: center; color: #dd6666">Tél.</TH>\n</TR>\n'
     previous_type = ''
     for name in list_shops:
         type_shop = list_shops[name]['Type']
@@ -224,7 +224,7 @@ def make_shop_contact_table(list_shops):
         address = list_shops[name]['AddressDescription']
         link = list_shops[name]['maplink']
         phone = list_shops[name]['Phone']
-        html += f"<TR><TD>{name_type}</TD><TD>{name}</TD><TD>{address}</TD><TD style='text-align: center'><A HREF='{link}'>Map</A></TD><TD style='text-align: center; '><A HREF='{phone}' style='text-decoration: none;' >📞</A></TD></TR>\n"
+        html += f"<TR><TD><B>{name_type}</B></TD><TD>{name}</TD><TD>{address}</TD><TD style='text-align: center'><A HREF='{link}'>Map</A></TD><TD style='text-align: center; '><A HREF='{phone}' style='text-decoration: none;' >📞</A></TD></TR>\n"
     html += '</TABLE></HTML>\n'
     return html
 
@@ -287,7 +287,7 @@ def make_shop_times_HTML():
 
     # Make HTML table
     log_msg('Making HTML table of shop opening times')
-    html = '\n\n<TABLE style="border-collapse: collapse; line-height: 1.4;">\n<TR><TH style="text-align: left; color: #dd6666"></TH><TH style="text-align: left; color: #dd6666">Nom</TH>'
+    html = '\n\n<TABLE style="border-collapse: collapse; line-height: 1.4;font-size: 0.75em;">\n<TR><TH style="text-align: left; color: #dd6666"></TH><TH style="text-align: left; color: #dd6666">Nom</TH>'
     for d in day_names: 
         html += f'<TH style="text-align: left; color: #dd6666;text-align: center">{d}</TH>'
     html += '</TR>\n'
@@ -306,7 +306,8 @@ def make_shop_times_HTML():
             html += f'<TD style="text-align: center;">{row[d]}</TD>'
         html += '</TR>\n'
     html += '</TABLE></HTML>\n'
-    
+    html += f'<BR><span style="font-size: 10px;">Mise à jour: {get_now_french()}</SPAN><BR>'
+
     # Return table
     return html
 

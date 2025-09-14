@@ -232,7 +232,7 @@ def generate_confession_schedule():
     
 
     # Add church addresses
-    h = '<TABLE style="border-collapse:collapse;">\n'
+    h += '<TABLE style="border-collapse:collapse;">\n'
     h += '<TR><th style="color:#dd6666; text-align:left; padding-right:64px;">Eglise</th>\n'
     h += '<th style="color:#dd6666; text-align:left; padding-right:64px;">Adresse</th>\n'
     h += '<th style="color:#dd6666; text-align:left; padding-right:64px;">Plan</th>\n'
