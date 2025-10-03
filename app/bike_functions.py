@@ -148,7 +148,7 @@ def periodic_query_bike():
             log_msg('Error in periodic bike update: ' + str(e))
         else:
             log_msg('Periodic bike update done')
-        time.sleep(30 * 60)
+        time.sleep(10 * 60)
 
 ############################################################################
 # GET BIKE DATABASE STATS
