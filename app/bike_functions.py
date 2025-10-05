@@ -173,15 +173,18 @@ def update_dott_db():
 
     # Append newly downloaded data to SQL DB
     log_msg('Appending Dott data to SQL database - start')
-    x[[k for k in pg_types.keys()]].to_sql(
-        "dottbrussels",
-        get_sql_engine(),
-        if_exists="append",
-        index=False,
-        dtype=pg_types,
-        method="multi", 
-        chunksize=1000
-    )
+    try:
+        x[[k for k in pg_types.keys()]].to_sql(
+            "dottbrussels",
+            get_sql_engine(),
+            if_exists="append",
+            index=False,
+            dtype=pg_types,
+            method="multi", 
+            chunksize=1000
+        )
+    except Exception as e:
+        log_msg('Error in appending Dott data to SQL database: ' + str(e))
     log_msg('Appending Dott data to SQL database - end')
 
 
