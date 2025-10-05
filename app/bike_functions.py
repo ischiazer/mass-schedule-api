@@ -6,12 +6,14 @@ import requests
 import time
 from sqlalchemy import create_engine, types
 from babel.dates import format_datetime
+import datetime
 
 ##################################################################
 # GLOBAL VARIABLES
 URL_GBFS = "https://data.lime.bike/api/partners/v2/gbfs/paris/gbfs.json"
 URL_types = 'https://data.lime.bike/api/partners/v2/gbfs/paris/vehicle_types.json'
 list_fields_cat = ['bike_id','propulsion_type','form_factor','date_time']
+URL_DOTT = 'https://gbfs.api.ridedott.com/public/v2/brussels/free_bike_status.json'
 SQL_URL = os.getenv('RENDER_DB_URL')
 _sql_engine = None
 
@@ -92,7 +94,21 @@ def download_bikes(url_locations, url_types):
     return vehicles.copy()
 
 ############################################################################
-# UPDATE THE BIKE DATABASE
+# ONE-OFF DOWNLOAD DOTT BIKE DATA
+def download_dott_bikes():
+    log_msg('Downloading Dott bike data (1)')
+    t = pd.Timestamp(datetime.datetime.now()).tz_localize('Europe/Paris')
+    log_msg('Downloading Dott bike data (2)')
+    data = requests.get(URL_DOTT).json()
+    log_msg('Downloading Dott bike data (3)')
+    x = pd.DataFrame.from_dict(data['data']['bikes'])
+    x['Time'] = t
+    x['TimeStr'] = t.strftime('%Y-%m-%d %H:%M')
+    log_msg('Downloading Dott bike data (4 - done)')
+    return x
+
+############################################################################
+# UPDATE THE LIME BIKE DATABASE
 def update_bike_db():
     # Get the new bike data
     print(get_now_french_seconds() + ' Downloading bike data...')
@@ -133,12 +149,48 @@ def update_bike_db():
     print(get_now_french_seconds() + ' Completed SQL append query')
 
 
+############################################################################
+# UPDATE THE DOTT BIKE DATABASE
+def update_dott_db():
+    # Get the new dott data
+    x = download_dott_bikes()
+
+    # dtype mapping for SQL
+    pg_types = {
+        'bike_id':              types.Text(),
+        'current_range_meters': types.Float(),
+        "is_disabled":          types.Boolean(),
+        "is_reserved":          types.Boolean(),
+        "last_reported":        types.Float(),
+        "lat":                  types.Float(),
+        "lon":                  types.Float(),
+        "current_fuel_percent": types.Float(),
+        'pricing_plan_id':      types.Text(),
+        "vehicle_type_id":      types.Text(),
+        "Time":                 types.TIMESTAMP(timezone=True),
+        "TimeStr":              types.Text(),
+    }
+
+    # Append newly downloaded data to SQL DB
+    log_msg('Appending Dott data to SQL database - start')
+    x[[k for k in pg_types.keys()]].to_sql(
+        "dottbrussels",
+        get_sql_engine(),
+        if_exists="append",
+        index=False,
+        dtype=pg_types,
+        method="multi", 
+        chunksize=1000
+    )
+    log_msg('Appending Dott data to SQL database - end')
+
+
 ##################################################################
-# REGULAR CALL TO THE UPDATE_BIKE_DB_FUNCTION
+# REGULAR CALL TO THE LIME UPDATE_BIKE_DB_FUNCTION
 def periodic_query_bike():
     log_msg('Entering background function periodic_query_bike ')
     log_msg('Bike sleep start')
-    time.sleep(19 * 60)
+    time.sleep(7 * 60)
     log_msg('Bike sleep end')
     while True:
         log_msg('Periodic bike update through update_bike_db ')
@@ -148,7 +200,25 @@ def periodic_query_bike():
             log_msg('Error in periodic bike update: ' + str(e))
         else:
             log_msg('Periodic bike update done')
+        time.sleep(30 * 60)
+
+##################################################################
+# REGULAR CALL TO THE DOTT UPDATE_DOTT_DB_FUNCTION
+def periodic_query_dott():
+    log_msg('Entering background function periodic_query_dott ')
+    log_msg('Dott sleep start')
+    time.sleep(10)
+    log_msg('Dott sleep end')
+    while True:
+        log_msg('Periodic dott update through periodic_query_dott ')
+        try:
+            update_dott_db()
+        except Exception as e:
+            log_msg('Error in periodic Dott update: ' + str(e))
+        else:
+            log_msg('Periodic Dott update done')
         time.sleep(10 * 60)
+
 
 ############################################################################
 # GET BIKE DATABASE STATS

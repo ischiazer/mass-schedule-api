@@ -1,7 +1,7 @@
 import threading
 from app.temperature_functions import background_loop_temperature
 from app.meloir_functions import periodic_query_readings, periodic_query_vatican_news, periodic_query_perplexity, periodic_query_mass_schedule
-from app.bike_functions import periodic_query_bike
+from app.bike_functions import periodic_query_bike, periodic_query_dott
 from app.berger_confessions import periodic_query_confessions
 from app.berger_mass import periodic_query_berger_mass
 from app.berger_shops import periodic_query_berger_shops
@@ -62,6 +62,7 @@ def start_background_threads():
         periodic_query_perplexity,
         periodic_query_vatican_news,
         periodic_query_bike,
+        periodic_query_dott,
         wrap_async(periodic_query_confessions),
         wrap_async(periodic_query_mass_schedule),  
         wrap_async(periodic_query_berger_mass),
