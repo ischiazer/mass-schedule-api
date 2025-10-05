@@ -97,7 +97,7 @@ def download_bikes(url_locations, url_types):
 # ONE-OFF DOWNLOAD DOTT BIKE DATA
 def download_dott_bikes():
     log_msg('Downloading Dott bike data (1)')
-    t = pd.Timestamp(datetime.datetime.now()).tz_localize('Europe/Paris')
+    t = pd.Timestamp.now(tz='Europe/Paris')
     log_msg('Downloading Dott bike data (2)')
     data = requests.get(URL_DOTT).json()
     log_msg('Downloading Dott bike data (3)')
