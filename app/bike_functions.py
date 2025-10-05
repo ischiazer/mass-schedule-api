@@ -102,8 +102,8 @@ def download_dott_bikes():
     data = requests.get(URL_DOTT).json()
     log_msg('Downloading Dott bike data (3)')
     x = pd.DataFrame.from_dict(data['data']['bikes'])
-    x['ScrapeTime'] = t
-    x['TimeStr'] = t.strftime('%Y-%m-%d %H:%M')
+    x['scrape_time'] = t
+    x['time_str'] = t.strftime('%Y-%m-%d %H:%M')
     log_msg('Downloading Dott bike data (4 - done)')
     return x
 
@@ -167,8 +167,8 @@ def update_dott_db():
         "current_fuel_percent": types.Float(),
         'pricing_plan_id':      types.Text(),
         "vehicle_type_id":      types.Text(),
-        "ScrapeTime":           types.TIMESTAMP(timezone=True),
-        "TimeStr":              types.Text(),
+        "scrape_time":           types.TIMESTAMP(timezone=True),
+        "time_str":              types.Text(),
     }
 
     # Append newly downloaded data to SQL DB
