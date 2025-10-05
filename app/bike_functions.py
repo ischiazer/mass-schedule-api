@@ -103,8 +103,9 @@ def download_dott_bikes():
     log_msg('Downloading Dott bike data (3)')
     x = pd.DataFrame.from_dict(data['data']['bikes'])
     x['scrape_time'] = t
-    x['time_str'] = t.strftime('%Y-%m-%d %H:%M')
-    log_msg('Downloading Dott bike data (4 - done)')
+    t_str = t.strftime('%Y-%m-%d %H:%M')
+    x['time_str'] = t_str
+    log_msg('Downloading Dott bike data (4 - done time=' + t_str + ')')
     return x
 
 ############################################################################
@@ -136,7 +137,7 @@ def update_bike_db():
     }
 
     # Append newly downloaded data to SQL DB
-    print(get_now_french_seconds() + ' Starting SQL append query')
+    print(get_now_french_seconds() + ' Starting SQL append query ')
     x.to_sql(
         "bikeactivity",
         get_sql_engine(),
@@ -173,8 +174,9 @@ def update_dott_db():
 
     # Append newly downloaded data to SQL DB
     log_msg('Appending Dott data to SQL database - start')
+    log_msg('Dott data shape = ' + str(x.shape))
     try:
-        x[[k for k in pg_types.keys()]].to_sql(
+        n_added = x[[k for k in pg_types.keys()]].to_sql(
             "dottbrussels",
             get_sql_engine(),
             if_exists="append",
@@ -185,6 +187,8 @@ def update_dott_db():
         )
     except Exception as e:
         log_msg('Error in appending Dott data to SQL database: ' + str(e))
+    else:
+        log_msg('Appending Dott data to SQL database - successful - added ' + str(n_added) + ' rows'    )
     log_msg('Appending Dott data to SQL database - end')
 
 
