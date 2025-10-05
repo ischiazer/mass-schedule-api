@@ -174,6 +174,8 @@ def update_dott_db():
 
     # Append newly downloaded data to SQL DB
     log_msg('Appending Dott data to SQL database - start')
+    n_rows = int(pd.read_sql('SELECT COUNT(*) FROM dottbrussels', get_sql_engine()).iloc[0,0])
+    log_msg('Dott rows before = ' + str(n_rows))
     log_msg('Dott data shape = ' + str(x.shape))
     try:
         n_added = x[[k for k in pg_types.keys()]].to_sql(
@@ -190,6 +192,8 @@ def update_dott_db():
         log_msg('Error in appending Dott data to SQL database: ' + str(e))
     else:
         log_msg('Appending Dott data to SQL database - successful - added ' + str(n_added) + ' rows'    )
+    n_rows = int(pd.read_sql('SELECT COUNT(*) FROM dottbrussels', get_sql_engine()).iloc[0,0])
+    log_msg('Dott rows after = ' + str(n_rows))
     log_msg('Appending Dott data to SQL database - end')
 
 
