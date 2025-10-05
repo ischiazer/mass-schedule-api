@@ -176,6 +176,8 @@ def update_dott_db():
     log_msg('Appending Dott data to SQL database - start')
     n_rows = int(pd.read_sql('SELECT COUNT(*) FROM dottbrussels', get_sql_engine()).iloc[0,0])
     log_msg('Dott rows before = ' + str(n_rows))
+    scrape_time = x['time_str'].iloc[0]
+    log_msg('Dott scrape_time = ' + scrape_time)
     log_msg('Dott data shape = ' + str(x.shape))
     try:
         n_added = x[[k for k in pg_types.keys()]].to_sql(
