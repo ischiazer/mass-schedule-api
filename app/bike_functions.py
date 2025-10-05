@@ -16,6 +16,31 @@ list_fields_cat = ['bike_id','propulsion_type','form_factor','date_time']
 URL_DOTT = 'https://gbfs.api.ridedott.com/public/v2/brussels/free_bike_status.json'
 SQL_URL = os.getenv('RENDER_DB_URL')
 _sql_engine = None
+URL_sources_all_bikes = [
+    ['dott','paris', 'https://gbfs.api.ridedott.com/public/v2/paris/free_bike_status.json'],
+    ['dott','brussels', 'https://gbfs.api.ridedott.com/public/v2/brussels/free_bike_status.json'],
+    ['dott','milan', 'https://gbfs.api.ridedott.com/public/v2/milan/free_bike_status.json'],
+    ['dott','rome', 'https://gbfs.api.ridedott.com/public/v2/rome/free_bike_status.json'],
+    ['dott','munich', 'https://gbfs.api.ridedott.com/public/v2/munich/free_bike_status.json'],
+    ['dott','frankfurt','https://gbfs.api.ridedott.com/public/v2/frankfurt/free_bike_status.json'],
+    ['dott','hamburg', 'https://gbfs.api.ridedott.com/public/v2/hamburg/free_bike_status.json'],
+    ['dott','berlin','https://gbfs.api.ridedott.com/public/v2/berlin/free_bike_status.json'],
+    ['dott','copenhagen','https://gbfs.api.ridedott.com/public/v2/copenhagen/free_bike_status.json'],
+    ['dott','warsaw', 'https://gbfs.api.ridedott.com/public/v2/warsaw/free_bike_status.json'],
+    ['dott','lyon', 'https://gbfs.api.ridedott.com/public/v2/lyon/free_bike_status.json'],
+    ['dott','budapest', 'https://gbfs.api.ridedott.com/public/v2/budapest/free_bike_status.json'],
+    ['dott','leipzig', 'https://gbfs.api.ridedott.com/public/v2/leipzig/free_bike_status.json'],
+    ['dott','cologne','https://gbfs.api.ridedott.com/public/v2/cologne/free_bike_status.json'],
+    ['bird','milan','https://mds.bird.co/gbfs/v2/public/milan/free_bike_status.json'],
+    ['bird','rome','https://mds.bird.co/gbfs/v2/public/rome/free_bike_status.json'],
+    ['bird','barcelona','https://mds.bird.co/gbfs/v2/public/barcelona/free_bike_status.json'],
+    ['bird','madrid','https://mds.bird.co/gbfs/v2/public/madrid/free_bike_status.json'],
+    ['bird','zurich','https://mds.bird.co/gbfs/v2/public/zurich/free_bike_status.json'],
+    ['bird','lisbon','https://mds.bird.co/gbfs/v2/public/lisbon/free_bike_status.json'],
+    ['donkey','barcelona','https://stables.donkey.bike/api/public/gbfs/2/donkey_barcelona/en/free_bike_status.json'],
+    ['donkey','copenhagen', 'https://stables.donkey.bike/api/public/gbfs/2/donkey_copenhagen/en/free_bike_status.json'],
+    ['donkey','geneva','https://stables.donkey.bike/api/public/gbfs/2/donkey_ge/de/free_bike_status.json']
+]
 
 ##################################################################
 # RETURN SQL ENGINE (AND START ONE IF THERE IS NONE)
@@ -106,6 +131,31 @@ def download_dott_bikes():
     t_str = t.strftime('%Y-%m-%d %H:%M')
     x['time_str'] = t_str
     log_msg('Downloading Dott bike data (4 - done time=' + t_str + ')')
+    return x
+############################################################################
+# ONE-OFF DOWNLOAD DOTT BIKE DATA
+def download_all_bikes():
+    log_msg('Downloading all cities bike data (1)')
+    list_data = []
+    for source in URL_sources_all_bikes:
+        provider = source[0]
+        city = source[1]
+        url = source[2]
+        log_msg('\n==> Bikes ==> ' + provider + ' / ' + city)
+        log_msg('\tDownloading bike data (1)')
+        t = pd.Timestamp.now(tz='Europe/Paris')
+        log_msg('\tDownloading all cities bike data (2)')
+        data = requests.get(url).json()
+        log_msg('\tDownloading all cities bike data (3)')
+        x = pd.DataFrame.from_dict(data['data']['bikes'])
+        x['scrape_time'] = t
+        t_str = t.strftime('%Y-%m-%d %H:%M')
+        x['time_str'] = t_str
+        x['city'] = city
+        x['provider'] = provider
+        log_msg('Downloading all cities bike data (4 - done time=' + t_str + ')')
+        list_data.append(x)
+    x = pd.concat(list_data)
     return x
 
 ############################################################################
@@ -199,6 +249,59 @@ def update_dott_db():
     log_msg('Appending Dott data to SQL database - end')
 
 
+
+############################################################################
+# UPDATE THE ALL-CITIES BIKE DATABASE
+def update_all_bikes_db():
+    # Get the new all-cities bike data
+    x = download_all_bikes()
+
+    # dtype mapping for SQL
+    pg_types = {
+        'bike_id':              types.Text(),
+        "lat":                  types.Float(),
+        "lon":                  types.Float(),
+        "is_reserved":          types.Boolean(),
+        "is_disabled":          types.Boolean(),
+        'current_range_meters': types.Float(),
+        "last_reported":        types.Float(),
+        "scrape_time":          types.TIMESTAMP(timezone=True),
+        "time_str":             types.Text(),
+        'city':                 types.Text(),
+        'provider':             types.Text(),
+        "current_fuel_percent": types.Float(),
+        'pricing_plan_id':      types.Text(),
+        'station_id':           types.Text(),
+        "vehicle_type_id":      types.Text(),
+    }
+
+    # Append newly downloaded data to SQL DB
+    log_msg('Appending all cities bike data to SQL database - start')
+    n_rows = int(pd.read_sql('SELECT COUNT(*) FROM all_bikes', get_sql_engine()).iloc[0,0])
+    log_msg('All-cities rows before = ' + str(n_rows))
+    scrape_time = x['time_str'].iloc[0]
+    log_msg('All-cities scrape_time = ' + scrape_time)
+    log_msg('All-cities data shape = ' + str(x.shape))
+    try:
+        n_added = x[[k for k in pg_types.keys()]].to_sql(
+            "all_bikes",
+            get_sql_engine(),
+            if_exists="append",
+            schema="public",
+            index=False,
+            dtype=pg_types,
+            method="multi", 
+            chunksize=1000
+        )
+    except Exception as e:
+        log_msg('Error in appending all-cities bike data to SQL database: ' + str(e))
+    else:
+        log_msg('Appending all-cities bike data to SQL database - successful - added ' + str(n_added) + ' rows'    )
+    n_rows = int(pd.read_sql('SELECT COUNT(*) FROM all_bikes', get_sql_engine()).iloc[0,0])
+    log_msg('All-cities rows after = ' + str(n_rows))
+    log_msg('Appending all-cities bike data to SQL database - end')
+
+
 ##################################################################
 # REGULAR CALL TO THE LIME UPDATE_BIKE_DB_FUNCTION
 def periodic_query_bike():
@@ -221,7 +324,7 @@ def periodic_query_bike():
 def periodic_query_dott():
     log_msg('Entering background function periodic_query_dott ')
     log_msg('Dott sleep start')
-    time.sleep(10)
+    time.sleep(60*4)
     log_msg('Dott sleep end')
     while True:
         log_msg('Periodic dott update through periodic_query_dott ')
@@ -231,6 +334,22 @@ def periodic_query_dott():
             log_msg('Error in periodic Dott update: ' + str(e))
         else:
             log_msg('Periodic Dott update done')
+        time.sleep(10 * 60)
+##################################################################
+# REGULAR CALL TO THE ALL-CITIES periodic_query_all_bikes
+def periodic_query_all_bikes():
+    log_msg('Entering background function periodic_query_dott ')
+    log_msg('All-cities sleep start')
+    time.sleep(10)
+    log_msg('All-cities sleep end')
+    while True:
+        log_msg('Periodic all-cities update through periodic_query_all_bikes ')
+        try:
+            update_all_bikes_db()
+        except Exception as e:
+            log_msg('Error in periodic all-cities update: ' + str(e))
+        else:
+            log_msg('Periodic all-cities update done')
         time.sleep(10 * 60)
 
 
