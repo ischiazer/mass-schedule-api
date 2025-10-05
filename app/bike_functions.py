@@ -182,7 +182,7 @@ def update_dott_db():
             "dottbrussels",
             get_sql_engine(),
             if_exists="append",
-            schema="public"
+            schema="public",
             index=False,
             dtype=pg_types,
             method="multi", 
