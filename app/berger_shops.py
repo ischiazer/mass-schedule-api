@@ -248,35 +248,38 @@ def make_shop_times_HTML():
         if list_hours[shop] is None:
             map_times.loc[shop, :] = '-'
         else:
-            for m in list_hours[shop]['periods']:
-                times_open = m['open']
-                times_close = m['close']
-                if True or (times_open['day'] == times_close['day']):
-                    day_number = times_open['day']
-                    day_name = day_names[day_number]
-                    s = ''
-                    for t in [times_open['time'],times_close['time']]:
-                        if len(t) == 4:
-                            if t[0] == '0':
-                                t_hours = t[1]
+            if not ('periods' in list_hours[shop]):
+                print('no -periods- field in ', shop)
+            else:
+                for m in list_hours[shop]['periods']:
+                    times_open = m['open']
+                    times_close = m['close']
+                    if True or (times_open['day'] == times_close['day']):
+                        day_number = times_open['day']
+                        day_name = day_names[day_number]
+                        s = ''
+                        for t in [times_open['time'],times_close['time']]:
+                            if len(t) == 4:
+                                if t[0] == '0':
+                                    t_hours = t[1]
+                                else:
+                                    t_hours = t[:2]
+                                if t[-2:] == '00':
+                                    t_min = ''
+                                else:
+                                    t_min = t[2:]
+                                s += t_hours + 'h' + t_min
                             else:
-                                t_hours = t[:2]
-                            if t[-2:] == '00':
-                                t_min = ''
-                            else:
-                                t_min = t[2:]
-                            s += t_hours + 'h' + t_min
+                                s += '?'
+                            s += '-'
+                        s = s[:-1]
+                        if map_times.loc[shop, day_name] == '':
+                            sep = ''
                         else:
-                            s += '?'
-                        s += '-'
-                    s = s[:-1]
-                    if map_times.loc[shop, day_name] == '':
-                        sep = ''
+                            sep = '<BR>'
+                        map_times.loc[shop, day_name] = map_times.loc[shop, day_name] + sep + s
                     else:
-                        sep = '<BR>'
-                    map_times.loc[shop, day_name] = map_times.loc[shop, day_name] + sep + s
-                else:
-                    map_times.loc[shop, :] = '.'
+                        map_times.loc[shop, :] = '.'
     map_times = map_times.reset_index().rename({'index':'Nom'}, axis=1)
     map_times[' '] = [list_shops[s]['Type'] for s in map_times.Nom]
     map_times.set_index(' ', inplace=True)
