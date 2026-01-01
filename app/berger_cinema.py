@@ -28,7 +28,7 @@ def query_current_cinema():
 def periodic_cinema_update():
     log_msg('Entering background function periodic_cinema_update ')
     log_msg('periodic_cinema_update sleep')
-    time.sleep(3)
+    time.sleep(1)
     log_msg('periodic_cinema_update sleep end')
     while True:
         log_msg('periodic_cinema_update loop step ')
