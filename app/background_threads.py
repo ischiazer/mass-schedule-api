@@ -5,6 +5,7 @@ from app.bike_functions import periodic_query_bike, periodic_query_dott, periodi
 from app.berger_confessions import periodic_query_confessions
 from app.berger_mass import periodic_query_berger_mass
 from app.berger_shops import periodic_query_berger_shops
+from app.berger_cinema import periodic_cinema_update
 from app.utilities import log_msg
 import os
 import glob
@@ -67,7 +68,8 @@ def start_background_threads():
         wrap_async(periodic_query_confessions),
         wrap_async(periodic_query_mass_schedule),  
         wrap_async(periodic_query_berger_mass),
-        periodic_query_berger_shops
+        periodic_query_berger_shops,
+        periodic_cinema_update
     ]
 
 
