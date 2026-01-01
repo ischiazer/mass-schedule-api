@@ -13,7 +13,7 @@ from . import lib_tmdb
 from html import escape
 from urllib.parse import quote
 from pathlib import Path
-from .utilities import get_now_french, push_b2_file, download_file_from_b2
+from .utilities import get_now_french, push_b2_file, download_file_from_b2, log_msg
 
 ##################################################################
 # INITIALISATION
