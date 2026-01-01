@@ -516,7 +516,7 @@ def periodic_query_vatican_news():
 # REGULAR CALL TO PERPLEXITY
 def periodic_query_perplexity():
     log_msg('Entering background function periodic_query_perplexity ')
-    time.sleep(1.1 * 60)
+    time.sleep(21.1 * 60)
     log_msg('Sleep time elapsed for periodic_query_perplexity')
     while True:
         log_msg('Periodic call to perplexity within periodic_query_perplexity ')

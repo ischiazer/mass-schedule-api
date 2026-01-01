@@ -925,9 +925,12 @@ def add_TMBD_details():
 ############################################################
 # PRODUCE HTML TABLE FOR VIEWING
 
-def make_HTML():
+# Resolve template relative to this file so it works both locally
+# and on Render, regardless of the current working directory.
+TEMPLATE_PATH = (Path(__file__).resolve().parent.parent
+                                 / 'app_files' / 'berger_files' / 'film_table_template.html')
 
-  TEMPLATE_PATH = Path('../app_files/berger_files/film_table_template.html')
+def make_HTML():
   BASE_HEADERS = [
       "","Film","Genre","Cinemas"
   ]

@@ -340,7 +340,7 @@ def periodic_query_dott():
 def periodic_query_all_bikes():
     log_msg('Entering background function periodic_query_dott ')
     log_msg('All-cities sleep start')
-    time.sleep(10)
+    time.sleep(9*60)
     log_msg('All-cities sleep end')
     while True:
         log_msg('Periodic all-cities update through periodic_query_all_bikes ')
