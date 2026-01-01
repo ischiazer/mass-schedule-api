@@ -1,100 +1,3 @@
-# %%
-
-##################################################################
-# CONNECT TO BLACKBLAZE
-from babel.dates import format_datetime
-import pytz
-from datetime import datetime
-from b2sdk.v2 import InMemoryAccountInfo, B2Api
-import logging
-
-##################################################################
-# LOG MESSAGES ON CONSOLE AND FILE
-def log_msg(msg):
-    logging.info(msg)
-    d = datetime.now(pytz.timezone('Europe/Paris'))
-    d_str = format_datetime(d, "d-MM-y HH:mm:ss", locale='fr_FR')
-    if not isinstance(msg, str):
-        msg = str(msg)
-    print(d_str + ' ' + msg,flush=True)
-
-def get_b2_bucket(bucket_name):
-    b2_info = InMemoryAccountInfo()
-    b2_api = B2Api(b2_info)
-    if bucket_name == 'meloir':
-        b2_application_key_id = os.getenv("B2_MELOIR_KEY_ID")
-        b2_application_key = os.getenv("B2_MELOIR_APPLICATION_KEY")
-        b2_name = 'MeloirFiles'
-    elif bucket_name == 'temperature':
-        b2_application_key_id = os.getenv("B2_MELOIR_KEY_ID")
-        b2_application_key = os.getenv("B2_MELOIR_APPLICATION_KEY")
-        b2_name = 'MeloirFiles'
-    elif bucket_name == 'berger':
-        b2_application_key_id = os.getenv('B2_BERGER_KEY_ID')
-        b2_application_key = os.getenv('B2_BERGER_APPLICATION_KEY')
-        b2_name = 'bergerbookings'
-    elif bucket_name == 'bikedata':
-        b2_application_key_id = os.getenv('B2_BIKEDATA_KEY_ID')
-        b2_application_key = os.getenv('B2_BIKEDATA_APPLICATION_KEY')
-        b2_name = 'bikedata'
-    elif bucket_name == 'bergerconfessions':
-        b2_application_key_id = os.getenv('B2_BERGERCONFESSIONS_KEY_ID')
-        b2_application_key = os.getenv('B2_BERGERCONFESSIONS_APPLICATION_KEY')
-        b2_name = 'bergerconfessions'
-    elif bucket_name == 'bergermesses':
-        b2_application_key_id = os.getenv('B2_BERGERMESSES_KEY_ID')
-        b2_application_key = os.getenv('B2_BERGERMESSES_APPLICATION_KEY')
-        b2_name = 'bergermesses'
-    elif bucket_name == 'bergershops':
-        b2_application_key_id = os.getenv('B2_BERGERSHOPS_KEYID')
-        b2_application_key = os.getenv('B2_BERGERSHOPS_APPLICATION_KEY')
-        b2_name = 'bergershops'
-    else:
-        raise ValueError("Unknown bucket name: " + str(bucket_name))
-    b2_api.authorize_account("production", b2_application_key_id, b2_application_key)
-    
-    return b2_api.get_bucket_by_name(b2_name)
-
-##################################################################
-# UPLOAD FILE TO BLACKBLAZE
-def push_b2_file(bucket_name, file_local, file_BB):
-    bucket = get_b2_bucket(bucket_name)
-    bucket.upload_local_file(
-        local_file=file_local,
-        file_name=file_BB
-    )
-##################################################################
-# DOWNLOAD FILE FROM BLACKBLAZE
-def download_file_from_b2(bucket_name, file_name_BB, local_path):
-    log_msg('Getting bucket...')
-    bucket = get_b2_bucket(bucket_name)
-    log_msg('Done')
-    log_msg('Downloading file from BB:'+ str(file_name_BB))
-    x = bucket.download_file_by_name(file_name_BB)
-    log_msg('Save file '+ str(local_path))
-    x.save_to(local_path)
-    log_msg('Done')
-    log_msg(f"Downloaded '{file_name_BB}' to '{local_path}'")
-
-# Return a datetime object
-def get_now_french_noformat():
-    paris_tz = pytz.timezone('Europe/Paris')
-    now_paris = datetime.now(paris_tz)
-    return now_paris
-
-# Return a string
-def get_now_french():
-    now_paris = get_now_french_noformat()
-    formatted = format_datetime(now_paris, "EEE d MMMM y 'à' HH:mm", locale='fr_FR')
-    return formatted
-
-# Return a string with seconds
-def get_now_french_seconds():
-    now_paris = get_now_french_noformat()
-    formatted = format_datetime(now_paris, "EEE d MMMM y 'à' HH:mm:ss", locale='fr_FR')
-    return formatted
-
-
 
 import os, time, json
 import requests, re
@@ -106,7 +9,7 @@ from datetime import date, timedelta, datetime
 import unicodedata
 import urllib.parse
 import unicodedata
-import lib_tmdb
+from . import lib_tmdb
 from html import escape
 from urllib.parse import quote
 from pathlib import Path
