@@ -122,7 +122,7 @@ def get_direct_church_confession_perplexity(church_name, openAI_client, url):
         run_status = openAI_client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
         if run_status.status in ["completed", "failed"]:
             break
-        time.sleep(1)
+        time.sleep(17*60)
     
     # Get the assistant reply
     log_msg('\tGetting confessions OpenAI answer')

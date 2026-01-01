@@ -339,7 +339,7 @@ def make_overall_shop_HTML():
 def periodic_query_berger_shops():
     log_msg('Entering background function periodic_query_berger_shops ')
     log_msg('periodic_query_berger_shops sleep')
-    time.sleep(1)
+    time.sleep(60*29)
     log_msg('periodic_query_berger_shops sleep end')
     while True:
         log_msg('periodic_query_berger_shops loop step ')

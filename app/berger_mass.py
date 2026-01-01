@@ -198,7 +198,7 @@ def make_html_paris_mass_schedule():
 def periodic_query_berger_mass():
     log_msg('Entering background function periodic_query_berger_mass ')
     log_msg('periodic_query_berger_mass sleep')
-    time.sleep(3)
+    time.sleep(13*60)
     log_msg('periodic_query_berger_mass sleep end')
     while True:
         log_msg('periodic_query_berger_mass loop step ')
