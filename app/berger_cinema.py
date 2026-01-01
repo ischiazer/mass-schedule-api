@@ -17,7 +17,7 @@ def query_current_cinema():
     log_msg(f"Force cinema update  pid= {os.getpid()}")
     try:
         run_cinema_update()
-        return 'Done''
+        return 'Done'
     except Exception as e:
         logging.error(f"Cinema update failed: {e}")
         return f"Error update cinema: {e}", 500
