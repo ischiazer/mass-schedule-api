@@ -1,0 +1,180 @@
+<style>
+  .film-table-page {
+    width: 100vw;
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px 0;
+    background: #ffffff;
+  }
+  .film-table-container {
+    width: 100%;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    color: #000000;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #ffffff;
+  }
+  .film-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .film-table thead th {
+    text-align: left;
+    color: #C0716D;
+    border-bottom: 1px solid #C0716D;
+    font-weight: 600;
+    padding: 8px 6px;
+    white-space: nowrap;
+  }
+  .film-table tbody td {
+    color: #000000;
+    border-bottom: 1px solid #E0E0E0;
+    padding: 10px 6px;
+    vertical-align: top;
+    word-break: break-word;
+  }
+  .film-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+  .film-eye-btn,
+  .film-youtube-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #C0716D;
+  }
+  .film-eye-btn:focus,
+  .film-youtube-btn:focus {
+    outline: 2px solid #C0716D;
+    outline-offset: 2px;
+  }
+  .film-youtube-btn.disabled {
+    cursor: default;
+    color: #bbbbbb;
+  }
+  .col-poster { width: 9%; min-width: 90px; }
+  .col-title { width: 18%; min-width: 210px; }
+  .col-eye { width: 3%; text-align: center; }
+  .col-youtube { width: 3%; text-align: center; }
+  .col-director { width: 12%; min-width: 120px; }
+  .col-year { width: 7%; min-width: 65px; }
+  .col-genre { width: 8%; min-width: 95px; }
+  .col-country { width: 8%; min-width: 90px; }
+  .col-cinemas { width: 15%; min-width: 200px; }
+  .col-schedule { width: 17%; min-width: 220px; }
+  .poster-thumb {
+    width: 70px;
+    height: 100px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f3f3f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .poster-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .poster-thumb--placeholder {
+    border: 1px solid #dddddd;
+  }
+  .synopsis-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.45);
+  }
+  .synopsis-modal-content {
+    background: #ffffff;
+    margin: 6% auto;
+    padding: 24px 28px;
+    border-radius: 12px;
+    max-width: 760px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .close-synopsis {
+    float: right;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 18px;
+    color: #C0716D;
+  }
+  .modal-body {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .modal-poster-img {
+    width: 190px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
+  .modal-poster-placeholder {
+    width: 190px;
+    height: 270px;
+    border-radius: 8px;
+    background: #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888888;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .modal-details {
+    flex: 1;
+  }
+  .modal-details h3 {
+    margin-top: 0;
+    color: #C0716D;
+  }
+  .modal-section {
+    margin-top: 18px;
+  }
+  .modal-section h4 {
+    margin: 0 0 8px;
+    font-size: 0.95rem;
+    color: #C0716D;
+  }
+  @media (max-width: 900px) {
+    .film-table { table-layout: auto; }
+    .film-table thead th, .film-table tbody td { padding: 8px 4px; }
+    .film-table-page { padding: 12px 0; }
+    .modal-body { flex-direction: column; align-items: center; }
+    .synopsis-modal-content { margin: 4% 12px; }
+  }
+</style>
+<script>
+  document.addEventListener('keydown', function(event) {
+    var key = event.key || event.keyCode;
+    if (key === 'Escape' || key === 'Esc' || key === 27) {
+      var modals = document.getElementsByClassName('synopsis-modal');
+      for (var i = 0; i < modals.length; i++) {
+        modals[i].style.display = 'none';
+      }
+    }
+  });
+</script>
+<div class="film-table-page">
+  <div class="film-table-container">
+    <table class="film-table">
+      __COLGROUP__
+      __TABLE_HEAD__
+      __TABLE_BODY__
+    </table>
+  </div>
+  __MODALS__
+</div>
