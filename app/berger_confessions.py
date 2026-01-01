@@ -263,7 +263,7 @@ def generate_confession_schedule():
 def periodic_query_confessions():
     log_msg('Entering background function periodic_query_confessions ')
     log_msg('periodic_query_confessions sleep')
-    time.sleep(19)
+    time.sleep(39*60)
     log_msg('periodic_query_confessions sleep end')
     while True:
         log_msg('periodic_query_confessions loop step ')

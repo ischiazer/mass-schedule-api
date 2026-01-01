@@ -18,11 +18,13 @@ def register_blueprints(app):
     from .meloir import bp_meloir
     from .temperature import bp_temperature
     from .bike import bp_bike
+    from .berger_cinema import bp_cinema
 
     app.register_blueprint(bp_berger, url_prefix="")
     app.register_blueprint(bp_meloir, url_prefix="")
     app.register_blueprint(bp_temperature, url_prefix="")
     app.register_blueprint(bp_bike, url_prefix="")
+    app.register_blueprint(bp_cinema, url_prefix="")
     log_msg('/ end of register_bluperint function/')
 
 ##################################################################
