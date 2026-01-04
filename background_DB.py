@@ -26,7 +26,7 @@ def log(msg: str):
         print(f"{ts} [logger] failed to write log file: {e!r}", flush=True)
 
 def main():
-    dsn = os.environ["DATABASE_URL"]
+    dsn = os.environ["RENDER_DB_URL"]
 
     log(f"[startup] backfill worker starting")
     log(f"[startup] log file: {LOG_PATH}")
