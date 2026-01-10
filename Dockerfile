@@ -10,7 +10,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Add French language and time
 RUN apt-get update && \
-    apt-get install -y locales && \
+    apt-get install -y --no-install-recommends locales micro nano less && \
     locale-gen fr_FR.UTF-8 && \
     update-locale LANG=fr_FR.UTF-8
 ENV LANG fr_FR.UTF-8
