@@ -315,6 +315,224 @@ def update_all_bikes_db_new():
         log_msg("No data downloaded; nothing to do.")
         return
 
+    UNKNOWN = "<UNKNOWN>"
+    UNKNOWN_STATION_ID = -1  # only safe if real station IDs are never negative
+
+    # 2) Keep only expected raw columns (matches your stage schema)
+    cols = [
+        "bike_id", "lat", "lon", "is_reserved", "is_disabled",
+        "current_range_meters", "vehicle_type_id", "last_reported",
+        "scrape_time", "time_str", "city", "provider",
+        "current_fuel_percent", "pricing_plan_id", "station_id",
+    ]
+    x = x[cols].copy()
+
+    # Ensure scrape_time is tz-aware
+    x["scrape_time"] = pd.to_datetime(x["scrape_time"], utc=True, errors="coerce")
+
+    engine = get_sql_engine()
+    stage_table = "stage_ingest_bikes"
+
+    pg_types_stage = {
+        "bike_id":              types.Text(),
+        "lat":                  types.Float(),
+        "lon":                  types.Float(),
+        "is_reserved":          types.Boolean(),
+        "is_disabled":          types.Boolean(),
+        "current_range_meters": types.BigInteger(),
+        "vehicle_type_id":      types.Text(),
+        "last_reported":        types.BigInteger(),
+        "scrape_time":          types.TIMESTAMP(timezone=True),
+        "time_str":             types.Text(),
+        "city":                 types.Text(),
+        "provider":             types.Text(),
+        "current_fuel_percent": types.Float(),
+        "pricing_plan_id":      types.Text(),
+        "station_id":           types.Text(),
+    }
+
+    log_msg("Ingest snapshot -> stage -> dims -> dim_bike -> fact : start")
+    log_msg(f"Snapshot rows = {len(x):,}")
+    log_msg(f"Scrape time (first) = {x['scrape_time'].iloc[0]}")
+
+    with engine.begin() as conn:
+        # 3) Recreate stage table each run
+        conn.execute(text(f"DROP TABLE IF EXISTS public.{stage_table};"))
+        x.to_sql(
+            stage_table,
+            con=conn,
+            schema="public",
+            if_exists="replace",
+            index=False,
+            dtype=pg_types_stage,
+            method="multi",
+            chunksize=2000
+        )
+        conn.execute(text(f"ANALYZE public.{stage_table};"))
+
+        # 3b) Ensure surrogate "unknown" rows exist (idempotent)
+        conn.execute(text(f"""
+            INSERT INTO dim_city (city_name) VALUES (:u)
+            ON CONFLICT (city_name) DO NOTHING;
+        """), {"u": UNKNOWN})
+
+        conn.execute(text(f"""
+            INSERT INTO dim_provider (provider_name) VALUES (:u)
+            ON CONFLICT (provider_name) DO NOTHING;
+        """), {"u": UNKNOWN})
+
+        conn.execute(text(f"""
+            INSERT INTO dim_vehicle (vehicle_type_code) VALUES (:u)
+            ON CONFLICT (vehicle_type_code) DO NOTHING;
+        """), {"u": UNKNOWN})
+
+        conn.execute(text(f"""
+            INSERT INTO dim_pricing (pricing_plan_code) VALUES (:u)
+            ON CONFLICT (pricing_plan_code) DO NOTHING;
+        """), {"u": UNKNOWN})
+
+        conn.execute(text(f"""
+            INSERT INTO dim_station (station_id) VALUES (:sid)
+            ON CONFLICT (station_id) DO NOTHING;
+        """), {"sid": UNKNOWN_STATION_ID})
+
+        # We'll use a normalized CTE so every step uses consistent rules
+        # city/provider/vehicle/pricing: NULL/'' -> '<UNKNOWN>'
+        # station_id_bigint: numeric -> bigint, else -1
+        # bike_id: must be present (can't dimension a NULL bike_id)
+        norm_cte = f"""
+        WITH s_norm AS (
+          SELECT
+            s.*,
+            COALESCE(NULLIF(s.city,''), :u)            AS city_norm,
+            COALESCE(NULLIF(s.provider,''), :u)        AS provider_norm,
+            COALESCE(NULLIF(s.vehicle_type_id,''), :u) AS vehicle_norm,
+            COALESCE(NULLIF(s.pricing_plan_id,''), :u) AS pricing_norm,
+            CASE
+              WHEN s.station_id ~ '^[0-9]+$' THEN s.station_id::bigint
+              ELSE :unknown_station
+            END AS station_id_norm
+          FROM public.{stage_table} s
+        )
+        """
+
+        # 4) Upsert dimensions using normalized values (includes UNKNOWN)
+        conn.execute(text(norm_cte + """
+            INSERT INTO dim_city (city_name)
+            SELECT DISTINCT city_norm
+            FROM s_norm
+            ON CONFLICT (city_name) DO NOTHING;
+        """), {"u": UNKNOWN, "unknown_station": UNKNOWN_STATION_ID})
+
+        conn.execute(text(norm_cte + """
+            INSERT INTO dim_provider (provider_name)
+            SELECT DISTINCT provider_norm
+            FROM s_norm
+            ON CONFLICT (provider_name) DO NOTHING;
+        """), {"u": UNKNOWN, "unknown_station": UNKNOWN_STATION_ID})
+
+        conn.execute(text(norm_cte + """
+            INSERT INTO dim_vehicle (vehicle_type_code)
+            SELECT DISTINCT vehicle_norm
+            FROM s_norm
+            ON CONFLICT (vehicle_type_code) DO NOTHING;
+        """), {"u": UNKNOWN, "unknown_station": UNKNOWN_STATION_ID})
+
+        conn.execute(text(norm_cte + """
+            INSERT INTO dim_pricing (pricing_plan_code)
+            SELECT DISTINCT pricing_norm
+            FROM s_norm
+            ON CONFLICT (pricing_plan_code) DO NOTHING;
+        """), {"u": UNKNOWN, "unknown_station": UNKNOWN_STATION_ID})
+
+        conn.execute(text(norm_cte + """
+            INSERT INTO dim_station (station_id)
+            SELECT DISTINCT station_id_norm
+            FROM s_norm
+            ON CONFLICT (station_id) DO NOTHING;
+        """), {"u": UNKNOWN, "unknown_station": UNKNOWN_STATION_ID})
+
+        # 5) Upsert dim_bike (ensure completeness for new bikes)
+        # Map provider/vehicle via normalized values (never NULL; uses UNKNOWN)
+        conn.execute(text(norm_cte + """
+            INSERT INTO dim_bike (bike_id, provider_id, vehicle_id)
+            SELECT DISTINCT
+              s_norm.bike_id,
+              p.provider_id,
+              v.vehicle_id
+            FROM s_norm
+            JOIN dim_provider p
+              ON p.provider_name = s_norm.provider_norm
+            JOIN dim_vehicle v
+              ON v.vehicle_type_code = s_norm.vehicle_norm
+            WHERE s_norm.bike_id IS NOT NULL
+              AND s_norm.bike_id <> ''
+            ON CONFLICT (bike_id) DO UPDATE
+              SET provider_id = EXCLUDED.provider_id,
+                  vehicle_id  = EXCLUDED.vehicle_id;
+        """), {"u": UNKNOWN, "unknown_station": UNKNOWN_STATION_ID})
+
+        # 6) Insert into fact using normalized joins + station sentinel
+        res = conn.execute(text(norm_cte + """
+            INSERT INTO fact_bike_snapshot (
+              city_id,
+              snapshot_ts,
+              bike_key,
+              pricing_id,
+              station_id,
+              lat,
+              lon,
+              is_reserved,
+              is_disabled,
+              current_range_meters,
+              current_fuel_percent,
+              last_reported_ts
+            )
+            SELECT
+              c.city_id,
+              s_norm.scrape_time AS snapshot_ts,
+              b.bike_key,
+              pr.pricing_id,
+              st.station_id,
+              s_norm.lat::double precision,
+              s_norm.lon::double precision,
+              s_norm.is_reserved::boolean,
+              s_norm.is_disabled::boolean,
+              s_norm.current_range_meters::integer,
+              s_norm.current_fuel_percent::real,
+              CASE
+                WHEN s_norm.last_reported IS NOT NULL THEN to_timestamp(s_norm.last_reported::double precision)
+                ELSE NULL
+              END AS last_reported_ts
+            FROM s_norm
+            JOIN dim_city c
+              ON c.city_name = s_norm.city_norm
+            JOIN dim_bike b
+              ON b.bike_id = s_norm.bike_id
+            LEFT JOIN dim_pricing pr
+              ON pr.pricing_plan_code = s_norm.pricing_norm
+            JOIN dim_station st
+              ON st.station_id = s_norm.station_id_norm
+            WHERE s_norm.scrape_time IS NOT NULL
+              AND s_norm.is_reserved IS NOT NULL
+              AND s_norm.is_disabled IS NOT NULL
+              AND s_norm.bike_id IS NOT NULL
+              AND s_norm.bike_id <> ''
+            ON CONFLICT (city_id, bike_key, snapshot_ts) DO NOTHING;
+        """), {"u": UNKNOWN, "unknown_station": UNKNOWN_STATION_ID})
+
+        log_msg(f"Fact insert executed (driver rowcount={res.rowcount})")
+
+    log_msg("Ingest snapshot -> stage -> dims -> dim_bike -> fact : end")
+    
+def update_all_bikes_db_new_no_nulls():
+    # 1) Download latest snapshot
+    x = download_all_bikes()
+
+    if x is None or len(x) == 0:
+        log_msg("No data downloaded; nothing to do.")
+        return
+
     # 2) Keep only expected raw columns (matches your all_bikes schema)
     cols = [
         "bike_id", "lat", "lon", "is_reserved", "is_disabled",
